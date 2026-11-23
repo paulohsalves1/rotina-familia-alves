@@ -1,14 +1,12 @@
-// ============================================================================
-// 1. CONFIGURAÇÃO DO FIREBASE (COLE SUAS CHAVES AQUI QUANDO CRIAR O PROJETO)
-// ============================================================================
-const firebaseConfig = {https://console.firebase.google.com/project/rotina-familia-alves/database/rotina-familia-alves-default-rtdb/data/~2F?hl=pt-br}
-  apiKey: "", // Cole aqui sua apiKey
-  authDomain: "",
-  databaseURL: "", // Ex: "https://seu-projeto-default-rtdb.firebaseio.com"
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+JavaScript
+const firebaseConfig = {
+  apiKey: "COLE_SUA_API_KEY_AQUI",
+  authDomain: "rotina-familia-alves.firebaseapp.com",
+  databaseURL: "https://rotina-familia-alves-default-rtdb.firebaseio.com",
+  projectId: "rotina-familia-alves",
+  storageBucket: "rotina-familia-alves.firebasestorage.app",
+  messagingSenderId: "COLE_SEU_MESSAGING_SENDER_ID_AQUI",
+  appId: "COLE_SEU_APP_ID_AQUI"
 };
 
 let db = null;
