@@ -5,253 +5,398 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Família Alves · Rotina & Missões</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2A7B76" />
+  <meta name="theme-color" content="#4A7C59" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-adult: #F7F5F0;
+      --bg-adult: #FAF8F5;
       --card-bg: #FFFFFF;
-      --primary: #2A7B76;
-      --accent: #D96B43;
+      --primary: #4A7C59;
+      --primary-dark: #365E42;
+      --primary-soft: #EBF3EE;
+      --accent: #C96A48;
+      --accent-soft: #FDF3EF;
       --text-main: #1F2933;
       --text-muted: #616E7C;
-      --border: #E4E7EB;
-      --note-bg: #FFF6DC;
+      --border: #EAE5DC;
+      --note-bg: #FDFBF5;
+      --note-border: #E8DFC2;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-adult); color: var(--text-main); -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg-adult); color: var(--text-main); -webkit-tap-highlight-color: transparent; line-height: 1.45; }
     .hidden { display: none !important; }
 
     /* GATEKEEPER & PIN MODAL */
     .gate-screen, .modal {
-      position: fixed; inset: 0; background: rgba(31, 41, 51, 0.72);
+      position: fixed; inset: 0; background: rgba(31, 41, 51, 0.68);
       display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999;
+      backdrop-filter: blur(3px);
     }
     .gate-card, .modal-box {
-      background: #fff; padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center;
+      background: var(--bg-adult); padding: 24px; border-radius: 26px; width: 100%; max-width: 376px; text-align: center;
+      box-shadow: 0 22px 44px rgba(31, 41, 51, 0.2); border: 1px solid var(--border);
     }
-    .gate-card h1 { color: var(--primary); margin-bottom: 8px; }
-    .gate-card p { color: var(--text-muted); margin-bottom: 20px; }
+    .gate-card h1 { color: var(--primary-dark); margin-bottom: 6px; font-size: 25px; font-weight: 800; letter-spacing: -0.02em; }
+    .gate-card p { color: var(--text-muted); margin-bottom: 20px; font-size: 14px; }
     .btn-profile {
-      display: block; width: 100%; padding: 14px; margin-bottom: 10px; border: 1.5px solid var(--border);
-      border-radius: 14px; background: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+      display: block; width: 100%; padding: 14px 16px; margin-bottom: 10px; border: 1.5px solid var(--border);
+      border-radius: 18px; background: var(--card-bg); font-size: 15px; font-weight: 700; cursor: pointer;
+      color: var(--text-main); transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
     }
-    .btn-profile.duda { background: #E6F7F5; border-color: var(--primary); color: var(--primary); }
-    .btn-profile.apoio { background: #FFF8EB; border-color: #F6AD55; color: #9C4221; }
+    .btn-profile:active { transform: scale(0.98); }
+    .btn-profile:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .btn-profile.duda { background: var(--primary-soft); border-color: #B8D8C2; color: var(--primary-dark); font-family: 'Nunito', sans-serif; font-weight: 900; }
+    .btn-profile.apoio { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
 
     .modal-box input {
-      width: 150px; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 10px;
-      margin: 16px 0; border: 2px solid var(--border); border-radius: 12px;
+      width: 164px; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 11px;
+      margin: 16px 0; border: 2px solid var(--border); border-radius: 16px; font-weight: 800;
+      background: var(--card-bg); color: var(--text-main);
     }
     .modal-actions { display: flex; gap: 10px; justify-content: center; }
 
     /* BOTTOM SHEET MODAL */
     .sheet-backdrop {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+      position: fixed; inset: 0; background: rgba(31, 41, 51, 0.52);
       display: flex; align-items: flex-end; justify-content: center; z-index: 1000;
+      backdrop-filter: blur(2px);
     }
     .sheet-box {
-      background: #fff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0;
+      background: var(--bg-adult); width: 100%; max-width: 520px; border-radius: 28px 28px 0 0;
       padding: 12px 20px 28px; animation: slideUp 0.2s ease-out; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 -12px 32px rgba(31, 41, 51, 0.16); border-top: 1px solid var(--border);
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .sheet-handle { width: 40px; height: 4px; background: #CBD5E1; border-radius: 99px; margin: 0 auto 14px; }
-    .sheet-box h3 { font-size: 18px; margin-bottom: 14px; color: var(--text-main); }
-    .sheet-body label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin: 10px 0 5px; text-transform: uppercase; }
+    .sheet-handle { width: 42px; height: 4px; background: #D6CFC2; border-radius: 99px; margin: 0 auto 14px; }
+    .sheet-box h3 { font-size: 18px; margin-bottom: 12px; color: var(--text-main); font-weight: 800; }
+    .sheet-body label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 0.45px; }
     .sheet-body input, .sheet-body select {
-      width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; background: #fff;
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 15px; background: var(--card-bg); color: var(--text-main);
     }
     .chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
     .chip-opt {
-      padding: 8px 14px; border-radius: 12px; border: 1.5px solid var(--border);
-      background: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+      padding: 8px 14px; border-radius: 13px; border: 1.5px solid var(--border);
+      background: var(--card-bg); font-size: 13px; font-weight: 700; cursor: pointer; color: var(--text-main);
+      transition: all 0.12s ease;
     }
     .chip-opt.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .sheet-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .chip-opt.penalty.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sheet-actions { display: flex; gap: 10px; margin-top: 22px; }
     .sheet-actions button { flex: 1; padding: 13px; font-size: 15px; }
 
     /* HEADER ADULTO & INDICADOR DE SYNC */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 18px 10px; background: var(--bg-adult); position: sticky; top: 0; z-index: 10;
+      padding: 14px 16px 12px; background: rgba(250, 248, 245, 0.95);
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
     }
-    .user-sync-row { display: flex; align-items: center; gap: 6px; }
-    .badge-user { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+    .user-sync-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    .badge-user { font-size: 11px; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 0.5px; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .sync-dot.online { background: #22C55E; box-shadow: 0 0 6px #22C55E; }
-    .sync-dot.offline { background: #F59E0B; }
+    .sync-dot.online { background: var(--primary); box-shadow: 0 0 6px rgba(74, 124, 89, 0.55); }
+    .sync-dot.offline { background: var(--accent); }
 
-    .app-header h1 { font-size: 20px; font-weight: 800; }
-    .btn-duda-switch {
-      background: #FFF; border: 1.5px solid var(--primary); color: var(--primary);
-      padding: 8px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; cursor: pointer;
+    .app-header h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+    .header-actions { display: flex; gap: 7px; align-items: center; }
+    .btn-icon-lock {
+      background: var(--card-bg); border: 1.5px solid var(--border); color: var(--text-muted);
+      padding: 8px 11px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer;
     }
+    .btn-duda-switch {
+      background: var(--accent-soft); border: 1.5px solid #F0CFC2; color: #8A452B;
+      padding: 8px 13px; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .btn-duda-switch:active { transform: scale(0.97); }
 
     /* CONTEÚDO E CARDS */
-    .app-content { padding: 8px 16px 92px; max-width: 520px; margin: 0 auto; }
+    .app-content { padding: 12px 16px 96px; max-width: 520px; margin: 0 auto; }
     .tab-view { display: none; }
     .tab-view.active { display: block; }
 
     /* SELETOR DE DIA NA ABA HOJE */
     .day-switcher-bar {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      background: #FFFFFF; border-radius: 16px; padding: 10px 12px; margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: var(--card-bg); border-radius: 18px; padding: 10px 12px; margin-bottom: 14px;
+      border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(31, 41, 51, 0.03);
     }
     .day-nav-btn {
-      background: #F1F5F9; border: none; width: 34px; height: 34px; border-radius: 11px;
+      background: var(--bg-adult); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 12px;
       font-weight: 800; font-size: 14px; color: var(--text-main); cursor: pointer; flex-shrink: 0;
     }
     .day-center-info { text-align: center; flex: 1; }
-    .day-center-info strong { display: block; font-size: 15px; color: var(--text-main); text-transform: capitalize; }
+    .day-center-info strong { display: block; font-size: 15px; color: var(--text-main); text-transform: capitalize; font-weight: 800; }
     .day-center-info small { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .btn-today-pill {
-      background: #EEF6F5; color: var(--primary); border: none; padding: 6px 10px;
-      border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; flex-shrink: 0;
+      background: var(--primary-soft); color: var(--primary-dark); border: none; padding: 6px 11px;
+      border-radius: 11px; font-size: 11px; font-weight: 800; cursor: pointer; flex-shrink: 0;
     }
 
     .card {
-      background: var(--card-bg); border-radius: 18px; padding: 16px; margin-bottom: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: var(--card-bg); border-radius: 22px; padding: 16px; margin-bottom: 14px;
+      border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(31, 41, 51, 0.03);
     }
-    .card-note { background: var(--note-bg); border: 1px solid #F3E2A9; }
+    .card-note { background: var(--note-bg); border: 1.5px solid var(--note-border); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
-    .card-header h2 { font-size: 16px; font-weight: 700; }
+    .card-header h2 { font-size: 16px; font-weight: 800; letter-spacing: -0.015em; }
     .btn-group-mini { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     .btn-mini {
-      background: #EEF6F5; color: var(--primary); border: none; padding: 6px 10px;
-      border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+      background: var(--primary-soft); color: var(--primary-dark); border: none; padding: 7px 11px;
+      border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; transition: opacity 0.12s ease;
     }
+    .btn-mini.penalty {
+      background: var(--accent-soft); color: #8A452B; border: 1px solid #F0CFC2;
+    }
+    .btn-mini:active { opacity: 0.8; }
 
-    .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-    .sub-title { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+    .divider { border: none; border-top: 1px solid #EFECE5; margin: 12px 0; }
+    .sub-title { font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.45px; }
     .sub-list .row-item {
-      display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 5px 0; gap: 8px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; gap: 8px;
     }
-    .item-actions-inline { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .act-icon { cursor: pointer; font-size: 13px; opacity: 0.85; padding: 2px 4px; }
+    .item-actions-inline { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .act-icon { cursor: pointer; font-size: 13px; opacity: 0.82; padding: 3px 5px; border-radius: 8px; }
+    .act-icon:hover { background: var(--bg-adult); opacity: 1; }
 
     /* CHECKLISTS & LOGÍSTICA */
     .check-item {
-      display: flex; align-items: center; justify-content: space-between; padding: 8px 0;
-      border-bottom: 1px solid #F1F3F5; font-size: 14px; cursor: pointer; gap: 8px;
+      display: flex; align-items: center; justify-content: space-between; padding: 9px 0;
+      border-bottom: 1px solid #F3F0EA; font-size: 14px; cursor: pointer; gap: 8px;
     }
     .check-item:last-child { border-bottom: none; }
     .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
     .valor-pill {
-      font-size: 11px; font-weight: 700; background: #EDF2F7; color: #4A5568;
-      padding: 2px 7px; border-radius: 6px; margin-left: 6px;
+      font-size: 11px; font-weight: 700; background: #F2EFE9; color: #52606D;
+      padding: 2px 8px; border-radius: 8px; margin-left: 6px;
     }
+
+    /* NOVO LAYOUT UNIFICADO DA ABA HOJE */
+    .hoje-glance-card {
+      background: linear-gradient(160deg, #FFFFFF 0%, #F5F9F6 100%);
+      border-radius: 24px; padding: 16px; margin-bottom: 14px;
+      border: 1.5px solid #D5E5DB; box-shadow: 0 4px 14px rgba(54, 94, 66, 0.05);
+    }
+    .hoje-glance-top {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .hoje-status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--primary-soft); color: var(--primary-dark);
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 99px;
+      margin-bottom: 6px;
+    }
+    .hoje-glance-title {
+      font-size: 16px; font-weight: 800; color: var(--text-main); letter-spacing: -0.015em;
+    }
+    .hoje-glance-sub {
+      font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px;
+    }
+    .hoje-mini-pendencias {
+      background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border);
+      border-radius: 16px; padding: 10px 12px; margin-top: 10px;
+    }
+    .hoje-mini-pendencias-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .timeline-feed { position: relative; margin-top: 6px; }
+    .timeline-row {
+      display: flex; gap: 11px; padding: 10px 0; border-bottom: 1px solid #F3F0EA;
+      align-items: flex-start;
+    }
+    .timeline-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .timeline-time-col {
+      width: 52px; flex-shrink: 0; font-size: 11px; font-weight: 800;
+      color: var(--primary-dark); background: var(--primary-soft);
+      padding: 4px 6px; border-radius: 10px; text-align: center; margin-top: 1px;
+    }
+    .timeline-time-col.casal { background: var(--accent-soft); color: #8A452B; }
+    .timeline-time-col.duda { background: var(--note-bg); color: #854D0E; border: 1px solid var(--note-border); }
+    .timeline-main-col { flex: 1; min-width: 0; }
+    .timeline-title-line {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      font-size: 14px; font-weight: 700; color: var(--text-main);
+    }
+    .timeline-title-line.done { text-decoration: line-through; color: var(--text-muted); }
+    .timeline-meta { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
     .logistica-box {
-      display: flex; justify-content: space-between; background: #F4F8F8;
-      padding: 12px; border-radius: 12px; font-size: 14px; margin-bottom: 12px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--primary-soft);
+      padding: 12px; border-radius: 16px; font-size: 14px; margin-bottom: 12px; border: 1px solid #CFE3D6;
     }
-    .logistica-box span { color: var(--text-muted); display: block; font-size: 12px; }
+    .logistica-box span { color: var(--primary-dark); opacity: 0.85; display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+    .logistica-box strong { font-size: 14px; color: var(--text-main); }
 
-    .progress-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-    .progress-bar { height: 10px; background: #E4E7EB; border-radius: 99px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; }
+    .progress-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 7px; }
+    .progress-bar { height: 10px; background: #EFECE5; border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; border-radius: 99px; }
 
     /* FILTROS & CALENDÁRIO MENSAL */
-    .filter-pills { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; }
+    .filter-pills { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
     .pill {
-      padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
-      background: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+      padding: 8px 15px; border-radius: 20px; border: 1.5px solid var(--border);
+      background: var(--card-bg); font-size: 13px; font-weight: 700; cursor: pointer; color: var(--text-muted);
+      white-space: nowrap;
     }
     .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .cal-header h2 { font-size: 16px; font-weight: 800; text-transform: capitalize; }
     .cal-nav-btn {
-      background: #F1F5F9; border: none; width: 32px; height: 32px; border-radius: 10px;
+      background: var(--bg-adult); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 11px;
       font-weight: 700; color: var(--text-main); cursor: pointer;
     }
     .cal-weekdays {
       display: grid; grid-template-columns: repeat(7, 1fr); text-align: center;
-      font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;
+      font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;
     }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
     .cal-day {
       aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; position: relative;
-      border: 1.5px solid transparent;
+      border-radius: 13px; font-size: 13px; font-weight: 700; cursor: pointer; position: relative;
+      border: 1.5px solid transparent; background: var(--bg-adult);
     }
-    .cal-day.empty { cursor: default; }
-    .cal-day.today { border-color: var(--primary); color: var(--primary); font-weight: 800; }
-    .cal-day.selected { background: var(--primary); color: #fff; }
-    .cal-dots { display: flex; gap: 2px; margin-top: 2px; height: 5px; }
+    .cal-day.empty { cursor: default; background: transparent; }
+    .cal-day.today { border-color: var(--primary); color: var(--primary-dark); font-weight: 800; background: var(--card-bg); }
+    .cal-day.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .cal-dots { display: flex; gap: 2.5px; margin-top: 2px; height: 5px; }
     .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
-    .cal-dot.Duda { background: #2A7B76; }
-    .cal-dot.Casal { background: #D96B43; }
-    .cal-dot.Casa { background: #ECC94B; }
+    .cal-dot.Duda { background: var(--primary); }
+    .cal-dot.Casal { background: var(--accent); }
+    .cal-dot.Casa { background: #B7791F; }
     .cal-day.selected .cal-dot { background: #fff; }
 
     .agenda-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; gap: 8px;
+      padding: 10px 0; border-bottom: 1px solid #F3F0EA; font-size: 14px; gap: 8px;
     }
     .agenda-item:last-child { border-bottom: none; }
     .agenda-tag {
-      display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
-      border-radius: 8px; background: #EEF6F5; color: var(--primary); margin-right: 6px;
+      display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 8px;
+      border-radius: 8px; background: var(--primary-soft); color: var(--primary-dark); margin-right: 6px;
     }
-    .agenda-tag.Casal { background: #FDECE6; color: var(--accent); }
-    .agenda-tag.Casa { background: #FEF9C3; color: #854D0E; }
+    .agenda-tag.Casal { background: var(--accent-soft); color: #8A452B; }
+    .agenda-tag.Casa { background: var(--note-bg); color: #854D0E; border: 1px solid var(--note-border); }
 
     /* SAÚDE: MÚLTIPLOS REMÉDIOS & HISTÓRICO */
     .remedio-card {
-      background: #F0FAF4; padding: 14px; border-radius: 14px; border: 1px solid #C6F6D5;
+      background: var(--primary-soft); padding: 14px; border-radius: 16px; border: 1.5px solid #C7DFD0;
       margin-bottom: 10px;
     }
     .remedio-card:last-child { margin-bottom: 0; }
-    .remedio-card.overdue { background: #FFF5F5; border-color: #FEB2B2; }
+    .remedio-card.overdue { background: var(--accent-soft); border-color: #F0CFC2; }
     .remedio-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .remedio-actions-top { display: flex; gap: 8px; align-items: center; }
+    .remedio-actions-top { display: flex; gap: 6px; align-items: center; }
     .icon-btn-tiny {
-      background: rgba(255,255,255,0.85); border: 1px solid #CBD5E1; border-radius: 8px;
-      padding: 3px 7px; font-size: 12px; cursor: pointer;
+      background: rgba(255,255,255,0.92); border: 1px solid var(--border); border-radius: 9px;
+      padding: 4px 8px; font-size: 12px; cursor: pointer;
     }
     .btn-dose {
-      width: 100%; margin-top: 10px; padding: 11px; background: #2F855A; color: #fff;
-      border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
+      width: 100%; margin-top: 11px; padding: 11px; background: var(--primary); color: #fff;
+      border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer;
     }
-    .remedio-card.overdue .btn-dose { background: #C53030; }
+    .remedio-card.overdue .btn-dose { background: var(--accent); }
 
-    .dose-history-list { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
+    .dose-history-list { margin-top: 6px; display: flex; flex-direction: column; gap: 7px; }
     .dose-log-row {
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 9px 11px;
+      background: var(--bg-adult); border: 1px solid var(--border); border-radius: 13px; padding: 10px 12px;
       font-size: 13px;
     }
     .dose-log-main strong { color: var(--text-main); }
     .dose-log-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .dose-log-btns { display: flex; gap: 6px; flex-shrink: 0; }
 
-    .ficha-grid p { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .ficha-grid p { font-size: 14px; padding: 8px 0; border-bottom: 1px solid #F3F0EA; }
     .ficha-grid p:last-child { border-bottom: none; }
 
-    /* META, PEDIDOS DE DESEJO & BOTÕES */
-    .meta-admin-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    /* DESPESAS COMPARTILHADAS */
+    .finance-summary-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
+    }
+    .finance-stat-box {
+      background: var(--bg-adult); border: 1px solid var(--border); border-radius: 14px; padding: 10px;
+    }
+    .finance-stat-box span {
+      display: block; font-size: 10px; font-weight: 800; text-transform: uppercase;
+      color: var(--text-muted); letter-spacing: 0.35px;
+    }
+    .finance-stat-box strong {
+      display: block; font-size: 14px; font-weight: 800; color: var(--text-main); margin-top: 3px;
+    }
+    .finance-balance-banner {
+      background: var(--primary-soft); border: 1px solid #C7DFD0; color: var(--primary-dark);
+      border-radius: 14px; padding: 10px 12px; font-size: 12px; font-weight: 800;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    .despesa-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #F3F0EA; font-size: 13px;
+    }
+    .despesa-row:last-child { border-bottom: none; }
+    .despesa-status-badge {
+      font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px;
+      background: #F4E9C4; color: #854D0E; margin-left: 6px;
+    }
+    .despesa-status-badge.aprovada { background: var(--primary-soft); color: var(--primary-dark); }
+
+    /* VACINAS */
+    .vaccine-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 9px 0; border-bottom: 1px solid #F3F0EA; font-size: 13px;
+    }
+    .vaccine-row:last-child { border-bottom: none; }
+    .vaccine-pill {
+      font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
+      background: var(--primary-soft); color: var(--primary-dark); white-space: nowrap;
+    }
+    .vaccine-pill.upcoming { background: var(--note-bg); color: #854D0E; border: 1px solid var(--note-border); }
+
+    /* META, TRANSPARÊNCIA DE PENALIDADES, PEDIDOS DE DESEJO & BOTÕES */
+    .meta-admin-box { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .star-log-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .star-log-row {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+      background: var(--bg-adult); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px;
+      font-size: 13px;
+    }
+    .star-log-row.penalty {
+      background: var(--accent-soft); border-color: #F0CFC2;
+    }
+    .star-log-delta {
+      font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
+      background: var(--primary-soft); color: var(--primary-dark); white-space: nowrap;
+    }
+    .star-log-row.penalty .star-log-delta {
+      background: #F9DDD2; color: #8A452B;
+    }
+
     .wish-admin-card {
-      background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 12px;
+      background: var(--note-bg); border: 1.5px solid var(--note-border); border-radius: 16px; padding: 13px;
       margin-bottom: 10px;
     }
+    .wish-admin-card:last-child { margin-bottom: 0; }
     .wish-admin-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .wish-status-pill {
-      font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 99px;
-      background: #FEF3C7; color: #92400E; white-space: nowrap;
+      font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
+      background: #F4E9C4; color: #854D0E; white-space: nowrap;
     }
-    .wish-status-pill.approved { background: #DCFCE7; color: #166534; }
-    .wish-status-pill.rejected { background: #FEE2E2; color: #991B1B; }
-    .wish-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .wish-status-pill.approved { background: var(--primary-soft); color: var(--primary-dark); }
+    .wish-status-pill.rejected { background: var(--accent-soft); color: #8A452B; }
+    .wish-actions { display: flex; gap: 8px; margin-top: 11px; }
     .btn-approve {
-      flex: 1; background: #16A34A; color: #fff; border: none; padding: 9px 12px;
-      border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;
+      flex: 1; background: var(--primary); color: #fff; border: none; padding: 10px 12px;
+      border-radius: 11px; font-weight: 800; font-size: 13px; cursor: pointer;
     }
     .btn-reject {
-      flex: 1; background: #FEE2E2; color: #991B1B; border: none; padding: 9px 12px;
-      border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;
+      flex: 1; background: var(--accent-soft); color: #8A452B; border: 1px solid #F0CFC2; padding: 10px 12px;
+      border-radius: 11px; font-weight: 800; font-size: 13px; cursor: pointer;
     }
 
     /* RESUMO SEMANAL (ADMIN E DUDA) */
@@ -259,11 +404,11 @@
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 10px 0 4px;
     }
     .week-day-pill {
-      background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 7px 2px;
+      background: var(--bg-adult); border: 1.5px solid var(--border); border-radius: 13px; padding: 8px 2px;
       text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
-    .week-day-pill.today { border-color: #2563EB; background: #EFF6FF; }
-    .week-day-pill.selected { background: #1D4ED8; border-color: #1D4ED8; color: #fff; }
+    .week-day-pill.today { border-color: var(--primary); background: var(--primary-soft); }
+    .week-day-pill.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
     .week-day-pill.future { opacity: 0.45; cursor: default; }
     .week-day-pill small { font-size: 10px; font-weight: 800; text-transform: uppercase; }
     .week-day-pill strong { font-size: 13px; }
@@ -271,110 +416,138 @@
 
     .week-history-row {
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 12px;
+      background: var(--bg-adult); border: 1px solid var(--border); border-radius: 13px; padding: 10px 12px;
       margin-bottom: 8px; font-size: 13px;
     }
     .week-history-row:last-child { margin-bottom: 0; }
     .week-badge-stars {
-      background: #FEF3C7; color: #92400E; font-weight: 800; font-size: 12px;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E; font-weight: 800; font-size: 12px;
       padding: 4px 10px; border-radius: 99px; white-space: nowrap;
     }
 
-    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-    .btn-secondary { background: #EDF2F7; color: var(--text-main); border: none; padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 11px 18px; border-radius: 14px; font-weight: 800; cursor: pointer; }
+    .btn-primary.penalty { background: var(--accent); }
+    .btn-secondary { background: #EFECE5; color: var(--text-main); border: none; padding: 11px 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
     .row-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
     .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
 
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border);
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px); border-top: 1px solid var(--border);
       display: flex; justify-content: space-around; padding: 8px 0 12px; z-index: 20;
     }
     .nav-item {
       background: none; border: none; display: flex; flex-direction: column; align-items: center;
-      color: var(--text-muted); font-size: 18px; cursor: pointer;
+      color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 2px 12px; border-radius: 12px;
     }
-    .nav-item small { font-size: 11px; font-weight: 600; margin-top: 2px; }
-    .nav-item.active { color: var(--primary); }
+    .nav-item small { font-size: 11px; font-weight: 700; margin-top: 2px; }
+    .nav-item.active { color: var(--primary-dark); background: var(--primary-soft); }
 
     /* TEMA INFANTIL (MODO DUDA) */
-    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #E3F2FD 0%, #F4F9FF 100%); padding: 18px 16px 56px; }
-    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .duda-header h1 { font-size: 25px; color: #1E3A8A; font-weight: 900; }
+    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%); padding: 16px 16px 60px; font-family: 'Nunito', sans-serif; }
+    .duda-theme * { font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif; }
+    .duda-theme .app-content, .duda-content { max-width: 520px; margin: 0 auto; }
+    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .duda-header h1 { font-size: 25px; color: var(--text-main); font-weight: 900; }
     .btn-lock {
-      background: rgba(255,255,255,0.92); border: none; padding: 9px 13px;
-      border-radius: 16px; font-weight: 700; color: #475569; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      background: var(--card-bg); border: 1.5px solid var(--border); padding: 9px 14px;
+      border-radius: 16px; font-weight: 800; color: var(--text-muted); cursor: pointer; box-shadow: 0 2px 8px rgba(31, 41, 51, 0.05);
     }
 
     .duda-hero-card {
-      background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: #fff;
-      padding: 18px 16px; border-radius: 26px; text-align: center; margin-bottom: 14px;
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.28);
+      background: linear-gradient(135deg, #4A7C59 0%, #365E42 100%); color: #fff;
+      padding: 20px 16px; border-radius: 28px; text-align: center; margin: 0 auto 14px; max-width: 520px;
+      box-shadow: 0 10px 24px rgba(54, 94, 66, 0.22);
     }
     .duda-badges-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .duda-stars-badge {
-      display: inline-block; background: rgba(255,255,255,0.24); padding: 6px 13px;
+      display: inline-block; background: rgba(255,255,255,0.22); padding: 6px 14px;
       border-radius: 99px; font-size: 14px; font-weight: 900;
     }
-    .duda-stars-badge.wallet { background: #FACC15; color: #1E293B; }
+    .duda-stars-badge.wallet { background: #FACC15; color: var(--text-main); cursor: pointer; }
     .duda-hero-card h2 { font-size: 20px; margin-bottom: 10px; font-weight: 800; }
-    .duda-progress-bar { height: 15px; background: rgba(255,255,255,0.35); border-radius: 99px; overflow: hidden; }
+    .duda-progress-bar { height: 15px; background: rgba(255,255,255,0.3); border-radius: 99px; overflow: hidden; }
     .duda-progress-fill { height: 100%; background: #FACC15; transition: width 0.35s ease; border-radius: 99px; }
     .duda-celebration {
-      margin-top: 12px; background: rgba(255,255,255,0.22); padding: 8px 12px;
+      margin-top: 12px; background: rgba(255,255,255,0.22); padding: 9px 12px;
       border-radius: 14px; font-size: 13px; font-weight: 800;
     }
 
+    /* TRANSPARÊNCIA DE PENALIDADES NA VISÃO DA DUDA */
+    .duda-transparency-card {
+      background: var(--accent-soft); border: 2px solid #F0CFC2; border-radius: 24px;
+      padding: 15px; margin: 0 auto 14px; max-width: 520px;
+      box-shadow: 0 4px 14px rgba(201, 106, 72, 0.08);
+    }
+    .duda-transparency-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .duda-transparency-head h3 {
+      font-size: 16px; font-weight: 900; color: #8A452B;
+    }
+    .duda-penalty-item {
+      background: rgba(255, 255, 255, 0.88); border: 1px solid #F0CFC2; border-radius: 16px;
+      padding: 11px 13px; margin-top: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    }
+    .duda-penalty-item strong { color: #8A452B; font-size: 14px; display: block; }
+    .duda-penalty-item p { font-size: 13px; color: var(--text-main); font-weight: 700; margin-top: 2px; }
+    .duda-penalty-item small { font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-top: 3px; }
+    .btn-duda-ack {
+      background: #8A452B; color: #fff; border: none; padding: 7px 11px; border-radius: 12px;
+      font-size: 12px; font-weight: 900; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    }
+
     .duda-week-card {
-      background: #FFFFFF; border-radius: 22px; padding: 14px; margin-bottom: 14px;
-      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 15px; margin: 0 auto 14px; max-width: 520px;
+      box-shadow: 0 4px 14px rgba(31, 41, 51, 0.04);
     }
     .duda-week-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .duda-week-header h3 { font-size: 15px; font-weight: 900; color: #1E3A8A; }
+    .duda-week-header h3 { font-size: 15px; font-weight: 900; color: var(--primary-dark); }
     .btn-past-weeks {
-      background: #EFF6FF; color: #1D4ED8; border: none; padding: 6px 11px;
+      background: var(--primary-soft); color: var(--primary-dark); border: none; padding: 7px 12px;
       border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer;
     }
     .readonly-banner {
-      background: #FEF3C7; color: #92400E; font-size: 12px; font-weight: 800;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E; font-size: 12px; font-weight: 800;
       padding: 8px 12px; border-radius: 12px; text-align: center; margin-top: 8px;
     }
 
     .duda-wish-box {
-      background: #FFFFFF; border: 2.5px solid #FDE047; border-radius: 24px;
-      padding: 16px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.16);
+      background: var(--card-bg); border: 2px solid var(--note-border); border-radius: 24px;
+      padding: 16px; margin: 0 auto 18px; max-width: 520px; box-shadow: 0 4px 14px rgba(232, 223, 194, 0.35);
     }
     .duda-wish-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .duda-wish-top h3 { font-size: 17px; color: #854D0E; font-weight: 900; }
     .btn-wish-open {
-      background: linear-gradient(135deg, #F59E0B, #FACC15); color: #1E293B; border: none;
+      background: linear-gradient(135deg, #EAB308, #FACC15); color: var(--text-main); border: none;
       padding: 10px 14px; border-radius: 16px; font-weight: 900; font-size: 13px; cursor: pointer;
-      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 3px 8px rgba(234, 179, 8, 0.25);
     }
     .duda-wish-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .duda-wish-item {
-      background: #FEFCE8; border: 1.5px solid #FEF08A; border-radius: 16px;
+      background: var(--note-bg); border: 1.5px solid var(--note-border); border-radius: 16px;
       padding: 11px 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      font-size: 14px; font-weight: 700; color: #1E293B;
+      font-size: 14px; font-weight: 700; color: var(--text-main);
     }
-    .duda-wish-item.approved { background: #DCFCE7; border-color: #86EFAC; color: #166534; }
-    .duda-wish-item.rejected { background: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+    .duda-wish-item.approved { background: var(--primary-soft); border-color: #C7DFD0; color: var(--primary-dark); }
+    .duda-wish-item.rejected { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
     .wish-tag-mini {
-      font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 99px;
-      background: #FEF3C7; color: #92400E; white-space: nowrap;
+      font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
+      background: #F4E9C4; color: #854D0E; white-space: nowrap;
     }
-    .duda-wish-item.approved .wish-tag-mini { background: #BBF7D0; color: #166534; }
-    .duda-wish-item.rejected .wish-tag-mini { background: #FECACA; color: #991B1B; }
+    .duda-wish-item.approved .wish-tag-mini { background: #CFE3D6; color: var(--primary-dark); }
+    .duda-wish-item.rejected .wish-tag-mini { background: #F9DDD2; color: #8A452B; }
 
-    .duda-turno-title { font-size: 18px; font-weight: 900; color: #1E293B; margin: 16px 0 10px; }
+    .duda-turno-title { font-size: 18px; font-weight: 900; color: var(--text-main); margin: 16px 0 10px; }
     .duda-mission-card {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      background: #FFFBEB; border: 2.5px solid #FDE68A; padding: 16px; border-radius: 22px;
-      margin-bottom: 11px; font-size: 17px; font-weight: 800; color: #1E293B; cursor: pointer;
-      transition: transform 0.12s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+      background: var(--card-bg); border: 2px solid var(--border); padding: 16px; border-radius: 22px;
+      margin-bottom: 11px; font-size: 16px; font-weight: 800; color: var(--text-main); cursor: pointer;
+      transition: transform 0.12s ease; box-shadow: 0 3px 10px rgba(31, 41, 51, 0.03);
     }
     .duda-mission-card:active { transform: scale(0.97); }
     .duda-mission-card.completed {
-      background: #DCFCE7; border-color: #86EFAC; color: #166534;
+      background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark);
     }
     .duda-mission-card.locked-past {
       opacity: 0.85; cursor: default;
@@ -383,16 +556,16 @@
     .mission-left { display: flex; align-items: center; gap: 12px; }
     .mission-emoji { font-size: 24px; }
     .mission-star-tag {
-      font-size: 12px; font-weight: 900; background: #FEF3C7; color: #B45309;
+      font-size: 12px; font-weight: 900; background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E;
       padding: 4px 9px; border-radius: 99px; margin-right: 4px;
     }
-    .duda-mission-card.completed .mission-star-tag { background: #BBF7D0; color: #166534; }
+    .duda-mission-card.completed .mission-star-tag { background: #CFE3D6; border-color: transparent; color: var(--primary-dark); }
     .mission-circle {
       width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid #CBD5E1; flex-shrink: 0;
-      background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
+      background: var(--card-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
     }
     .duda-mission-card.completed .mission-circle {
-      background: #22C55E; border-color: #22C55E; color: #fff;
+      background: var(--primary); border-color: var(--primary); color: #fff;
     }
   </style>
 </head>
@@ -444,15 +617,19 @@
   <div id="apoio-app" class="hidden">
     <header class="app-header">
       <div>
-        <span class="badge-user">Modo Rede de Apoio</span>
+        <div class="user-sync-row">
+          <span class="badge-user">Modo Rede de Apoio</span>
+        </div>
         <h1>Resumo da Duda</h1>
       </div>
-      <button class="btn-duda-switch" onclick="openPinModal()">🔒 Responsáveis</button>
+      <div class="header-actions">
+        <button class="btn-duda-switch" onclick="openPinModal()">🔒 Responsáveis</button>
+      </div>
     </header>
     <main class="app-content">
       <div class="card">
         <h2>🎒 Logística de Hoje</h2>
-        <div class="logistica-box" style="margin-top:10px;">
+        <div class="logistica-box" style="margin-top:10px; margin-bottom:0;">
           <div><span>Leva:</span> <strong id="apoio-leva">-</strong></div>
           <div><span>Busca:</span> <strong id="apoio-busca">-</strong></div>
         </div>
@@ -463,7 +640,7 @@
       </div>
       <div class="card">
         <h2>🩺 Ficha de Emergência</h2>
-        <div id="apoio-ficha-box" class="ficha-grid" style="margin-top:8px;"></div>
+        <div id="apoio-ficha-box" class="ficha-grid" style="margin-top:6px;"></div>
       </div>
     </main>
   </div>
@@ -478,8 +655,8 @@
         </div>
         <h1 id="header-title">Família Alves · Dia</h1>
       </div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <button class="btn-duda-switch" style="border-color:#CBD5E1; color:#475569; padding:8px 10px;" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
+      <div class="header-actions">
+        <button class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
         <button class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
       </div>
     </header>
@@ -497,20 +674,42 @@
           <button class="day-nav-btn" onclick="shiftHojeDay(1)" title="Próximo dia">▶</button>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <h2>🏠 Casal & Casa</h2>
-            <div class="btn-group-mini">
-              <button class="btn-mini" onclick="openModalCasal()">+ Casal</button>
-              <button class="btn-mini" onclick="openModalPendencia()">+ Casa</button>
+        <!-- BLOCO DE RELANCE: LOGÍSTICA, PROGRESSO E PENDÊNCIAS RÁPIDAS -->
+        <div class="hoje-glance-card">
+          <div class="hoje-glance-top">
+            <div>
+              <span class="hoje-status-pill" id="hoje-status-badge">✨ Relance do Dia</span>
+              <h2 class="hoje-glance-title" id="logistica-card-title">Duda · Logística & Missões</h2>
+              <p class="hoje-glance-sub" id="hoje-glance-summary">Acompanhamento rápido da rotina e da casa</p>
+            </div>
+            <button class="btn-mini" onclick="openModalLogistica()">Editar / ⇄</button>
+          </div>
+
+          <div class="logistica-box">
+            <div><span>Leva:</span> <strong id="hoje-leva">-</strong></div>
+            <div><span>Busca:</span> <strong id="hoje-busca">-</strong></div>
+          </div>
+
+          <div class="progress-wrapper">
+            <div class="progress-info">
+              <span id="adult-duda-progress-label">Missões da Duda</span>
+              <strong id="adult-duda-progress-text">0 de 0</strong>
+            </div>
+            <div class="progress-bar">
+              <div id="adult-duda-progress-fill" class="progress-fill" style="width: 0%"></div>
             </div>
           </div>
-          <div id="casal-hoje-list" class="sub-list"></div>
-          <hr class="divider" />
-          <p class="sub-title">Pendências da Casa</p>
-          <div id="pendencias-list" class="check-list"></div>
+
+          <div class="hoje-mini-pendencias">
+            <div class="hoje-mini-pendencias-head">
+              <span class="sub-title" style="margin:0;">Pendências da Casa</span>
+              <button class="btn-mini" onclick="openModalPendencia()">+ Tarefa</button>
+            </div>
+            <div id="pendencias-list" class="check-list"></div>
+          </div>
         </div>
 
+        <!-- MURAL RÁPIDO DO DIA -->
         <div class="card card-note">
           <div class="card-header">
             <h2 id="mural-card-title">📌 Mural do Dia</h2>
@@ -519,24 +718,17 @@
           <div id="mural-list"></div>
         </div>
 
+        <!-- LINHA DO TEMPO UNIFICADA DO DIA (CASAL, AGENDA E MISSÕES DUDA) -->
         <div class="card">
           <div class="card-header">
-            <h2 id="logistica-card-title">🎒 Duda · Logística & Rotina</h2>
-            <button class="btn-mini" onclick="openModalLogistica()">Editar / ⇄</button>
-          </div>
-          <div class="logistica-box">
-            <div><span>Leva:</span> <strong id="hoje-leva">-</strong></div>
-            <div><span>Busca:</span> <strong id="hoje-busca">-</strong></div>
-          </div>
-          <div class="progress-wrapper">
-            <div class="progress-info">
-              <span id="adult-duda-progress-label">Missões do dia</span>
-              <strong id="adult-duda-progress-text">0 de 0</strong>
-            </div>
-            <div class="progress-bar">
-              <div id="adult-duda-progress-fill" class="progress-fill" style="width: 0%"></div>
+            <h2>🗓️ Linha do Tempo · Dia & Missões</h2>
+            <div class="btn-group-mini">
+              <button class="btn-mini" onclick="openModalCasal()">+ Casal</button>
+              <button class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
             </div>
           </div>
+          <p class="hint">Compromissos do casal, agenda do dia e missões da Duda em ordem do dia.</p>
+          <div id="hoje-timeline-list" class="timeline-feed"></div>
         </div>
       </section>
 
@@ -579,6 +771,15 @@
           </div>
           <div id="mercado-list" class="check-list"></div>
         </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>💸 Despesas Compartilhadas</h2>
+            <button class="btn-mini" onclick="openModalDespesa()">+ Despesa</button>
+          </div>
+          <div id="familia-despesas-summary"></div>
+          <div id="familia-despesas-list"></div>
+        </div>
       </section>
 
       <!-- ABA 3: SAÚDE DUDA -->
@@ -608,6 +809,12 @@
             <button class="btn-mini" onclick="openModalFicha()">Editar</button>
           </div>
           <div id="ficha-saude-box" class="ficha-grid"></div>
+          <hr class="divider" />
+          <div class="card-header" style="margin-bottom:6px;">
+            <span class="sub-title" style="margin:0;">Carteirinha & Próximas Vacinas</span>
+            <button class="btn-mini" onclick="openModalVacina()">+ Vacina</button>
+          </div>
+          <div id="vacinas-list-box"></div>
         </div>
       </section>
 
@@ -626,24 +833,30 @@
 
         <div class="card">
           <div class="card-header">
-            <h2>🎁 Pedidos de Desejo da Duda</h2>
-          </div>
-          <p class="hint">Quando a Duda escolhe um desejo na tela dela, ele aparece aqui para vocês aprovarem e descontarem as estrelas.</p>
-          <div id="admin-wishes-list"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2>🏆 Saldo Disponível de Estrelas</h2>
-            <button class="btn-mini" onclick="openModalEstrelasManual()">+ Atribuir / Ajustar</button>
+            <h2>🏆 Saldo & Transparência de Estrelas</h2>
+            <div class="btn-group-mini">
+              <button class="btn-mini" onclick="openModalEstrelasManual('bonus')">+ Bônus</button>
+              <button class="btn-mini penalty" onclick="openModalEstrelasManual('penalty')">- Penalidade</button>
+            </div>
           </div>
           <div class="meta-admin-box">
             <div>
               <strong style="font-size:18px; color:var(--primary);" id="admin-estrelas-count">⭐ 0 estrelas</strong>
-              <p class="hint" style="margin:4px 0 0;">Acumulado disponível (ganhos - desejos aprovados). Use o botão acima para atribuir estrelas extras.</p>
+              <p class="hint" style="margin:4px 0 0;">Toda penalidade ou bônus exige um motivo claro, exibido na tela da Duda para que ela entenda cada ajuste.</p>
             </div>
             <button class="btn-secondary" onclick="resetEstrelas()">Zerar</button>
           </div>
+          <hr class="divider" />
+          <p class="sub-title">Extrato Transparente (Penalidades, Bônus & Resgates)</p>
+          <div id="admin-star-history-list" class="star-log-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>🎁 Pedidos de Desejo da Duda</h2>
+          </div>
+          <p class="hint">Quando a Duda escolhe um desejo na tela dela, ele aparece aqui para vocês aprovarem e descontarem as estrelas.</p>
+          <div id="admin-wishes-list"></div>
         </div>
 
         <div class="card">
@@ -696,7 +909,7 @@
 
     <div class="duda-hero-card">
       <div class="duda-badges-row">
-        <div class="duda-stars-badge wallet" id="duda-total-stars">💰 Saldo: 0 ⭐</div>
+        <div class="duda-stars-badge wallet" onclick="openModalExtratoEstrelasDuda()" title="Toque para ver seu extrato de estrelas">💰 Saldo: <span id="duda-total-stars-num">0</span> ⭐ ▾</div>
         <div class="duda-stars-badge" id="duda-week-stars">📅 Semana: 0 ⭐</div>
       </div>
       <h2 id="duda-counter-text">0 de 0 Missões Feitas!</h2>
@@ -704,6 +917,16 @@
         <div id="duda-progress-fill" class="duda-progress-fill" style="width: 0%"></div>
       </div>
       <div id="duda-celebration-msg" class="duda-celebration hidden">🎉 Parabéns, Duda! Você completou todas as missões de hoje!</div>
+    </div>
+
+    <!-- CARD DE TRANSPARÊNCIA DE PENALIDADES (APARECE AUTOMATICAMENTE QUANDO HÁ PENALIDADES) -->
+    <div id="duda-transparency-box" class="duda-transparency-card hidden">
+      <div class="duda-transparency-head">
+        <h3>⚖️ Por que perdi estrelinhas?</h3>
+        <button class="btn-past-weeks" style="background:#fff; color:#8A452B;" onclick="openModalExtratoEstrelasDuda()">Ver Tudo</button>
+      </div>
+      <p style="font-size:12px; color:#8A452B; font-weight:700;">Aqui está explicado direitinho o motivo de cada desconto nas suas estrelas:</p>
+      <div id="duda-penalties-list"></div>
     </div>
 
     <div class="duda-week-card">
@@ -786,7 +1009,7 @@
 
     function formatDateBR(iso) {
       if (!iso) return '';
-      const [y, m, d] = iso.split('-');
+      const [, m, d] = iso.split('-');
       return `${d}/${m}`;
     }
 
@@ -797,7 +1020,7 @@
 
     function getMondayOfWeekISO(iso) {
       const dt = parseISODate(iso);
-      const day = dt.getDay(); // 0=Dom, 1=Seg ... 6=Sab
+      const day = dt.getDay();
       const diffToMonday = day === 0 ? -6 : 1 - day;
       dt.setDate(dt.getDate() + diffToMonday);
       return toISODate(dt);
@@ -847,6 +1070,7 @@
       },
       lastResetDate: todayStr,
       estrelasTotal: 4,
+      historicoEstrelas: [],
       desejos: [
         { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
       ],
@@ -875,6 +1099,10 @@
         { id: 1, categoria: "Duda", data: todayStr, hora: "07:30", texto: "Escola · Paulo leva / Isabela busca" },
         { id: 2, categoria: "Casal", data: todayStr, hora: "19:30", texto: "Alinhar programação do fim de semana" }
       ],
+      despesas: [
+        { id: 1, titulo: "Material escolar & cadernos", valor: 180.00, pagoPor: "Paulo", split: "50/50", status: "aprovada" },
+        { id: 2, titulo: "Consulta pediatra / check-up", valor: 240.00, pagoPor: "Isabela", split: "50/50", status: "pendente" }
+      ],
       mercado: [
         { id: 1, texto: "Frutas para lancheira", done: false },
         { id: 2, texto: "Leite e café", done: false }
@@ -891,6 +1119,10 @@
           }
         ],
         historicoDoses: [],
+        vacinasLista: [
+          { id: 1, nome: "Reforço vacinal anual", status: "Em dia", detalhe: "Carteirinha conferida" },
+          { id: 2, nome: "Acompanhamento de rotina", status: "Em breve", detalhe: "Sem urgência · revisar na próxima consulta" }
+        ],
         alergias: "Nenhuma registrada",
         tipoSanguineo: "O+",
         vacinas: "Em dia"
@@ -933,6 +1165,9 @@
       return {
         remedios,
         historicoDoses,
+        vacinasLista: Array.isArray(base.vacinasLista) ? base.vacinasLista : [
+          { id: 1, nome: "Reforço vacinal da idade", status: "Em dia", detalhe: "Sem pendências" }
+        ],
         alergias: base.alergias || "Nenhuma registrada",
         tipoSanguineo: base.tipoSanguineo || "O+",
         vacinas: base.vacinas || "Em dia"
@@ -952,7 +1187,9 @@
       const hoje = getTodayISO();
       st.pins = normalizePins(st);
       st.saude = normalizeSaudeState(st.saude);
+      if (!Array.isArray(st.historicoEstrelas)) st.historicoEstrelas = [];
       if (!Array.isArray(st.desejos)) st.desejos = [];
+      if (!Array.isArray(st.despesas)) st.despesas = [];
       if (!Array.isArray(st.casalHoje)) st.casalHoje = [];
       if (!Array.isArray(st.pendencias)) st.pendencias = [];
       if (!Array.isArray(st.mural)) st.mural = [];
@@ -960,11 +1197,9 @@
       if (!Array.isArray(st.mercado)) st.mercado = [];
       if (!Array.isArray(st.missoes)) st.missoes = [];
 
-      // Garante data nos itens legados de casalHoje e mural
       st.casalHoje.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
       st.mural.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
 
-      // Garante logisticaPorDia
       if (!st.logisticaPorDia || typeof st.logisticaPorDia !== 'object') {
         st.logisticaPorDia = {};
       }
@@ -975,7 +1210,6 @@
         st.logisticaPorDia[hoje] = { ...st.logistica };
       }
 
-      // Garante historicoMissoes
       if (!st.historicoMissoes || typeof st.historicoMissoes !== 'object') {
         st.historicoMissoes = {};
       }
@@ -1010,7 +1244,6 @@
     function checkDailyReset() {
       const hoje = getTodayISO();
       if (appState.lastResetDate !== hoje) {
-        // Preserva o histórico do dia anterior antes de zerar as missões de hoje
         const prevDate = appState.lastResetDate;
         if (prevDate && (!appState.historicoMissoes || !appState.historicoMissoes[prevDate])) {
           if (!appState.historicoMissoes) appState.historicoMissoes = {};
@@ -1316,6 +1549,7 @@
       renderCalendar();
       renderAgenda();
       renderMercado();
+      renderDespesas();
       renderSaude();
       renderMissoes();
       renderDesejos();
@@ -1339,27 +1573,25 @@
       if (hojeSelectedDateISO === hoje) backTodayBtn.classList.add('hidden');
       else backTodayBtn.classList.remove('hidden');
 
-      // Compromissos do Casal filtrados pelo dia selecionado
-      const casalEl = document.getElementById('casal-hoje-list');
-      const casalDoDia = (appState.casalHoje || [])
-        .map((item, idx) => ({ item, idx }))
-        .filter(({ item }) => (item.data || hoje) === hojeSelectedDateISO);
+      const logDia = getDayLogistica(hojeSelectedDateISO);
+      document.getElementById('hoje-leva').textContent = logDia.leva;
+      document.getElementById('hoje-busca').textContent = logDia.busca;
 
-      if (casalDoDia.length === 0) {
-        casalEl.innerHTML = `<p class="hint" style="margin:2px 0 6px;">Nenhum compromisso do casal registrado neste dia.</p>`;
-      } else {
-        casalEl.innerHTML = casalDoDia.map(({ item, idx }) => `
-          <div class="row-item">
-            <span>• ${item.texto}</span>
-            <div class="item-actions-inline">
-              <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
-              <span class="act-icon" title="Excluir" onclick="deleteCasal(${idx})">🗑️</span>
-            </div>
-          </div>
-        `).join('');
-      }
+      const stats = getDayMissionStats(hojeSelectedDateISO);
+      document.getElementById('adult-duda-progress-label').textContent = hojeSelectedDateISO === hoje
+        ? 'Missões de hoje'
+        : `Missões de ${formatDateBR(hojeSelectedDateISO)}`;
+      document.getElementById('adult-duda-progress-text').textContent = `${stats.done} de ${stats.total} (${stats.pct}%)`;
+      document.getElementById('adult-duda-progress-fill').style.width = `${stats.pct}%`;
 
-      // Pendências da Casa (globais, com editar e excluir)
+      const pendentesAbertas = (appState.pendencias || []).filter(p => !p.done).length;
+      document.getElementById('hoje-status-badge').textContent = hojeSelectedDateISO === hoje
+        ? '✨ Hoje em um relance'
+        : `📅 Dia ${formatDateBR(hojeSelectedDateISO)}`;
+      document.getElementById('hoje-glance-summary').textContent = pendentesAbertas > 0
+        ? `${pendentesAbertas} ${pendentesAbertas === 1 ? 'pendência aberta' : 'pendências abertas'} · ${stats.done}/${stats.total} missões concluídas`
+        : `Tudo em dia na casa · ${stats.done}/${stats.total} missões concluídas`;
+
       const pendEl = document.getElementById('pendencias-list');
       if ((appState.pendencias || []).length === 0) {
         pendEl.innerHTML = `<p class="hint" style="margin:2px 0;">Nenhuma pendência cadastrada.</p>`;
@@ -1375,7 +1607,6 @@
         `).join('');
       }
 
-      // Mural Rápido vinculado ao dia selecionado (não apaga ao virar o dia!)
       document.getElementById('mural-card-title').textContent = hojeSelectedDateISO === hoje
         ? '📌 Mural Rápido · Hoje'
         : `📌 Mural · ${formatDateBR(hojeSelectedDateISO)}`;
@@ -1389,7 +1620,7 @@
         muralEl.innerHTML = `<p class="hint" style="margin:0;">Nenhum recado fixado neste dia.</p>`;
       } else {
         muralEl.innerHTML = muralDoDia.map(({ m, idx }) => `
-          <div class="check-item" style="border:none; padding:4px 0; cursor:default;">
+          <div class="check-item" style="border:none; padding:5px 0; cursor:default;">
             <span><strong>${m.autor}:</strong> ${m.texto}</span>
             <div class="item-actions-inline">
               <span class="act-icon" title="Editar" onclick="openModalEditarMural(${idx})">✏️</span>
@@ -1399,18 +1630,86 @@
         `).join('');
       }
 
-      // Logística do dia selecionado
-      const logDia = getDayLogistica(hojeSelectedDateISO);
-      document.getElementById('hoje-leva').textContent = logDia.leva;
-      document.getElementById('hoje-busca').textContent = logDia.busca;
+      // Monta a linha do tempo unificada do dia: Casal + Agenda + Missões da Duda
+      const timelineEntries = [];
 
-      // Progresso de missões da Duda naquele dia
-      const stats = getDayMissionStats(hojeSelectedDateISO);
-      document.getElementById('adult-duda-progress-label').textContent = hojeSelectedDateISO === hoje
-        ? 'Missões de hoje'
-        : `Missões de ${formatDateBR(hojeSelectedDateISO)}`;
-      document.getElementById('adult-duda-progress-text').textContent = `${stats.done} de ${stats.total} (${stats.pct}%)`;
-      document.getElementById('adult-duda-progress-fill').style.width = `${stats.pct}%`;
+      (appState.casalHoje || []).forEach((item, idx) => {
+        if ((item.data || hoje) === hojeSelectedDateISO) {
+          const horaMatch = String(item.texto || '').match(/\b(\d{1,2}:\d{2})\b/);
+          timelineEntries.push({
+            sortKey: horaMatch ? horaMatch[1] : '09:00',
+            timeLabel: horaMatch ? horaMatch[1] : 'Casal',
+            badgeType: 'casal',
+            tag: 'Casal',
+            title: item.texto,
+            meta: 'Turno / Compromisso do casal',
+            done: false,
+            actionsHTML: `
+              <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteCasal(${idx})">🗑️</span>
+            `
+          });
+        }
+      });
+
+      (appState.agenda || []).forEach((ev, originalIdx) => {
+        if (ev.data === hojeSelectedDateISO) {
+          timelineEntries.push({
+            sortKey: ev.hora || '12:00',
+            timeLabel: ev.hora || ev.categoria,
+            badgeType: ev.categoria === 'Casal' ? 'casal' : '',
+            tag: `Agenda · ${ev.categoria}`,
+            title: ev.texto,
+            meta: 'Compromisso no calendário',
+            done: false,
+            actionsHTML: `
+              <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${originalIdx})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteAgenda(${originalIdx})">🗑️</span>
+            `
+          });
+        }
+      });
+
+      const turnoOrdem = { 'Manhã': '08:00', 'Tarde': '14:00', 'Noite': '19:30' };
+      const isViewingToday = hojeSelectedDateISO === hoje;
+      (appState.missoes || []).forEach((m, idx) => {
+        const isDone = isViewingToday ? Boolean(m.done) : stats.completedIds.includes(m.id);
+        timelineEntries.push({
+          sortKey: turnoOrdem[m.turno] || '15:00',
+          timeLabel: m.turno || 'Duda',
+          badgeType: 'duda',
+          tag: 'Duda · Missão',
+          title: `${m.emoji || '⭐'} ${m.titulo}`,
+          meta: isDone ? 'Concluída (+1 ⭐)' : 'Pendente da Duda',
+          done: isDone,
+          onToggle: isViewingToday ? `toggleMissao(${idx})` : '',
+          actionsHTML: ''
+        });
+      });
+
+      timelineEntries.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+      const timelineEl = document.getElementById('hoje-timeline-list');
+      if (timelineEntries.length === 0) {
+        timelineEl.innerHTML = `<p class="hint" style="margin:4px 0;">Nenhum item registrado para este dia.</p>`;
+      } else {
+        timelineEl.innerHTML = timelineEntries.map(entry => `
+          <div class="timeline-row">
+            <div class="timeline-time-col ${entry.badgeType}">${entry.timeLabel}</div>
+            <div class="timeline-main-col">
+              <div class="timeline-title-line ${entry.done ? 'done' : ''}"
+                   style="${entry.onToggle ? 'cursor:pointer;' : ''}"
+                   ${entry.onToggle ? `onclick="${entry.onToggle}"` : ''}>
+                ${entry.onToggle ? `<span>${entry.done ? '✅' : '⬜'}</span>` : ''}
+                <span class="agenda-tag ${entry.tag.includes('Casal') ? 'Casal' : ''}">${entry.tag}</span>
+                <span>${entry.title}</span>
+              </div>
+              <div class="timeline-meta">${entry.meta}</div>
+            </div>
+            ${entry.actionsHTML ? `<div class="item-actions-inline">${entry.actionsHTML}</div>` : ''}
+          </div>
+        `).join('');
+      }
     }
 
     function renderAgenda() {
@@ -1452,7 +1751,73 @@
       `).join('');
     }
 
+    function formatBRL(val) {
+      const num = Number(val) || 0;
+      return `R$ ${num.toFixed(2).replace('.', ',')}`;
+    }
+
+    function renderDespesas() {
+      const sumEl = document.getElementById('familia-despesas-summary');
+      const listEl = document.getElementById('familia-despesas-list');
+      if (!sumEl || !listEl) return;
+
+      const despesas = appState.despesas || [];
+      const total = despesas.reduce((acc, d) => acc + (Number(d.valor) || 0), 0);
+      const metade = total / 2;
+
+      let pagoPaulo = 0;
+      let pagoIsabela = 0;
+      despesas.filter(d => d.status === 'aprovada').forEach(d => {
+        const v = Number(d.valor) || 0;
+        if (d.pagoPor === 'Isabela') pagoIsabela += v;
+        else pagoPaulo += v;
+      });
+      const diff = (pagoPaulo - pagoIsabela) / 2;
+      const saldoTexto = Math.abs(diff) < 0.01
+        ? 'Saldo de despesas: Tudo acertado (R$ 0,00)'
+        : diff > 0
+          ? `Isabela acerta ${formatBRL(diff)} com Paulo`
+          : `Paulo acerta ${formatBRL(Math.abs(diff))} com Isabela`;
+
+      sumEl.innerHTML = `
+        <div class="finance-summary-grid">
+          <div class="finance-stat-box"><span>Total</span><strong>${formatBRL(total)}</strong></div>
+          <div class="finance-stat-box"><span>50% Paulo</span><strong>${formatBRL(metade)}</strong></div>
+          <div class="finance-stat-box"><span>50% Isabela</span><strong>${formatBRL(metade)}</strong></div>
+        </div>
+        <div class="finance-balance-banner">
+          <span>⚖️ ${saldoTexto}</span>
+          <span>50/50</span>
+        </div>
+      `;
+
+      if (despesas.length === 0) {
+        listEl.innerHTML = `<p class="hint" style="margin:0;">Nenhuma despesa lançada ainda.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = despesas.map((d, idx) => {
+        const isAprovada = d.status === 'aprovada';
+        return `
+          <div class="despesa-row">
+            <div>
+              <div>
+                <strong>${d.titulo}</strong>
+                <span class="despesa-status-badge ${isAprovada ? 'aprovada' : ''}">${isAprovada ? 'Aprovada' : 'Pendente'}</span>
+              </div>
+              <div class="hint" style="margin:2px 0 0;">${formatBRL(d.valor)} · Pago por ${d.pagoPor || 'Paulo'} · ${d.split || '50/50'}</div>
+            </div>
+            <div class="item-actions-inline">
+              ${!isAprovada ? `<button class="btn-mini" onclick="aprovarDespesa(${idx})">✓ Aprovar</button>` : ''}
+              <span class="act-icon" title="Excluir" onclick="deleteDespesa(${idx})">🗑️</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function getRemedioNextDoseText(rem) {
+      if (!rem) return '-';
       if (rem.ultimaDoseTimestamp) {
         if (rem.intervaloHoras && Number(rem.intervaloHoras) > 0) {
           const nextMs = Number(rem.ultimaDoseTimestamp) + (Number(rem.intervaloHoras) * 3600000);
@@ -1548,6 +1913,28 @@
         <p><strong>Tipo Sanguíneo:</strong> ${s.tipoSanguineo}</p>
         <p><strong>Vacinas:</strong> ${s.vacinas}</p>
       `;
+
+      const vacEl = document.getElementById('vacinas-list-box');
+      if (vacEl) {
+        const vacList = s.vacinasLista || [];
+        vacEl.innerHTML = vacList.length === 0
+          ? `<p class="hint" style="margin:0;">Nenhuma vacina adicional listada.</p>`
+          : vacList.map((v, idx) => {
+              const isUpcoming = v.status !== 'Em dia';
+              return `
+                <div class="vaccine-row">
+                  <div>
+                    <strong>${v.nome}</strong>
+                    ${v.detalhe ? `<div class="hint" style="margin:2px 0 0;">${v.detalhe}</div>` : ''}
+                  </div>
+                  <div class="item-actions-inline">
+                    <span class="vaccine-pill ${isUpcoming ? 'upcoming' : ''}">${v.status}</span>
+                    <span class="act-icon" title="Excluir" onclick="deleteVacina(${idx})">🗑️</span>
+                  </div>
+                </div>
+              `;
+            }).join('');
+      }
     }
 
     function renderApoio() {
@@ -1624,9 +2011,105 @@
 
     function selectDudaWeekDay(iso) {
       const hoje = getTodayISO();
-      if (iso > hoje) return; // Não seleciona dias futuros
+      if (iso > hoje) return;
       dudaSelectedDateISO = iso;
       renderMissoes();
+    }
+
+    function registrarMovimentacaoEstrelas({ tipo, delta, motivo, autor }) {
+      if (!Array.isArray(appState.historicoEstrelas)) appState.historicoEstrelas = [];
+      appState.historicoEstrelas.unshift({
+        id: Date.now(),
+        tipo, // 'penalidade' | 'bonus' | 'resgate'
+        delta,
+        motivo,
+        autor: autor || 'Responsável',
+        timestamp: Date.now(),
+        vistoPelaDuda: false
+      });
+    }
+
+    function confirmarLeituraPenalidadeDuda(id) {
+      const item = (appState.historicoEstrelas || []).find(h => String(h.id) === String(id));
+      if (item) {
+        item.vistoPelaDuda = true;
+        saveState();
+      }
+    }
+
+    function renderStarTransparency() {
+      const hist = appState.historicoEstrelas || [];
+
+      // 1. Renderiza no painel dos responsáveis (Admin)
+      const adminListEl = document.getElementById('admin-star-history-list');
+      if (adminListEl) {
+        if (hist.length === 0) {
+          adminListEl.innerHTML = `<p class="hint" style="margin:0;">Nenhuma penalidade, bônus ou resgate registrado ainda.</p>`;
+        } else {
+          adminListEl.innerHTML = hist.slice(0, 10).map(item => {
+            const isPenalty = item.tipo === 'penalidade' || item.delta < 0;
+            const sign = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
+            const vistoBadge = item.tipo === 'penalidade'
+              ? (item.vistoPelaDuda ? ' · ✅ Duda leu' : ' · 👀 Visível para Duda')
+              : '';
+            return `
+              <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
+                <div>
+                  <strong>${item.tipo === 'penalidade' ? '⚠️ Penalidade' : item.tipo === 'resgate' ? '🎁 Resgate de Desejo' : '✨ Bônus'}: ${item.motivo}</strong>
+                  <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · Por ${item.autor}${vistoBadge}</div>
+                </div>
+                <span class="star-log-delta">${sign} ⭐</span>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // 2. Renderiza na visão da Duda (Transparência ativa para penalidades não dispensadas)
+      const dudaTranspBox = document.getElementById('duda-transparency-box');
+      const dudaPenaltiesEl = document.getElementById('duda-penalties-list');
+      if (dudaTranspBox && dudaPenaltiesEl) {
+        const penalidadesPendentes = hist.filter(h => h.tipo === 'penalidade' && !h.vistoPelaDuda);
+        if (penalidadesPendentes.length === 0) {
+          dudaTranspBox.classList.add('hidden');
+        } else {
+          dudaTranspBox.classList.remove('hidden');
+          dudaPenaltiesEl.innerHTML = penalidadesPendentes.map(p => `
+            <div class="duda-penalty-item">
+              <div>
+                <strong>${p.delta} ⭐ · ${p.motivo}</strong>
+                <small>Explicado por ${p.autor} · ${formatDoseDisplay(p.timestamp)}</small>
+              </div>
+              <button class="btn-duda-ack" onclick="confirmarLeituraPenalidadeDuda(${p.id})">Entendi ✓</button>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function openModalExtratoEstrelasDuda() {
+      const hist = appState.historicoEstrelas || [];
+      const wallet = appState.estrelasTotal || 0;
+      const bodyHTML = `
+        <p class="hint">Você tem <strong>💰 ${wallet} ${wallet === 1 ? 'estrela' : 'estrelas'}</strong> guardadas. Veja tudo o que entrou e saiu da sua caixinha:</p>
+        ${hist.length === 0
+          ? `<p class="hint">Você ainda não teve descontos nem estrelas extras. Continue completando suas missões! 🌟</p>`
+          : `<div class="star-log-list">${hist.slice(0, 15).map(item => {
+              const isPenalty = item.tipo === 'penalidade' || item.delta < 0;
+              const sign = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
+              return `
+                <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
+                  <div>
+                    <strong>${item.tipo === 'penalidade' ? '⚠️ Desconto' : item.tipo === 'resgate' ? '🎁 Desejo' : '🌟 Bônus'}: ${item.motivo}</strong>
+                    <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · ${item.autor}</div>
+                  </div>
+                  <span class="star-log-delta">${sign} ⭐</span>
+                </div>
+              `;
+            }).join('')}</div>`
+        }
+      `;
+      openSheet('💰 Extrato das Minhas Estrelas', bodyHTML, () => {});
     }
 
     function renderMissoes() {
@@ -1642,8 +2125,7 @@
       const weekStars = getWeekStarsEarned(currentMonday);
       const walletStars = appState.estrelasTotal || 0;
 
-      // Hero Duda
-      document.getElementById('duda-total-stars').textContent = `💰 Saldo: ${walletStars} ⭐`;
+      document.getElementById('duda-total-stars-num').textContent = walletStars;
       document.getElementById('duda-week-stars').textContent = `📅 Semana: ${weekStars} ⭐`;
       document.getElementById('duda-counter-text').textContent = isViewingToday
         ? `${dayStats.done} de ${dayStats.total} Missões Feitas!`
@@ -1657,7 +2139,8 @@
         celeb.classList.add('hidden');
       }
 
-      // Barrinha Semanal (Seg a Dom) na tela da Duda e na tela Admin
+      renderStarTransparency();
+
       const weekDays = getWeekDaysArray(currentMonday);
       const stripHTML = weekDays.map(d => {
         const st = getDayMissionStats(d.iso);
@@ -1688,7 +2171,6 @@
       if (isViewingToday) readonlyBanner.classList.add('hidden');
       else readonlyBanner.classList.remove('hidden');
 
-      // Espelho no Admin
       document.getElementById('admin-week-range-label').textContent =
         `Semana atual (${formatDateBR(currentMonday)} a ${formatDateBR(currentSunday)}): ${weekStars} ⭐ conquistadas`;
       document.getElementById('admin-week-strip').innerHTML = weekDays.map(d => {
@@ -1720,10 +2202,8 @@
         `).join('');
       }
 
-      // Saldo Admin
       document.getElementById('admin-estrelas-count').textContent = `⭐ ${walletStars} ${walletStars === 1 ? 'estrela' : 'estrelas'}`;
 
-      // Lista de missões na tela da Duda (editável apenas se isViewingToday)
       const turnos = ['Manhã', 'Tarde', 'Noite'];
       const icons = { 'Manhã': '☀️', 'Tarde': '🌤️', 'Noite': '🌙' };
       const dudaContainer = document.getElementById('duda-missoes-container');
@@ -1752,7 +2232,6 @@
         `;
       }).join('');
 
-      // Lista de missões no Admin
       const adminEl = document.getElementById('admin-missoes-list');
       adminEl.innerHTML = missoes.map((m, idx) => `
         <div class="check-item">
@@ -1850,12 +2329,14 @@
     // ============================================================================
     // 7. BOTTOM SHEET MODALS (INCLUINDO EDIÇÃO COMPLETA EM HOJE E FAMÍLIA)
     // ============================================================================
-    function openSheet(title, bodyHTML, onSave) {
+    function openSheet(title, bodyHTML, onSave, isPenalty = false) {
       document.getElementById('sheet-title').textContent = title;
       document.getElementById('sheet-body').innerHTML = bodyHTML;
       const saveBtn = document.getElementById('sheet-save-btn');
+      saveBtn.className = isPenalty ? 'btn-primary penalty' : 'btn-primary';
       saveBtn.onclick = () => {
-        onSave();
+        const result = onSave();
+        if (result === false) return;
         forceCloseSheet();
       };
       document.getElementById('sheet-modal').classList.remove('hidden');
@@ -2124,15 +2605,15 @@
 
         if (atual !== pinSalvo) {
           alert(`A senha atual de ${currentUser} está incorreta.`);
-          return;
+          return false;
         }
         if (!/^\d{4}$/.test(nova)) {
           alert('A nova senha deve ter exatamente 4 números.');
-          return;
+          return false;
         }
         if (nova !== confirma) {
           alert('A confirmação da nova senha não confere.');
-          return;
+          return false;
         }
 
         appState.pins[currentUser] = nova;
@@ -2141,21 +2622,76 @@
       });
     }
 
-    function openModalEstrelasManual() {
-      openSheet('Atribuir / Ajustar Estrelas ⭐', `
-        <p class="hint">Use os atalhos para somar estrelas extras (ex: se a Duda esqueceu de marcar ontem) ou defina o saldo total diretamente:</p>
-        <div class="chip-group" style="margin-bottom:10px;">
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 1">+1 ⭐</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 3">+3 ⭐</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 5">+5 ⭐</button>
+    function openModalEstrelasManual(initialMode = 'bonus') {
+      const isPenalty = initialMode === 'penalty';
+      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
+
+      const bodyHTML = isPenalty ? `
+        <p class="hint">Saldo atual: <strong>⭐ ${appState.estrelasTotal || 0}</strong>. O motivo abaixo será mostrado diretamente na tela da Duda para que ela entenda o desconto:</p>
+        <label>Quantas estrelas descontar?</label>
+        <input type="hidden" id="inp-pen-qtd" value="1" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt penalty selected" data-val="1" onclick="selectChip(this, 'inp-pen-qtd')">-1 ⭐</button>
+          <button type="button" class="chip-opt penalty" data-val="2" onclick="selectChip(this, 'inp-pen-qtd')">-2 ⭐</button>
+          <button type="button" class="chip-opt penalty" data-val="3" onclick="selectChip(this, 'inp-pen-qtd')">-3 ⭐</button>
+          <button type="button" class="chip-opt penalty" data-val="5" onclick="selectChip(this, 'inp-pen-qtd')">-5 ⭐</button>
         </div>
-        <label>Saldo Disponível Total</label>
-        <input type="number" id="inp-estrelas-qtd" min="0" value="${appState.estrelasTotal || 0}" />
-      `, () => {
-        const qtd = Math.max(0, Number(document.getElementById('inp-estrelas-qtd').value) || 0);
-        appState.estrelasTotal = qtd;
-        saveState();
-      });
+        <label>Motivo claro para a Duda (Obrigatório)</label>
+        <div class="chip-group" style="margin-bottom:8px;">
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Não cumpriu combinado de horário'">⏰ Horário</button>
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Deixou bagunça sem guardar'">🧸 Bagunça</button>
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Desrespeitou combinado da casa'">💬 Combinado</button>
+        </div>
+        <input type="text" id="inp-pen-motivo" placeholder="Ex: Não guardou os brinquedos após aviso" />
+      ` : `
+        <p class="hint">Saldo atual: <strong>⭐ ${appState.estrelasTotal || 0}</strong>. Adicione estrelinhas extras com uma mensagem positiva para a Duda:</p>
+        <label>Quantas estrelas somar?</label>
+        <input type="hidden" id="inp-bonus-qtd" value="1" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt selected" data-val="1" onclick="selectChip(this, 'inp-bonus-qtd')">+1 ⭐</button>
+          <button type="button" class="chip-opt" data-val="2" onclick="selectChip(this, 'inp-bonus-qtd')">+2 ⭐</button>
+          <button type="button" class="chip-opt" data-val="3" onclick="selectChip(this, 'inp-bonus-qtd')">+3 ⭐</button>
+          <button type="button" class="chip-opt" data-val="5" onclick="selectChip(this, 'inp-bonus-qtd')">+5 ⭐</button>
+        </div>
+        <label>Motivo / Elogio</label>
+        <input type="text" id="inp-bonus-motivo" placeholder="Ex: Ajudou sem precisar pedir!" />
+      `;
+
+      openSheet(
+        isPenalty ? '⚠️ Aplicar Penalidade Transparente' : '✨ Atribuir Estrelas Bônus',
+        bodyHTML,
+        () => {
+          const saldoAtual = appState.estrelasTotal || 0;
+          if (isPenalty) {
+            const qtd = Math.max(1, Number(document.getElementById('inp-pen-qtd').value) || 1);
+            const motivo = document.getElementById('inp-pen-motivo').value.trim();
+            if (!motivo) {
+              alert('Escreva o motivo da penalidade para ficar transparente para a Duda.');
+              return false;
+            }
+            const descontoReal = Math.min(saldoAtual, qtd);
+            appState.estrelasTotal = Math.max(0, saldoAtual - qtd);
+            registrarMovimentacaoEstrelas({
+              tipo: 'penalidade',
+              delta: -descontoReal,
+              motivo,
+              autor: quem
+            });
+          } else {
+            const qtd = Math.max(1, Number(document.getElementById('inp-bonus-qtd').value) || 1);
+            const motivo = document.getElementById('inp-bonus-motivo').value.trim() || 'Estrelas extras atribuídas';
+            appState.estrelasTotal = saldoAtual + qtd;
+            registrarMovimentacaoEstrelas({
+              tipo: 'bonus',
+              delta: qtd,
+              motivo,
+              autor: quem
+            });
+          }
+          saveState();
+        },
+        isPenalty
+      );
     }
 
     // --- CASAL (ADICIONAR E EDITAR + VÍNCULO COM DATA) ---
@@ -2284,7 +2820,7 @@
       });
     }
 
-    // --- LOGÍSTICA ESCOLAR POR DIA + VÍNCULO COM AGENDA ---
+    // --- LOGÍSTICA ESCOLAR POR DIA ---
     function openModalLogistica() {
       const currentLog = getDayLogistica(hojeSelectedDateISO);
       openSheet(`Logística Escolar · ${formatDateBR(hojeSelectedDateISO)}`, `
@@ -2395,6 +2931,80 @@
       });
     }
 
+    // --- DESPESAS COMPARTILHADAS ---
+    function openModalDespesa() {
+      const quemPadrao = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
+      openSheet('Nova Despesa Compartilhada', `
+        <label>Descrição do Gasto</label>
+        <input type="text" id="inp-desp-txt" placeholder="Ex: Uniforme escolar ou consulta" />
+        <label>Valor (R$)</label>
+        <input type="number" id="inp-desp-val" step="0.01" min="0" placeholder="Ex: 120.00" />
+        <label>Pago por</label>
+        <input type="hidden" id="inp-desp-quem" value="${quemPadrao}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${quemPadrao==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-desp-quem')">Paulo</button>
+          <button type="button" class="chip-opt ${quemPadrao==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-desp-quem')">Isabela</button>
+        </div>
+      `, () => {
+        const titulo = document.getElementById('inp-desp-txt').value.trim();
+        const valor = parseFloat(document.getElementById('inp-desp-val').value);
+        const pagoPor = document.getElementById('inp-desp-quem').value || quemPadrao;
+        if (titulo && !isNaN(valor) && valor > 0) {
+          if (!Array.isArray(appState.despesas)) appState.despesas = [];
+          appState.despesas.unshift({
+            id: Date.now(),
+            titulo,
+            valor,
+            pagoPor,
+            split: '50/50',
+            status: 'pendente'
+          });
+          saveState();
+        }
+      });
+    }
+
+    function aprovarDespesa(idx) {
+      if (!appState.despesas[idx]) return;
+      appState.despesas[idx].status = 'aprovada';
+      saveState();
+    }
+
+    function deleteDespesa(idx) {
+      appState.despesas.splice(idx, 1);
+      saveState();
+    }
+
+    // --- VACINAS ---
+    function openModalVacina() {
+      openSheet('Registrar Vacina / Acompanhamento', `
+        <label>Nome da Vacina ou Dose</label>
+        <input type="text" id="inp-vac-nome" placeholder="Ex: Reforço HPV ou Influenza" />
+        <label>Status</label>
+        <input type="hidden" id="inp-vac-status" value="Em dia" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt selected" data-val="Em dia" onclick="selectChip(this, 'inp-vac-status')">Em dia</button>
+          <button type="button" class="chip-opt" data-val="Em breve" onclick="selectChip(this, 'inp-vac-status')">Em breve</button>
+        </div>
+        <label>Observação (Opcional)</label>
+        <input type="text" id="inp-vac-det" placeholder="Ex: Tomada em 12/05 ou agendar para o mês que vem" />
+      `, () => {
+        const nome = document.getElementById('inp-vac-nome').value.trim();
+        const status = document.getElementById('inp-vac-status').value || 'Em dia';
+        const detalhe = document.getElementById('inp-vac-det').value.trim();
+        if (nome) {
+          if (!Array.isArray(appState.saude.vacinasLista)) appState.saude.vacinasLista = [];
+          appState.saude.vacinasLista.push({ id: Date.now(), nome, status, detalhe });
+          saveState();
+        }
+      });
+    }
+
+    function deleteVacina(idx) {
+      appState.saude.vacinasLista.splice(idx, 1);
+      saveState();
+    }
+
     // --- FICHA & MISSÕES (ADICIONAR E EDITAR) ---
     function openModalFicha() {
       const s = appState.saude;
@@ -2484,10 +3094,33 @@
       syncTodayMissionHistory();
       saveState();
     }
-    function resetEstrelas() { appState.estrelasTotal = 0; saveState(); }
+    function resetEstrelas() {
+      const saldoAnterior = appState.estrelasTotal || 0;
+      if (saldoAnterior <= 0) return;
+      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
+      openSheet('⚠️ Zerar Saldo de Estrelas', `
+        <p class="hint">Você está zerando <strong>⭐ ${saldoAnterior}</strong> da Duda. Informe o motivo para ficar registrado com transparência:</p>
+        <label>Motivo</label>
+        <input type="text" id="inp-zerar-motivo" placeholder="Ex: Fechamento de ciclo ou combinado reiniciado" />
+      `, () => {
+        const motivo = document.getElementById('inp-zerar-motivo').value.trim();
+        if (!motivo) {
+          alert('Informe o motivo para manter a transparência.');
+          return false;
+        }
+        appState.estrelasTotal = 0;
+        registrarMovimentacaoEstrelas({
+          tipo: 'penalidade',
+          delta: -saldoAnterior,
+          motivo,
+          autor: quem
+        });
+        saveState();
+      }, true);
+    }
 
     function toggleMissao(idx) {
-      if (dudaSelectedDateISO !== getTodayISO()) return; // Bloqueia alteração retroativa pela Duda
+      if (dudaSelectedDateISO !== getTodayISO()) return;
       const missao = appState.missoes[idx];
       if (!missao) return;
       missao.done = !missao.done;
@@ -2505,12 +3138,19 @@
       if (!desejo) return;
       const saldo = appState.estrelasTotal || 0;
       const custo = Number(desejo.custo) || 0;
+      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
       if (saldo < custo) {
-        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode atribuir/ajustar o saldo de estrelas se quiser aprovar mesmo assim.`);
+        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode atribuir estrelas bônus se quiser aprovar mesmo assim.`);
         return;
       }
       appState.estrelasTotal = saldo - custo;
       desejo.status = 'aprovado';
+      registrarMovimentacaoEstrelas({
+        tipo: 'resgate',
+        delta: -custo,
+        motivo: `Desejo aprovado: ${desejo.texto}`,
+        autor: quem
+      });
       saveState();
     }
 
