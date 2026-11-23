@@ -1,8 +1,13 @@
-const CACHE_NAME = 'familia-alves-v1';
-const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.json'];
+const CACHE_NAME = 'familia-alves-v2-compact';
+const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', (e) => {
