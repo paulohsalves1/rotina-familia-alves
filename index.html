@@ -52,7 +52,7 @@
     }
     .sheet-box {
       background: #fff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0;
-      padding: 12px 20px 28px; animation: slideUp 0.2s ease-out;
+      padding: 12px 20px 28px; animation: slideUp 0.2s ease-out; max-height: 90vh; overflow-y: auto;
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .sheet-handle { width: 40px; height: 4px; background: #CBD5E1; border-radius: 99px; margin: 0 auto 14px; }
@@ -97,9 +97,9 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .card-note { background: var(--note-bg); border: 1px solid #F3E2A9; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
     .card-header h2 { font-size: 16px; font-weight: 700; }
-    .btn-group-mini { display: flex; gap: 6px; }
+    .btn-group-mini { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     .btn-mini {
       background: #EEF6F5; color: var(--primary); border: none; padding: 6px 10px;
       border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
@@ -177,18 +177,61 @@
     .agenda-tag.Casal { background: #FDECE6; color: var(--accent); }
     .agenda-tag.Casa { background: #FEF9C3; color: #854D0E; }
 
-    /* SAÚDE */
-    .remedio-card { background: #F0FAF4; padding: 14px; border-radius: 14px; border: 1px solid #C6F6D5; }
+    /* SAÚDE: MÚLTIPLOS REMÉDIOS & HISTÓRICO */
+    .remedio-card {
+      background: #F0FAF4; padding: 14px; border-radius: 14px; border: 1px solid #C6F6D5;
+      margin-bottom: 10px;
+    }
+    .remedio-card:last-child { margin-bottom: 0; }
     .remedio-card.overdue { background: #FFF5F5; border-color: #FEB2B2; }
+    .remedio-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .remedio-actions-top { display: flex; gap: 8px; align-items: center; }
+    .icon-btn-tiny {
+      background: rgba(255,255,255,0.85); border: 1px solid #CBD5E1; border-radius: 8px;
+      padding: 3px 7px; font-size: 12px; cursor: pointer;
+    }
     .btn-dose {
-      width: 100%; margin-top: 12px; padding: 12px; background: #2F855A; color: #fff;
+      width: 100%; margin-top: 10px; padding: 11px; background: #2F855A; color: #fff;
       border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
     }
+    .remedio-card.overdue .btn-dose { background: #C53030; }
+
+    .dose-history-list { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
+    .dose-log-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 9px 11px;
+      font-size: 13px;
+    }
+    .dose-log-main strong { color: var(--text-main); }
+    .dose-log-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .dose-log-btns { display: flex; gap: 6px; flex-shrink: 0; }
+
     .ficha-grid p { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); }
     .ficha-grid p:last-child { border-bottom: none; }
 
-    /* META & BOTÕES */
-    .meta-admin-box { display: flex; justify-content: space-between; align-items: center; }
+    /* META, PEDIDOS DE DESEJO & BOTÕES */
+    .meta-admin-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .wish-admin-card {
+      background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 12px;
+      margin-bottom: 10px;
+    }
+    .wish-admin-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .wish-status-pill {
+      font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 99px;
+      background: #FEF3C7; color: #92400E; white-space: nowrap;
+    }
+    .wish-status-pill.approved { background: #DCFCE7; color: #166534; }
+    .wish-status-pill.rejected { background: #FEE2E2; color: #991B1B; }
+    .wish-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-approve {
+      flex: 1; background: #16A34A; color: #fff; border: none; padding: 9px 12px;
+      border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+    .btn-reject {
+      flex: 1; background: #FEE2E2; color: #991B1B; border: none; padding: 9px 12px;
+      border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     .btn-secondary { background: #EDF2F7; color: var(--text-main); border: none; padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
     .row-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
@@ -206,42 +249,78 @@
     .nav-item.active { color: var(--primary); }
 
     /* TEMA INFANTIL (MODO DUDA) */
-    .duda-theme { min-height: 100vh; background: #EDF6FF; padding: 18px 16px 40px; }
+    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #E3F2FD 0%, #F4F9FF 100%); padding: 18px 16px 56px; }
     .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .duda-header h1 { font-size: 24px; color: #1E3A8A; font-weight: 800; }
+    .duda-header h1 { font-size: 25px; color: #1E3A8A; font-weight: 900; }
     .btn-lock {
-      background: rgba(255,255,255,0.85); border: none; padding: 8px 12px;
-      border-radius: 14px; font-weight: 700; color: #475569; cursor: pointer;
+      background: rgba(255,255,255,0.92); border: none; padding: 9px 13px;
+      border-radius: 16px; font-weight: 700; color: #475569; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
     .duda-hero-card {
-      background: linear-gradient(135deg, #4F8EF7, #63B3ED); color: #fff;
-      padding: 18px; border-radius: 22px; text-align: center; margin-bottom: 20px;
-      box-shadow: 0 6px 16px rgba(79, 142, 247, 0.25);
+      background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: #fff;
+      padding: 20px 18px; border-radius: 26px; text-align: center; margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.28);
     }
     .duda-stars-badge {
-      display: inline-block; background: rgba(255,255,255,0.22); padding: 4px 12px;
-      border-radius: 99px; font-size: 13px; font-weight: 800; margin-bottom: 8px;
+      display: inline-block; background: rgba(255,255,255,0.24); padding: 6px 14px;
+      border-radius: 99px; font-size: 15px; font-weight: 900; margin-bottom: 10px;
     }
-    .duda-hero-card h2 { font-size: 20px; margin-bottom: 12px; }
-    .duda-progress-bar { height: 14px; background: rgba(255,255,255,0.35); border-radius: 99px; overflow: hidden; }
-    .duda-progress-fill { height: 100%; background: #FACC15; transition: width 0.3s ease; }
-    .duda-meta-label { font-size: 12px; font-weight: 700; margin-top: 10px; opacity: 0.95; }
+    .duda-hero-card h2 { font-size: 21px; margin-bottom: 12px; font-weight: 800; }
+    .duda-progress-bar { height: 15px; background: rgba(255,255,255,0.35); border-radius: 99px; overflow: hidden; }
+    .duda-progress-fill { height: 100%; background: #FACC15; transition: width 0.35s ease; border-radius: 99px; }
+    .duda-celebration {
+      margin-top: 12px; background: rgba(255,255,255,0.22); padding: 8px 12px;
+      border-radius: 14px; font-size: 13px; font-weight: 800;
+    }
 
-    .duda-turno-title { font-size: 17px; font-weight: 800; color: #1E293B; margin: 16px 0 10px; }
-    .duda-mission-card {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #FFFBEB; border: 2px solid #FDE68A; padding: 16px; border-radius: 18px;
-      margin-bottom: 10px; font-size: 17px; font-weight: 700; color: #1E293B; cursor: pointer;
-      transition: transform 0.1s ease;
+    .duda-wish-box {
+      background: #FFFFFF; border: 2.5px solid #FDE047; border-radius: 24px;
+      padding: 16px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.16);
     }
-    .duda-mission-card:active { transform: scale(0.98); }
+    .duda-wish-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .duda-wish-top h3 { font-size: 17px; color: #854D0E; font-weight: 900; }
+    .btn-wish-open {
+      background: linear-gradient(135deg, #F59E0B, #FACC15); color: #1E293B; border: none;
+      padding: 10px 14px; border-radius: 16px; font-weight: 900; font-size: 13px; cursor: pointer;
+      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+    }
+    .duda-wish-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .duda-wish-item {
+      background: #FEFCE8; border: 1.5px solid #FEF08A; border-radius: 16px;
+      padding: 11px 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 700; color: #1E293B;
+    }
+    .duda-wish-item.approved { background: #DCFCE7; border-color: #86EFAC; color: #166534; }
+    .duda-wish-item.rejected { background: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+    .wish-tag-mini {
+      font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 99px;
+      background: #FEF3C7; color: #92400E; white-space: nowrap;
+    }
+    .duda-wish-item.approved .wish-tag-mini { background: #BBF7D0; color: #166534; }
+    .duda-wish-item.rejected .wish-tag-mini { background: #FECACA; color: #991B1B; }
+
+    .duda-turno-title { font-size: 18px; font-weight: 900; color: #1E293B; margin: 16px 0 10px; }
+    .duda-mission-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: #FFFBEB; border: 2.5px solid #FDE68A; padding: 16px; border-radius: 22px;
+      margin-bottom: 11px; font-size: 17px; font-weight: 800; color: #1E293B; cursor: pointer;
+      transition: transform 0.12s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+    }
+    .duda-mission-card:active { transform: scale(0.97); }
     .duda-mission-card.completed {
       background: #DCFCE7; border-color: #86EFAC; color: #166534;
     }
+    .mission-left { display: flex; align-items: center; gap: 12px; }
+    .mission-emoji { font-size: 24px; }
+    .mission-star-tag {
+      font-size: 12px; font-weight: 900; background: #FEF3C7; color: #B45309;
+      padding: 4px 9px; border-radius: 99px; margin-right: 4px;
+    }
+    .duda-mission-card.completed .mission-star-tag { background: #BBF7D0; color: #166534; }
     .mission-circle {
-      width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid #CBD5E1;
-      background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px;
+      width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid #CBD5E1; flex-shrink: 0;
+      background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
     }
     .duda-mission-card.completed .mission-circle {
       background: #22C55E; border-color: #22C55E; color: #fff;
@@ -306,7 +385,7 @@
         </div>
       </div>
       <div class="card">
-        <h2>💊 Remédio Ativo</h2>
+        <h2>💊 Remédios Ativos</h2>
         <div id="apoio-remedio-box" style="margin-top:10px;"></div>
       </div>
       <div class="card">
@@ -417,10 +496,21 @@
       <section id="tab-saude" class="tab-view">
         <div class="card">
           <div class="card-header">
-            <h2>💊 Remédio Ativo</h2>
-            <button class="btn-mini" onclick="openModalRemedio()">Configurar</button>
+            <h2>💊 Remédios Ativos</h2>
+            <div class="btn-group-mini">
+              <button class="btn-mini" onclick="openModalNovoRemedio()">+ Remédio</button>
+              <button class="btn-mini" onclick="openModalLancarDoseAvulsa()">+ Dose</button>
+            </div>
           </div>
           <div id="remedio-box"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>🕒 Histórico de Doses</h2>
+          </div>
+          <p class="hint">Toque em ✏️ para corrigir horário, remédio ou responsável, ou em 🗑️ para excluir um lançamento errado.</p>
+          <div id="dose-history-box" class="dose-history-list"></div>
         </div>
 
         <div class="card">
@@ -432,17 +522,25 @@
         </div>
       </section>
 
-      <!-- ABA 4: GESTÃO MISSÕES DUDA -->
+      <!-- ABA 4: GESTÃO MISSÕES DUDA & DESEJOS -->
       <section id="tab-duda-admin" class="tab-view">
         <div class="card">
           <div class="card-header">
-            <h2>🏆 Estrelas & Meta da Duda</h2>
-            <button class="btn-mini" onclick="openModalMeta()">Editar Meta</button>
+            <h2>🎁 Pedidos de Desejo da Duda</h2>
+          </div>
+          <p class="hint">Quando a Duda escolhe um desejo na tela dela, ele aparece aqui para vocês aprovarem e descontarem as estrelas.</p>
+          <div id="admin-wishes-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>🏆 Saldo de Estrelas</h2>
+            <button class="btn-mini" onclick="openModalEstrelasManual()">Ajustar</button>
           </div>
           <div class="meta-admin-box">
             <div>
               <strong style="font-size:18px; color:var(--primary);" id="admin-estrelas-count">⭐ 0 estrelas</strong>
-              <p class="hint" style="margin:4px 0 0;" id="admin-meta-texto">Meta: 15 estrelas = Escolher passeio</p>
+              <p class="hint" style="margin:4px 0 0;">Ganho automático: +1 ⭐ por missão concluída</p>
             </div>
             <button class="btn-secondary" onclick="resetEstrelas()">Zerar</button>
           </div>
@@ -453,7 +551,7 @@
             <h2>🌟 Missões Recorrentes</h2>
             <button class="btn-mini" onclick="openModalMissao()">+ Missão</button>
           </div>
-          <p class="hint">Reiniciam automaticamente todo dia. As mudanças aparecem na hora na tela da Duda.</p>
+          <p class="hint">Cada missão concluída rende +1 estrela na hora para a Duda. Reiniciam todo dia.</p>
           <div id="admin-missoes-list"></div>
         </div>
 
@@ -493,12 +591,20 @@
     </header>
 
     <div class="duda-hero-card">
-      <div class="duda-stars-badge" id="duda-total-stars">⭐ 0 Estrelas acumuladas</div>
+      <div class="duda-stars-badge" id="duda-total-stars">⭐ 0 Estrelas</div>
       <h2 id="duda-counter-text">0 de 0 Missões Feitas!</h2>
       <div class="duda-progress-bar">
         <div id="duda-progress-fill" class="duda-progress-fill" style="width: 0%"></div>
       </div>
-      <p class="duda-meta-label" id="duda-meta-banner">🎯 Meta: 15 estrelas</p>
+      <div id="duda-celebration-msg" class="duda-celebration hidden">🎉 Parabéns, Duda! Você completou todas as missões de hoje!</div>
+    </div>
+
+    <div class="duda-wish-box">
+      <div class="duda-wish-top">
+        <h3>✨ Meus Desejos</h3>
+        <button class="btn-wish-open" onclick="openModalDesejoDuda()">🎁 Pedir Desejo</button>
+      </div>
+      <div id="duda-wishes-list" class="duda-wish-list"></div>
     </div>
 
     <main class="duda-content" id="duda-missoes-container"></main>
@@ -512,14 +618,14 @@
     // 1. CONFIGURAÇÃO DO FIREBASE (COLE SUAS CHAVES DO PROJETO rotina-familia-alves)
     // ============================================================================
     const firebaseConfig = {
-  apiKey: "AIzaSyDytzPCQOItH7iUSSRwDAdMA7u1znNBIz4",
-  authDomain: "rotina-familia-alves.firebaseapp.com",
-  databaseURL: "https://rotina-familia-alves-default-rtdb.firebaseio.com",
-  projectId: "rotina-familia-alves",
-  storageBucket: "rotina-familia-alves.firebasestorage.app",
-  messagingSenderId: "809425013156",
-  appId: "1:809425013156:web:71b324195a355ac29ad931"
-};
+      apiKey: "",
+      authDomain: "rotina-familia-alves.firebaseapp.com",
+      databaseURL: "https://rotina-familia-alves-default-rtdb.firebaseio.com",
+      projectId: "rotina-familia-alves",
+      storageBucket: "rotina-familia-alves.firebasestorage.app",
+      messagingSenderId: "",
+      appId: ""
+    };
 
     let db = null;
     const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.databaseURL);
@@ -536,7 +642,7 @@
     }
 
     // ============================================================================
-    // 2. UTILITÁRIOS DE DATA
+    // 2. UTILITÁRIOS DE DATA E HORA
     // ============================================================================
     function getTodayISO() {
       const now = new Date();
@@ -552,17 +658,38 @@
       return `${d}/${m}`;
     }
 
+    function formatDateTimeLocalInput(ts) {
+      const dt = ts ? new Date(Number(ts)) : new Date();
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const mm = String(dt.getMinutes()).padStart(2, '0');
+      return `${y}-${m}-${d}T${hh}:${mm}`;
+    }
+
+    function formatDoseDisplay(ts) {
+      if (!ts) return '-';
+      const dt = new Date(Number(ts));
+      const hojeISO = getTodayISO();
+      const itemISO = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      const hora = dt.toTimeString().slice(0, 5);
+      if (itemISO === hojeISO) return `Hoje às ${hora}`;
+      return `${formatDateBR(itemISO)} às ${hora}`;
+    }
+
     // ============================================================================
-    // 3. ESTADO INICIAL E RESET DIÁRIO AUTOMÁTICO
+    // 3. ESTADO INICIAL E MIGRAÇÃO DE MÚLTIPLOS REMÉDIOS + HISTÓRICO
     // ============================================================================
     const todayStr = getTodayISO();
 
     const defaultState = {
       pin: "1234",
       lastResetDate: todayStr,
-      rewardAwardedToday: false,
-      estrelasTotal: 6,
-      metaTexto: "15 estrelas = Escolher filme ou passeio",
+      estrelasTotal: 4,
+      desejos: [
+        { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
+      ],
       casalHoje: [
         { id: 1, texto: "Paulo: Turno até 18h" },
         { id: 2, texto: "Isabela: Compromisso às 15h" }
@@ -587,25 +714,63 @@
         { id: 2, texto: "Leite e café", done: false }
       ],
       saude: {
-        remedioNome: "Nenhum remédio ativo",
-        intervaloHoras: 6,
-        ultimaDoseTimestamp: null,
-        ultimaDoseTexto: "-",
-        proximaDoseTexto: "-",
+        remedios: [
+          {
+            id: 1,
+            nome: "Dipirona 20 gotas",
+            intervaloHoras: 6,
+            horarioFixo: "",
+            ultimaDoseTimestamp: null,
+            ultimaDoseResponsavel: ""
+          }
+        ],
+        historicoDoses: [],
         alergias: "Nenhuma registrada",
         tipoSanguineo: "O+",
         vacinas: "Em dia"
       },
       missoes: [
-        { id: 1, turno: "Manhã", titulo: "Escovar os dentes", done: true },
-        { id: 2, turno: "Manhã", titulo: "Arrumar a mochila", done: true },
-        { id: 3, turno: "Tarde", titulo: "Fazer lição de casa", done: false },
-        { id: 4, turno: "Tarde", titulo: "Guardar brinquedos", done: false },
-        { id: 5, turno: "Noite", titulo: "Separar uniforme de amanhã", done: false }
+        { id: 1, turno: "Manhã", emoji: "🦷", titulo: "Escovar os dentes", done: false },
+        { id: 2, turno: "Manhã", emoji: "🎒", titulo: "Arrumar a mochila", done: false },
+        { id: 3, turno: "Tarde", emoji: "✏️", titulo: "Fazer lição de casa", done: false },
+        { id: 4, turno: "Tarde", emoji: "🧸", titulo: "Guardar brinquedos", done: false },
+        { id: 5, turno: "Noite", emoji: "👕", titulo: "Separar uniforme de amanhã", done: false }
       ]
     };
 
-    let appState = JSON.parse(localStorage.getItem('familia_alves_v2')) || defaultState;
+    function normalizeSaudeState(saudeObj) {
+      const base = saudeObj || {};
+      let remedios = Array.isArray(base.remedios) ? base.remedios : null;
+      let historicoDoses = Array.isArray(base.historicoDoses) ? base.historicoDoses : [];
+
+      if (!remedios) {
+        if (base.remedioNome && base.remedioNome !== 'Nenhum remédio ativo') {
+          remedios = [{
+            id: Date.now(),
+            nome: base.remedioNome,
+            intervaloHoras: Number(base.intervaloHoras) || 6,
+            horarioFixo: "",
+            ultimaDoseTimestamp: base.ultimaDoseTimestamp || null,
+            ultimaDoseResponsavel: ""
+          }];
+        } else {
+          remedios = [];
+        }
+      }
+
+      return {
+        remedios,
+        historicoDoses,
+        alergias: base.alergias || "Nenhuma registrada",
+        tipoSanguineo: base.tipoSanguineo || "O+",
+        vacinas: base.vacinas || "Em dia"
+      };
+    }
+
+    let appState = JSON.parse(localStorage.getItem('familia_alves_v22')) || defaultState;
+    appState.saude = normalizeSaudeState(appState.saude);
+    if (!Array.isArray(appState.desejos)) appState.desejos = defaultState.desejos;
+
     let currentFilter = 'Todos';
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
@@ -615,14 +780,13 @@
       const hoje = getTodayISO();
       if (appState.lastResetDate !== hoje) {
         appState.lastResetDate = hoje;
-        appState.rewardAwardedToday = false;
         appState.missoes = (appState.missoes || []).map(m => ({ ...m, done: false }));
         saveState();
       }
     }
 
     function saveState() {
-      localStorage.setItem('familia_alves_v2', JSON.stringify(appState));
+      localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
       if (db) {
         db.set(appState);
       } else {
@@ -635,8 +799,10 @@
         const remoteData = snapshot.val();
         if (remoteData) {
           appState = { ...defaultState, ...remoteData };
+          appState.saude = normalizeSaudeState(remoteData.saude);
+          if (!Array.isArray(appState.desejos)) appState.desejos = [];
           checkDailyReset();
-          localStorage.setItem('familia_alves_v2', JSON.stringify(appState));
+          localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
           renderAll();
         } else {
           db.set(appState);
@@ -798,6 +964,7 @@
       renderMercado();
       renderSaude();
       renderMissoes();
+      renderDesejos();
       renderApoio();
     }
 
@@ -863,22 +1030,96 @@
       `).join('');
     }
 
+    function getRemedioNextDoseText(rem) {
+      if (rem.ultimaDoseTimestamp) {
+        if (rem.intervaloHoras && Number(rem.intervaloHoras) > 0) {
+          const nextMs = Number(rem.ultimaDoseTimestamp) + (Number(rem.intervaloHoras) * 3600000);
+          return formatDoseDisplay(nextMs);
+        }
+        if (rem.horarioFixo) return `Horário fixo às ${rem.horarioFixo}`;
+        return 'Conforme necessidade';
+      }
+      if (rem.horarioFixo) return `Fixo às ${rem.horarioFixo}`;
+      if (rem.intervaloHoras && Number(rem.intervaloHoras) > 0) {
+        return `A cada ${rem.intervaloHoras}h (registre a 1ª dose)`;
+      }
+      return '-';
+    }
+
+    function isRemedioOverdue(rem) {
+      if (!rem.ultimaDoseTimestamp || !rem.intervaloHoras) return false;
+      const nextMs = Number(rem.ultimaDoseTimestamp) + (Number(rem.intervaloHoras) * 3600000);
+      return Date.now() > nextMs;
+    }
+
     function renderSaude() {
       const s = appState.saude;
-      let isOverdue = false;
-      if (s.ultimaDoseTimestamp && s.intervaloHoras) {
-        const nextTime = s.ultimaDoseTimestamp + (Number(s.intervaloHoras) * 3600000);
-        isOverdue = Date.now() > nextTime;
+      const remedios = s.remedios || [];
+      const remBox = document.getElementById('remedio-box');
+
+      if (remedios.length === 0) {
+        remBox.innerHTML = `<p class="hint" style="margin:0;">Nenhum remédio cadastrado. Toque em <strong>+ Remédio</strong> para adicionar.</p>`;
+      } else {
+        const sortedRemedios = remedios
+          .map((rem, idx) => ({ rem, idx }))
+          .sort((a, b) => {
+            const nextA = a.rem.ultimaDoseTimestamp && a.rem.intervaloHoras
+              ? Number(a.rem.ultimaDoseTimestamp) + Number(a.rem.intervaloHoras) * 3600000
+              : Number.MAX_SAFE_INTEGER;
+            const nextB = b.rem.ultimaDoseTimestamp && b.rem.intervaloHoras
+              ? Number(b.rem.ultimaDoseTimestamp) + Number(b.rem.intervaloHoras) * 3600000
+              : Number.MAX_SAFE_INTEGER;
+            return nextA - nextB;
+          });
+
+        remBox.innerHTML = sortedRemedios.map(({ rem, idx }) => {
+          const overdue = isRemedioOverdue(rem);
+          const regraTag = rem.horarioFixo
+            ? `Horário: ${rem.horarioFixo}${rem.intervaloHoras ? ` · ${rem.intervaloHoras}/${rem.intervaloHoras}h` : ''}`
+            : `A cada ${rem.intervaloHoras || 6}h`;
+
+          return `
+            <div class="remedio-card ${overdue ? 'overdue' : ''}">
+              <div class="remedio-top">
+                <div>
+                  <strong>${rem.nome}</strong>
+                  <span class="valor-pill">${regraTag}</span>
+                </div>
+                <div class="remedio-actions-top">
+                  <button class="icon-btn-tiny" title="Editar remédio" onclick="openModalEditarRemedio(${idx})">✏️</button>
+                  <button class="icon-btn-tiny" title="Excluir remédio" onclick="deleteRemedio(${idx})">🗑️</button>
+                </div>
+              </div>
+              <p style="font-size:13px; margin-top:6px;">
+                Última dose: <strong>${rem.ultimaDoseTimestamp ? `${formatDoseDisplay(rem.ultimaDoseTimestamp)}${rem.ultimaDoseResponsavel ? ` (${rem.ultimaDoseResponsavel})` : ''}` : '-'}</strong>
+              </p>
+              <p style="font-size:13px; margin-top:2px;">
+                Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong> ${overdue ? '· Horário atingido' : ''}
+              </p>
+              <button class="btn-dose" onclick="registrarDoseRemedio(${idx})">✔️ Registrar Dose Agora</button>
+            </div>
+          `;
+        }).join('');
       }
 
-      document.getElementById('remedio-box').innerHTML = `
-        <div class="remedio-card ${isOverdue ? 'overdue' : ''}">
-          <strong>${s.remedioNome}</strong> ${s.remedioNome !== 'Nenhum remédio ativo' ? `<span class="valor-pill">A cada ${s.intervaloHoras}h</span>` : ''}
-          <p style="font-size:13px; margin-top:6px;">Última dose: <strong>${s.ultimaDoseTexto || '-'}</strong></p>
-          <p style="font-size:13px; margin-top:2px;">Próxima dose: <strong>${s.proximaDoseTexto || '-'}</strong> ${isOverdue ? '⚠️ (Horário atingido)' : ''}</p>
-          <button class="btn-dose" onclick="registrarDose()">✔️ Registrar Dose Agora</button>
-        </div>
-      `;
+      const hist = s.historicoDoses || [];
+      const histBox = document.getElementById('dose-history-box');
+      if (hist.length === 0) {
+        histBox.innerHTML = `<p class="hint" style="margin:0;">Nenhuma dose registrada no histórico ainda.</p>`;
+      } else {
+        histBox.innerHTML = hist.map((item, idx) => `
+          <div class="dose-log-row">
+            <div class="dose-log-main">
+              <strong>💊 ${item.remedioNome}</strong>
+              <div class="dose-log-meta">${formatDoseDisplay(item.timestamp)} · Por ${item.responsavel || 'Responsável'}${item.obs ? ` · ${item.obs}` : ''}</div>
+            </div>
+            <div class="dose-log-btns">
+              <button class="icon-btn-tiny" title="Corrigir dose" onclick="openModalEditarDose(${idx})">✏️</button>
+              <button class="icon-btn-tiny" title="Excluir dose" onclick="deleteDoseHistorico(${idx})">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+      }
 
       document.getElementById('ficha-saude-box').innerHTML = `
         <p><strong>Alergias:</strong> ${s.alergias}</p>
@@ -891,13 +1132,17 @@
       document.getElementById('apoio-leva').textContent = appState.logistica.leva;
       document.getElementById('apoio-busca').textContent = appState.logistica.busca;
       const s = appState.saude;
-      document.getElementById('apoio-remedio-box').innerHTML = `
-        <div class="remedio-card">
-          <strong>${s.remedioNome}</strong>
-          <p style="font-size:13px; margin-top:4px;">Última dose: ${s.ultimaDoseTexto || '-'}</p>
-          <p style="font-size:13px;">Próxima dose: ${s.proximaDoseTexto || '-'}</p>
-        </div>
-      `;
+      const remedios = s.remedios || [];
+      document.getElementById('apoio-remedio-box').innerHTML = remedios.length === 0
+        ? `<p class="hint" style="margin:0;">Nenhum remédio ativo no momento.</p>`
+        : remedios.map(rem => `
+            <div class="remedio-card">
+              <strong>${rem.nome}</strong>
+              <p style="font-size:13px; margin-top:4px;">Última dose: <strong>${rem.ultimaDoseTimestamp ? formatDoseDisplay(rem.ultimaDoseTimestamp) : '-'}</strong></p>
+              <p style="font-size:13px;">Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong></p>
+            </div>
+          `).join('');
+
       document.getElementById('apoio-ficha-box').innerHTML = `
         <p><strong>Alergias:</strong> ${s.alergias}</p>
         <p><strong>Tipo Sanguíneo:</strong> ${s.tipoSanguineo}</p>
@@ -917,11 +1162,16 @@
       document.getElementById('duda-counter-text').textContent = `${feitas} de ${total} Missões Feitas!`;
       document.getElementById('duda-progress-fill').style.width = `${pct}%`;
 
+      const celeb = document.getElementById('duda-celebration-msg');
+      if (total > 0 && feitas === total) {
+        celeb.classList.remove('hidden');
+      } else {
+        celeb.classList.add('hidden');
+      }
+
       const stars = appState.estrelasTotal || 0;
-      document.getElementById('duda-total-stars').textContent = `⭐ ${stars} Estrelas acumuladas`;
-      document.getElementById('duda-meta-banner').textContent = `🎯 ${appState.metaTexto || 'Meta da semana'}`;
-      document.getElementById('admin-estrelas-count').textContent = `⭐ ${stars} estrelas`;
-      document.getElementById('admin-meta-texto').textContent = `Meta: ${appState.metaTexto || '-'}`;
+      document.getElementById('duda-total-stars').textContent = `⭐ ${stars} ${stars === 1 ? 'Estrela' : 'Estrelas'}`;
+      document.getElementById('admin-estrelas-count').textContent = `⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}`;
 
       const turnos = ['Manhã', 'Tarde', 'Noite'];
       const icons = { 'Manhã': '☀️', 'Tarde': '🌤️', 'Noite': '🌙' };
@@ -934,8 +1184,14 @@
           <h3 class="duda-turno-title">${icons[turno]} ${turno}</h3>
           ${doTurno.map(m => `
             <div class="duda-mission-card ${m.done ? 'completed' : ''}" onclick="toggleMissao(${m.idx})">
-              <span>${m.titulo}</span>
-              <div class="mission-circle">${m.done ? '✓' : ''}</div>
+              <div class="mission-left">
+                <span class="mission-emoji">${m.emoji || '⭐'}</span>
+                <span>${m.titulo}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="mission-star-tag">${m.done ? '+1 ⭐' : '1 ⭐'}</span>
+                <div class="mission-circle">${m.done ? '✓' : ''}</div>
+              </div>
             </div>
           `).join('')}
         `;
@@ -944,10 +1200,63 @@
       const adminEl = document.getElementById('admin-missoes-list');
       adminEl.innerHTML = missoes.map((m, idx) => `
         <div class="check-item">
-          <span><strong>[${m.turno}]</strong> ${m.titulo} ${m.done ? '✅' : ''}</span>
+          <span>${m.emoji || '⭐'} <strong>[${m.turno}]</strong> ${m.titulo} ${m.done ? '✅' : ''}</span>
           <small onclick="deleteMissao(${idx})">🗑️</small>
         </div>
       `).join('');
+    }
+
+    function renderDesejos() {
+      const desejos = appState.desejos || [];
+      const dudaWishList = document.getElementById('duda-wishes-list');
+      const adminWishList = document.getElementById('admin-wishes-list');
+
+      if (desejos.length === 0) {
+        dudaWishList.innerHTML = `<p class="hint" style="margin:0;">Toque em "Pedir Desejo" para escolher o que você quer conquistar com suas estrelas!</p>`;
+      } else {
+        dudaWishList.innerHTML = desejos.slice(0, 4).map(d => {
+          const badgeMap = {
+            pendente: '⏳ Esperando aprovar',
+            aprovado: '🎉 Aprovado!',
+            recusado: '💬 Vamos combinar outro'
+          };
+          return `
+            <div class="duda-wish-item ${d.status === 'aprovado' ? 'approved' : d.status === 'recusado' ? 'rejected' : ''}">
+              <span>🎁 ${d.texto} <small style="opacity:0.75;">(${d.custo} ⭐)</small></span>
+              <span class="wish-tag-mini">${badgeMap[d.status] || 'Pendente'}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (desejos.length === 0) {
+        adminWishList.innerHTML = `<p class="hint" style="margin:0;">Nenhum pedido de desejo no momento.</p>`;
+      } else {
+        adminWishList.innerHTML = desejos.map((d, idx) => {
+          const statusLabel = d.status === 'aprovado' ? 'Aprovado' : d.status === 'recusado' ? 'Recusado' : 'Aguardando';
+          const statusClass = d.status === 'aprovado' ? 'approved' : d.status === 'recusado' ? 'rejected' : '';
+          return `
+            <div class="wish-admin-card">
+              <div class="wish-admin-top">
+                <div>
+                  <strong>🎁 ${d.texto}</strong>
+                  <p class="hint" style="margin:3px 0 0;">Custo sugerido: <strong>${d.custo} ⭐</strong> (Saldo atual: ${appState.estrelasTotal || 0} ⭐)</p>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span class="wish-status-pill ${statusClass}">${statusLabel}</span>
+                  <small style="cursor:pointer;" onclick="deleteDesejo(${idx})">✕</small>
+                </div>
+              </div>
+              ${d.status === 'pendente' ? `
+                <div class="wish-actions">
+                  <button class="btn-approve" onclick="aprovarDesejo(${idx})">✓ Aprovar (-${d.custo} ⭐)</button>
+                  <button class="btn-reject" onclick="recusarDesejo(${idx})">✕ Recusar</button>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     // ============================================================================
@@ -976,6 +1285,246 @@
       el.parentElement.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
       document.getElementById(hiddenInputId).value = el.dataset.val;
+    }
+
+    // --- MODAIS DE SAÚDE (MÚLTIPLOS REMÉDIOS + CORREÇÃO/EXCLUSÃO DE DOSES) ---
+    function buildRemedioFormHTML(rem) {
+      const r = rem || { nome: '', intervaloHoras: 6, horarioFixo: '' };
+      const intVal = r.intervaloHoras || 6;
+      return `
+        <label>Nome do Medicamento e Dose</label>
+        <input type="text" id="inp-rem-nome" value="${r.nome}" placeholder="Ex: Dipirona 20 gotas ou Amoxicilina" />
+        <label>Intervalo entre Doses (em horas)</label>
+        <input type="hidden" id="inp-rem-int" value="${intVal}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${intVal==2?'selected':''}" data-val="2" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=2;">2/2h</button>
+          <button type="button" class="chip-opt ${intVal==3?'selected':''}" data-val="3" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=3;">3/3h</button>
+          <button type="button" class="chip-opt ${intVal==4?'selected':''}" data-val="4" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=4;">4/4h</button>
+          <button type="button" class="chip-opt ${intVal==6?'selected':''}" data-val="6" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=6;">6/6h</button>
+          <button type="button" class="chip-opt ${intVal==8?'selected':''}" data-val="8" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=8;">8/8h</button>
+          <button type="button" class="chip-opt ${intVal==12?'selected':''}" data-val="12" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=12;">12/12h</button>
+          <button type="button" class="chip-opt ${intVal==24?'selected':''}" data-val="24" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=24;">24/24h</button>
+          <button type="button" class="chip-opt ${intVal==0?'selected':''}" data-val="0" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=0;">Sem intervalo</button>
+        </div>
+        <label>Ou digite outro intervalo em horas (Ex: 1, 5, 10)</label>
+        <input type="number" id="inp-rem-int-custom" min="0" step="0.5" value="${intVal}" oninput="document.getElementById('inp-rem-int').value = this.value; this.previousElementSibling.querySelectorAll('.chip-opt').forEach(c => c.classList.toggle('selected', Number(c.dataset.val) === Number(this.value)));" />
+        <label>Horário Base / Fixo (Opcional)</label>
+        <input type="time" id="inp-rem-hora" value="${r.horarioFixo || ''}" />
+      `;
+    }
+
+    function openModalNovoRemedio() {
+      openSheet('Adicionar Novo Remédio', buildRemedioFormHTML(null), () => {
+        const nome = document.getElementById('inp-rem-nome').value.trim();
+        const customEl = document.getElementById('inp-rem-int-custom');
+        const intervalo = customEl ? (Number(customEl.value) || 0) : (Number(document.getElementById('inp-rem-int').value) || 0);
+        const horarioFixo = document.getElementById('inp-rem-hora').value;
+        if (nome) {
+          appState.saude.remedios.push({
+            id: Date.now(),
+            nome,
+            intervaloHoras: intervalo,
+            horarioFixo,
+            ultimaDoseTimestamp: null,
+            ultimaDoseResponsavel: ""
+          });
+          saveState();
+        }
+      });
+    }
+
+    function openModalEditarRemedio(idx) {
+      const rem = appState.saude.remedios[idx];
+      if (!rem) return;
+      openSheet('Editar Remédio', buildRemedioFormHTML(rem), () => {
+        const nome = document.getElementById('inp-rem-nome').value.trim();
+        const customEl = document.getElementById('inp-rem-int-custom');
+        const intervalo = customEl ? (Number(customEl.value) || 0) : (Number(document.getElementById('inp-rem-int').value) || 0);
+        const horarioFixo = document.getElementById('inp-rem-hora').value;
+        if (nome) {
+          rem.nome = nome;
+          rem.intervaloHoras = intervalo;
+          rem.horarioFixo = horarioFixo;
+          saveState();
+        }
+      });
+    }
+
+    function deleteRemedio(idx) {
+      if (!confirm("Remover este remédio da lista ativa?")) return;
+      appState.saude.remedios.splice(idx, 1);
+      saveState();
+    }
+
+    function syncRemedioLastDoseFromHistory(remedioId) {
+      const hist = appState.saude.historicoDoses || [];
+      const matching = hist
+        .filter(h => String(h.remedioId) === String(remedioId))
+        .sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+
+      const rem = (appState.saude.remedios || []).find(r => String(r.id) === String(remedioId));
+      if (rem) {
+        if (matching.length > 0) {
+          rem.ultimaDoseTimestamp = matching[0].timestamp;
+          rem.ultimaDoseResponsavel = matching[0].responsavel || '';
+        } else {
+          rem.ultimaDoseTimestamp = null;
+          rem.ultimaDoseResponsavel = '';
+        }
+      }
+    }
+
+    function registrarDoseRemedio(idx) {
+      const rem = appState.saude.remedios[idx];
+      if (!rem) return;
+      const quem = localStorage.getItem('familia_alves_profile') || 'Paulo';
+      const agoraMs = Date.now();
+
+      rem.ultimaDoseTimestamp = agoraMs;
+      rem.ultimaDoseResponsavel = quem;
+
+      if (!Array.isArray(appState.saude.historicoDoses)) appState.saude.historicoDoses = [];
+      appState.saude.historicoDoses.unshift({
+        id: agoraMs,
+        remedioId: rem.id,
+        remedioNome: rem.nome,
+        timestamp: agoraMs,
+        responsavel: quem,
+        obs: ''
+      });
+      appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+      saveState();
+    }
+
+    function openModalLancarDoseAvulsa() {
+      const remedios = appState.saude.remedios || [];
+      const quemPadrao = localStorage.getItem('familia_alves_profile') || 'Paulo';
+      const optionsHTML = remedios.length > 0
+        ? remedios.map(r => `<option value="${r.id}">${r.nome}</option>`).join('')
+        : `<option value="avulso">Dose avulsa</option>`;
+
+      openSheet('Lançar Dose Manual / Corrigir Hora', `
+        <label>Medicamento</label>
+        <select id="inp-dose-rem">${optionsHTML}</select>
+        <label>Data e Hora da Dose</label>
+        <input type="datetime-local" id="inp-dose-dt" value="${formatDateTimeLocalInput(Date.now())}" />
+        <label>Quem deu</label>
+        <input type="text" id="inp-dose-resp" value="${quemPadrao}" />
+        <label>Observação (Opcional)</label>
+        <input type="text" id="inp-dose-obs" placeholder="Ex: Lançado após o retorno da escola" />
+      `, () => {
+        const selVal = document.getElementById('inp-dose-rem').value;
+        const dtStr = document.getElementById('inp-dose-dt').value;
+        const resp = document.getElementById('inp-dose-resp').value.trim() || quemPadrao;
+        const obs = document.getElementById('inp-dose-obs').value.trim();
+        const ts = dtStr ? new Date(dtStr).getTime() : Date.now();
+        if (isNaN(ts)) return;
+
+        const remObj = remedios.find(r => String(r.id) === String(selVal));
+        const remNome = remObj ? remObj.nome : 'Dose avulsa';
+
+        appState.saude.historicoDoses.push({
+          id: Date.now(),
+          remedioId: remObj ? remObj.id : 'avulso',
+          remedioNome: remNome,
+          timestamp: ts,
+          responsavel: resp,
+          obs
+        });
+        appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+        if (remObj) syncRemedioLastDoseFromHistory(remObj.id);
+        saveState();
+      });
+    }
+
+    function openModalEditarDose(idx) {
+      const item = appState.saude.historicoDoses[idx];
+      if (!item) return;
+      const remedios = appState.saude.remedios || [];
+      const optionsHTML = remedios.length > 0
+        ? remedios.map(r => `<option value="${r.id}" ${String(r.id)===String(item.remedioId)?'selected':''}>${r.nome}</option>`).join('') +
+          `<option value="avulso" ${item.remedioId==='avulso'?'selected':''}>${item.remedioNome}</option>`
+        : `<option value="avulso">${item.remedioNome}</option>`;
+
+      openSheet('Corrigir Lançamento de Dose', `
+        <label>Medicamento</label>
+        <select id="inp-edit-dose-rem">${optionsHTML}</select>
+        <label>Data e Hora Correta</label>
+        <input type="datetime-local" id="inp-edit-dose-dt" value="${formatDateTimeLocalInput(item.timestamp)}" />
+        <label>Responsável</label>
+        <input type="text" id="inp-edit-dose-resp" value="${item.responsavel || ''}" />
+        <label>Observação</label>
+        <input type="text" id="inp-edit-dose-obs" value="${item.obs || ''}" />
+      `, () => {
+        const oldRemId = item.remedioId;
+        const selVal = document.getElementById('inp-edit-dose-rem').value;
+        const dtStr = document.getElementById('inp-edit-dose-dt').value;
+        const resp = document.getElementById('inp-edit-dose-resp').value.trim() || 'Responsável';
+        const obs = document.getElementById('inp-edit-dose-obs').value.trim();
+        const ts = dtStr ? new Date(dtStr).getTime() : item.timestamp;
+        if (isNaN(ts)) return;
+
+        const remObj = remedios.find(r => String(r.id) === String(selVal));
+        item.remedioId = remObj ? remObj.id : selVal;
+        item.remedioNome = remObj ? remObj.nome : item.remedioNome;
+        item.timestamp = ts;
+        item.responsavel = resp;
+        item.obs = obs;
+
+        appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+        if (oldRemId) syncRemedioLastDoseFromHistory(oldRemId);
+        if (item.remedioId) syncRemedioLastDoseFromHistory(item.remedioId);
+        saveState();
+      });
+    }
+
+    function deleteDoseHistorico(idx) {
+      if (!confirm("Excluir este registro de dose do histórico?")) return;
+      const removed = appState.saude.historicoDoses.splice(idx, 1)[0];
+      if (removed && removed.remedioId) {
+        syncRemedioLastDoseFromHistory(removed.remedioId);
+      }
+      saveState();
+    }
+
+    function openModalDesejoDuda() {
+      const stars = appState.estrelasTotal || 0;
+      openSheet('Qual é o seu desejo, Duda? 🌟', `
+        <p class="hint">Você tem <strong>⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}</strong> agora. Escreva o que você quer pedir:</p>
+        <label>Meu desejo</label>
+        <input type="text" id="inp-desejo-txt" placeholder="Ex: Tomar sorvete ou escolher o filme" />
+        <label>Quantas estrelas você quer oferecer?</label>
+        <input type="hidden" id="inp-desejo-custo" value="5" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt" data-val="3" onclick="selectChip(this, 'inp-desejo-custo')">3 ⭐</button>
+          <button type="button" class="chip-opt selected" data-val="5" onclick="selectChip(this, 'inp-desejo-custo')">5 ⭐</button>
+          <button type="button" class="chip-opt" data-val="10" onclick="selectChip(this, 'inp-desejo-custo')">10 ⭐</button>
+          <button type="button" class="chip-opt" data-val="15" onclick="selectChip(this, 'inp-desejo-custo')">15 ⭐</button>
+        </div>
+      `, () => {
+        const texto = document.getElementById('inp-desejo-txt').value.trim();
+        const custo = Number(document.getElementById('inp-desejo-custo').value) || 5;
+        if (texto) {
+          appState.desejos.unshift({
+            id: Date.now(),
+            texto,
+            custo,
+            status: 'pendente'
+          });
+          saveState();
+        }
+      });
+    }
+
+    function openModalEstrelasManual() {
+      openSheet('Ajustar Saldo de Estrelas', `
+        <label>Quantidade total de estrelas</label>
+        <input type="number" id="inp-estrelas-qtd" min="0" value="${appState.estrelasTotal || 0}" />
+      `, () => {
+        const qtd = Math.max(0, Number(document.getElementById('inp-estrelas-qtd').value) || 0);
+        appState.estrelasTotal = qtd;
+        saveState();
+      });
     }
 
     function openModalCasal() {
@@ -1083,47 +1632,6 @@
       });
     }
 
-    function openModalRemedio() {
-      const s = appState.saude;
-      openSheet('Configurar Remédio Ativo', `
-        <label>Nome do Medicamento e Dose</label>
-        <input type="text" id="inp-rem-nome" value="${s.remedioNome === 'Nenhum remédio ativo' ? '' : s.remedioNome}" placeholder="Ex: Ibuprofeno 40 gotas" />
-        <label>Intervalo (em horas)</label>
-        <input type="hidden" id="inp-rem-int" value="${s.intervaloHoras || 6}" />
-        <div class="chip-group">
-          <button type="button" class="chip-opt ${s.intervaloHoras==4?'selected':''}" data-val="4" onclick="selectChip(this, 'inp-rem-int')">4/4h</button>
-          <button type="button" class="chip-opt ${s.intervaloHoras==6?'selected':''}" data-val="6" onclick="selectChip(this, 'inp-rem-int')">6/6h</button>
-          <button type="button" class="chip-opt ${s.intervaloHoras==8?'selected':''}" data-val="8" onclick="selectChip(this, 'inp-rem-int')">8/8h</button>
-          <button type="button" class="chip-opt ${s.intervaloHoras==12?'selected':''}" data-val="12" onclick="selectChip(this, 'inp-rem-int')">12/12h</button>
-        </div>
-      `, () => {
-        const nome = document.getElementById('inp-rem-nome').value.trim();
-        const intervalo = Number(document.getElementById('inp-rem-int').value) || 6;
-        appState.saude.remedioNome = nome || 'Nenhum remédio ativo';
-        appState.saude.intervaloHoras = intervalo;
-        if (!nome) {
-          appState.saude.ultimaDoseTexto = '-';
-          appState.saude.proximaDoseTexto = '-';
-          appState.saude.ultimaDoseTimestamp = null;
-        }
-        saveState();
-      });
-    }
-
-    function registrarDose() {
-      const quem = localStorage.getItem('familia_alves_profile') || 'Paulo';
-      const agora = new Date();
-      const horaAtual = agora.toTimeString().slice(0, 5);
-      const intervalo = Number(appState.saude.intervaloHoras) || 6;
-      const proximaData = new Date(agora.getTime() + intervalo * 3600000);
-      const horaProxima = proximaData.toTimeString().slice(0, 5);
-
-      appState.saude.ultimaDoseTimestamp = agora.getTime();
-      appState.saude.ultimaDoseTexto = `${horaAtual} (${quem})`;
-      appState.saude.proximaDoseTexto = `${horaProxima}`;
-      saveState();
-    }
-
     function openModalFicha() {
       const s = appState.saude;
       openSheet('Editar Ficha Rápida', `
@@ -1150,30 +1658,30 @@
           <button type="button" class="chip-opt selected" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
           <button type="button" class="chip-opt" data-val="Noite" onclick="selectChip(this, 'inp-mis-turno')">🌙 Noite</button>
         </div>
+        <label>Ícone da Missão</label>
+        <input type="hidden" id="inp-mis-emoji" value="⭐" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt" data-val="🦷" onclick="selectChip(this, 'inp-mis-emoji')">🦷</button>
+          <button type="button" class="chip-opt" data-val="🎒" onclick="selectChip(this, 'inp-mis-emoji')">🎒</button>
+          <button type="button" class="chip-opt" data-val="✏️" onclick="selectChip(this, 'inp-mis-emoji')">✏️</button>
+          <button type="button" class="chip-opt" data-val="🧸" onclick="selectChip(this, 'inp-mis-emoji')">🧸</button>
+          <button type="button" class="chip-opt selected" data-val="⭐" onclick="selectChip(this, 'inp-mis-emoji')">⭐</button>
+        </div>
         <label>Descrição da Missão</label>
         <input type="text" id="inp-mis-txt" placeholder="Ex: Guardar os tênis" />
       `, () => {
         const turno = document.getElementById('inp-mis-turno').value;
+        const emoji = document.getElementById('inp-mis-emoji').value || '⭐';
         const titulo = document.getElementById('inp-mis-txt').value.trim();
         if (titulo) {
-          appState.missoes.push({ id: Date.now(), turno, titulo, done: false });
+          appState.missoes.push({ id: Date.now(), turno, emoji, titulo, done: false });
           saveState();
         }
       });
     }
 
-    function openModalMeta() {
-      openSheet('Meta de Estrelas da Duda', `
-        <label>Combinado / Recompensa</label>
-        <input type="text" id="inp-meta-txt" value="${appState.metaTexto || ''}" placeholder="Ex: 15 estrelas = Escolher filme" />
-      `, () => {
-        appState.metaTexto = document.getElementById('inp-meta-txt').value.trim();
-        saveState();
-      });
-    }
-
     // ============================================================================
-    // 8. AÇÕES DIRETAS
+    // 8. AÇÕES DIRETAS (MISSÕES +1 ⭐, DESEJOS & APROVAÇÃO)
     // ============================================================================
     function deleteCasal(idx) { appState.casalHoje.splice(idx, 1); saveState(); }
     function togglePendencia(idx) { appState.pendencias[idx].done = !appState.pendencias[idx].done; saveState(); }
@@ -1183,20 +1691,43 @@
     function toggleMercado(idx) { appState.mercado[idx].done = !appState.mercado[idx].done; saveState(); }
     function deleteMercado(idx) { appState.mercado.splice(idx, 1); saveState(); }
     function deleteMissao(idx) { appState.missoes.splice(idx, 1); saveState(); }
-    function resetEstrelas() { appState.estrelasTotal = 0; appState.rewardAwardedToday = false; saveState(); }
+    function resetEstrelas() { appState.estrelasTotal = 0; saveState(); }
 
     function toggleMissao(idx) {
-      appState.missoes[idx].done = !appState.missoes[idx].done;
-      const missoes = appState.missoes;
-      const todasFeitas = missoes.length > 0 && missoes.every(m => m.done);
-
-      if (todasFeitas && !appState.rewardAwardedToday) {
-        appState.estrelasTotal = (appState.estrelasTotal || 0) + 3;
-        appState.rewardAwardedToday = true;
-      } else if (!todasFeitas && appState.rewardAwardedToday) {
-        appState.estrelasTotal = Math.max(0, (appState.estrelasTotal || 0) - 3);
-        appState.rewardAwardedToday = false;
+      const missao = appState.missoes[idx];
+      if (!missao) return;
+      missao.done = !missao.done;
+      if (missao.done) {
+        appState.estrelasTotal = (appState.estrelasTotal || 0) + 1;
+      } else {
+        appState.estrelasTotal = Math.max(0, (appState.estrelasTotal || 0) - 1);
       }
+      saveState();
+    }
+
+    function aprovarDesejo(idx) {
+      const desejo = appState.desejos[idx];
+      if (!desejo) return;
+      const saldo = appState.estrelasTotal || 0;
+      const custo = Number(desejo.custo) || 0;
+      if (saldo < custo) {
+        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode ajustar o saldo de estrelas se quiser aprovar mesmo assim.`);
+        return;
+      }
+      appState.estrelasTotal = saldo - custo;
+      desejo.status = 'aprovado';
+      saveState();
+    }
+
+    function recusarDesejo(idx) {
+      const desejo = appState.desejos[idx];
+      if (!desejo) return;
+      desejo.status = 'recusado';
+      saveState();
+    }
+
+    function deleteDesejo(idx) {
+      appState.desejos.splice(idx, 1);
       saveState();
     }
 
