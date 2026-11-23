@@ -1,7 +1,7 @@
 // ============================================================================
 // 1. CONFIGURAÇÃO DO FIREBASE (COLE SUAS CHAVES AQUI QUANDO CRIAR O PROJETO)
 // ============================================================================
-const firebaseConfig = {
+const firebaseConfig = {https://console.firebase.google.com/project/rotina-familia-alves/database/rotina-familia-alves-default-rtdb/data/~2F?hl=pt-br}
   apiKey: "", // Cole aqui sua apiKey
   authDomain: "",
   databaseURL: "", // Ex: "https://seu-projeto-default-rtdb.firebaseio.com"
