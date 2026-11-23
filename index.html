@@ -92,6 +92,24 @@
     .tab-view { display: none; }
     .tab-view.active { display: block; }
 
+    /* SELETOR DE DIA NA ABA HOJE */
+    .day-switcher-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: #FFFFFF; border-radius: 16px; padding: 10px 12px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .day-nav-btn {
+      background: #F1F5F9; border: none; width: 34px; height: 34px; border-radius: 11px;
+      font-weight: 800; font-size: 14px; color: var(--text-main); cursor: pointer; flex-shrink: 0;
+    }
+    .day-center-info { text-align: center; flex: 1; }
+    .day-center-info strong { display: block; font-size: 15px; color: var(--text-main); text-transform: capitalize; }
+    .day-center-info small { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .btn-today-pill {
+      background: #EEF6F5; color: var(--primary); border: none; padding: 6px 10px;
+      border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; flex-shrink: 0;
+    }
+
     .card {
       background: var(--card-bg); border-radius: 18px; padding: 16px; margin-bottom: 14px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -107,12 +125,16 @@
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .sub-title { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
-    .sub-list .row-item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 4px 0; }
+    .sub-list .row-item {
+      display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 5px 0; gap: 8px;
+    }
+    .item-actions-inline { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .act-icon { cursor: pointer; font-size: 13px; opacity: 0.85; padding: 2px 4px; }
 
     /* CHECKLISTS & LOGÍSTICA */
     .check-item {
       display: flex; align-items: center; justify-content: space-between; padding: 8px 0;
-      border-bottom: 1px solid #F1F3F5; font-size: 14px; cursor: pointer;
+      border-bottom: 1px solid #F1F3F5; font-size: 14px; cursor: pointer; gap: 8px;
     }
     .check-item:last-child { border-bottom: none; }
     .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
@@ -167,7 +189,7 @@
 
     .agenda-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; gap: 8px;
     }
     .agenda-item:last-child { border-bottom: none; }
     .agenda-tag {
@@ -232,6 +254,32 @@
       border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;
     }
 
+    /* RESUMO SEMANAL (ADMIN E DUDA) */
+    .week-strip-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 10px 0 4px;
+    }
+    .week-day-pill {
+      background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 7px 2px;
+      text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .week-day-pill.today { border-color: #2563EB; background: #EFF6FF; }
+    .week-day-pill.selected { background: #1D4ED8; border-color: #1D4ED8; color: #fff; }
+    .week-day-pill.future { opacity: 0.45; cursor: default; }
+    .week-day-pill small { font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .week-day-pill strong { font-size: 13px; }
+    .week-day-pill span { font-size: 11px; font-weight: 800; }
+
+    .week-history-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 12px;
+      margin-bottom: 8px; font-size: 13px;
+    }
+    .week-history-row:last-child { margin-bottom: 0; }
+    .week-badge-stars {
+      background: #FEF3C7; color: #92400E; font-weight: 800; font-size: 12px;
+      padding: 4px 10px; border-radius: 99px; white-space: nowrap;
+    }
+
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     .btn-secondary { background: #EDF2F7; color: var(--text-main); border: none; padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
     .row-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
@@ -250,7 +298,7 @@
 
     /* TEMA INFANTIL (MODO DUDA) */
     .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #E3F2FD 0%, #F4F9FF 100%); padding: 18px 16px 56px; }
-    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .duda-header h1 { font-size: 25px; color: #1E3A8A; font-weight: 900; }
     .btn-lock {
       background: rgba(255,255,255,0.92); border: none; padding: 9px 13px;
@@ -259,19 +307,36 @@
 
     .duda-hero-card {
       background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: #fff;
-      padding: 20px 18px; border-radius: 26px; text-align: center; margin-bottom: 16px;
+      padding: 18px 16px; border-radius: 26px; text-align: center; margin-bottom: 14px;
       box-shadow: 0 8px 20px rgba(59, 130, 246, 0.28);
     }
+    .duda-badges-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .duda-stars-badge {
-      display: inline-block; background: rgba(255,255,255,0.24); padding: 6px 14px;
-      border-radius: 99px; font-size: 15px; font-weight: 900; margin-bottom: 10px;
+      display: inline-block; background: rgba(255,255,255,0.24); padding: 6px 13px;
+      border-radius: 99px; font-size: 14px; font-weight: 900;
     }
-    .duda-hero-card h2 { font-size: 21px; margin-bottom: 12px; font-weight: 800; }
+    .duda-stars-badge.wallet { background: #FACC15; color: #1E293B; }
+    .duda-hero-card h2 { font-size: 20px; margin-bottom: 10px; font-weight: 800; }
     .duda-progress-bar { height: 15px; background: rgba(255,255,255,0.35); border-radius: 99px; overflow: hidden; }
     .duda-progress-fill { height: 100%; background: #FACC15; transition: width 0.35s ease; border-radius: 99px; }
     .duda-celebration {
       margin-top: 12px; background: rgba(255,255,255,0.22); padding: 8px 12px;
       border-radius: 14px; font-size: 13px; font-weight: 800;
+    }
+
+    .duda-week-card {
+      background: #FFFFFF; border-radius: 22px; padding: 14px; margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+    }
+    .duda-week-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .duda-week-header h3 { font-size: 15px; font-weight: 900; color: #1E3A8A; }
+    .btn-past-weeks {
+      background: #EFF6FF; color: #1D4ED8; border: none; padding: 6px 11px;
+      border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+    .readonly-banner {
+      background: #FEF3C7; color: #92400E; font-size: 12px; font-weight: 800;
+      padding: 8px 12px; border-radius: 12px; text-align: center; margin-top: 8px;
     }
 
     .duda-wish-box {
@@ -311,6 +376,10 @@
     .duda-mission-card.completed {
       background: #DCFCE7; border-color: #86EFAC; color: #166534;
     }
+    .duda-mission-card.locked-past {
+      opacity: 0.85; cursor: default;
+    }
+    .duda-mission-card.locked-past:active { transform: none; }
     .mission-left { display: flex; align-items: center; gap: 12px; }
     .mission-emoji { font-size: 24px; }
     .mission-star-tag {
@@ -407,7 +476,7 @@
           <span class="badge-user" id="current-user-label">Paulo</span>
           <span id="sync-dot" class="sync-dot offline" title="Status de sincronização"></span>
         </div>
-        <h1 id="header-title">Família Alves · Hoje</h1>
+        <h1 id="header-title">Família Alves · Dia</h1>
       </div>
       <div style="display:flex; gap:6px; align-items:center;">
         <button class="btn-duda-switch" style="border-color:#CBD5E1; color:#475569; padding:8px 10px;" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
@@ -416,8 +485,18 @@
     </header>
 
     <main class="app-content">
-      <!-- ABA 1: HOJE -->
+      <!-- ABA 1: HOJE / DIÁRIO NAVEGÁVEL -->
       <section id="tab-hoje" class="tab-view active">
+        <div class="day-switcher-bar">
+          <button class="day-nav-btn" onclick="shiftHojeDay(-1)" title="Dia anterior">◀</button>
+          <div class="day-center-info">
+            <strong id="hoje-day-label">Hoje · 23/11</strong>
+            <small id="hoje-day-sublabel">Segunda-feira</small>
+          </div>
+          <button id="btn-back-today" class="btn-today-pill hidden" onclick="goHojeToday()">Hoje</button>
+          <button class="day-nav-btn" onclick="shiftHojeDay(1)" title="Próximo dia">▶</button>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <h2>🏠 Casal & Casa</h2>
@@ -434,7 +513,7 @@
 
         <div class="card card-note">
           <div class="card-header">
-            <h2>📌 Mural Rápido</h2>
+            <h2 id="mural-card-title">📌 Mural do Dia</h2>
             <button class="btn-mini" onclick="openModalMural()">+ Recado</button>
           </div>
           <div id="mural-list"></div>
@@ -442,16 +521,16 @@
 
         <div class="card">
           <div class="card-header">
-            <h2>🎒 Duda · Logística & Rotina</h2>
+            <h2 id="logistica-card-title">🎒 Duda · Logística & Rotina</h2>
             <button class="btn-mini" onclick="openModalLogistica()">Editar / ⇄</button>
           </div>
           <div class="logistica-box">
-            <div><span>Leva:</span> <strong id="hoje-leva">Paulo (07:30)</strong></div>
-            <div><span>Busca:</span> <strong id="hoje-busca">Isabela (12:00)</strong></div>
+            <div><span>Leva:</span> <strong id="hoje-leva">-</strong></div>
+            <div><span>Busca:</span> <strong id="hoje-busca">-</strong></div>
           </div>
           <div class="progress-wrapper">
             <div class="progress-info">
-              <span>Missões de hoje</span>
+              <span id="adult-duda-progress-label">Missões do dia</span>
               <strong id="adult-duda-progress-text">0 de 0</strong>
             </div>
             <div class="progress-bar">
@@ -485,7 +564,10 @@
         <div class="card">
           <div class="card-header">
             <h2 id="selected-day-title">📅 Eventos do Dia</h2>
-            <button class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+            <div class="btn-group-mini">
+              <button class="btn-mini" onclick="openDayInHojeTab()">Abrir Dia ↗</button>
+              <button class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+            </div>
           </div>
           <div id="agenda-list" class="agenda-list"></div>
         </div>
@@ -533,6 +615,17 @@
       <section id="tab-duda-admin" class="tab-view">
         <div class="card">
           <div class="card-header">
+            <h2>📊 Resumo Semanal · Duda (Seg a Dom)</h2>
+          </div>
+          <p class="hint" id="admin-week-range-label">Semana atual</p>
+          <div id="admin-week-strip" class="week-strip-grid"></div>
+          <hr class="divider" />
+          <p class="sub-title">Semanas Anteriores</p>
+          <div id="admin-past-weeks-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
             <h2>🎁 Pedidos de Desejo da Duda</h2>
           </div>
           <p class="hint">Quando a Duda escolhe um desejo na tela dela, ele aparece aqui para vocês aprovarem e descontarem as estrelas.</p>
@@ -541,13 +634,13 @@
 
         <div class="card">
           <div class="card-header">
-            <h2>🏆 Saldo de Estrelas</h2>
-            <button class="btn-mini" onclick="openModalEstrelasManual()">Ajustar</button>
+            <h2>🏆 Saldo Disponível de Estrelas</h2>
+            <button class="btn-mini" onclick="openModalEstrelasManual()">+ Atribuir / Ajustar</button>
           </div>
           <div class="meta-admin-box">
             <div>
               <strong style="font-size:18px; color:var(--primary);" id="admin-estrelas-count">⭐ 0 estrelas</strong>
-              <p class="hint" style="margin:4px 0 0;">Ganho automático: +1 ⭐ por missão concluída</p>
+              <p class="hint" style="margin:4px 0 0;">Acumulado disponível (ganhos - desejos aprovados). Use o botão acima para atribuir estrelas extras.</p>
             </div>
             <button class="btn-secondary" onclick="resetEstrelas()">Zerar</button>
           </div>
@@ -579,16 +672,16 @@
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" onclick="switchTab('hoje', 'Família Alves · Hoje', this)">
+      <button class="nav-item active" id="nav-btn-hoje" onclick="switchTab('hoje', 'Família Alves · Dia', this)">
         <span>🏠</span><small>Hoje</small>
       </button>
-      <button class="nav-item" onclick="switchTab('familia', 'Calendário & Família', this)">
+      <button class="nav-item" id="nav-btn-familia" onclick="switchTab('familia', 'Calendário & Família', this)">
         <span>📅</span><small>Família</small>
       </button>
-      <button class="nav-item" onclick="switchTab('saude', 'Saúde · Duda', this)">
+      <button class="nav-item" id="nav-btn-saude" onclick="switchTab('saude', 'Saúde · Duda', this)">
         <span>❤️</span><small>Saúde</small>
       </button>
-      <button class="nav-item" onclick="switchTab('duda-admin', 'Missões Duda', this)">
+      <button class="nav-item" id="nav-btn-duda" onclick="switchTab('duda-admin', 'Missões Duda', this)">
         <span>🚀</span><small>Duda</small>
       </button>
     </nav>
@@ -602,12 +695,26 @@
     </header>
 
     <div class="duda-hero-card">
-      <div class="duda-stars-badge" id="duda-total-stars">⭐ 0 Estrelas</div>
+      <div class="duda-badges-row">
+        <div class="duda-stars-badge wallet" id="duda-total-stars">💰 Saldo: 0 ⭐</div>
+        <div class="duda-stars-badge" id="duda-week-stars">📅 Semana: 0 ⭐</div>
+      </div>
       <h2 id="duda-counter-text">0 de 0 Missões Feitas!</h2>
       <div class="duda-progress-bar">
         <div id="duda-progress-fill" class="duda-progress-fill" style="width: 0%"></div>
       </div>
       <div id="duda-celebration-msg" class="duda-celebration hidden">🎉 Parabéns, Duda! Você completou todas as missões de hoje!</div>
+    </div>
+
+    <div class="duda-week-card">
+      <div class="duda-week-header">
+        <h3 id="duda-week-title">📆 Minha Semana (Seg a Dom)</h3>
+        <button class="btn-past-weeks" onclick="openModalSemanasAnterioresDuda()">📜 Semanas Anteriores</button>
+      </div>
+      <div id="duda-week-strip" class="week-strip-grid"></div>
+      <div id="duda-readonly-banner" class="readonly-banner hidden">
+        👀 Vendo dia anterior (somente consulta). Toque em <strong>Hoje</strong> na barrinha acima para marcar suas missões!
+      </div>
     </div>
 
     <div class="duda-wish-box">
@@ -626,7 +733,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
     // ============================================================================
-    // 1. CONFIGURAÇÃO DO FIREBASE (COLE SUAS CHAVES DO PROJETO rotina-familia-alves)
+    // 1. CONFIGURAÇÃO DO FIREBASE
     // ============================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyDytzPCQOItH7iUSSRwDAdMA7u1znNBIz4",
@@ -653,20 +760,59 @@
     }
 
     // ============================================================================
-    // 2. UTILITÁRIOS DE DATA E HORA
+    // 2. UTILITÁRIOS DE DATA, SEMANA (SEG A DOM) E HORA
     // ============================================================================
-    function getTodayISO() {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
+    function toISODate(dt) {
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
       return `${y}-${m}-${d}`;
+    }
+
+    function parseISODate(iso) {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function addDaysISO(iso, delta) {
+      const dt = parseISODate(iso);
+      dt.setDate(dt.getDate() + delta);
+      return toISODate(dt);
+    }
+
+    function getTodayISO() {
+      return toISODate(new Date());
     }
 
     function formatDateBR(iso) {
       if (!iso) return '';
       const [y, m, d] = iso.split('-');
       return `${d}/${m}`;
+    }
+
+    function getWeekdayNamePT(iso) {
+      const names = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      return names[parseISODate(iso).getDay()];
+    }
+
+    function getMondayOfWeekISO(iso) {
+      const dt = parseISODate(iso);
+      const day = dt.getDay(); // 0=Dom, 1=Seg ... 6=Sab
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+      dt.setDate(dt.getDate() + diffToMonday);
+      return toISODate(dt);
+    }
+
+    function getWeekDaysArray(mondayISO) {
+      const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+      return labels.map((label, i) => {
+        const iso = addDaysISO(mondayISO, i);
+        return {
+          label,
+          iso,
+          dayNum: iso.split('-')[2]
+        };
+      });
     }
 
     function formatDateTimeLocalInput(ts) {
@@ -683,14 +829,14 @@
       if (!ts) return '-';
       const dt = new Date(Number(ts));
       const hojeISO = getTodayISO();
-      const itemISO = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      const itemISO = toISODate(dt);
       const hora = dt.toTimeString().slice(0, 5);
       if (itemISO === hojeISO) return `Hoje às ${hora}`;
       return `${formatDateBR(itemISO)} às ${hora}`;
     }
 
     // ============================================================================
-    // 3. ESTADO INICIAL E MIGRAÇÃO DE MÚLTIPLOS REMÉDIOS + HISTÓRICO
+    // 3. ESTADO INICIAL E MIGRAÇÃO DE DADOS POR DATA & HISTÓRICO SEMANAL
     // ============================================================================
     const todayStr = getTodayISO();
 
@@ -705,19 +851,25 @@
         { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
       ],
       casalHoje: [
-        { id: 1, texto: "Paulo: Turno até 18h" },
-        { id: 2, texto: "Isabela: Compromisso às 15h" }
+        { id: 1, data: todayStr, texto: "Paulo: Turno até 18h" },
+        { id: 2, data: todayStr, texto: "Isabela: Compromisso às 15h" }
       ],
       pendencias: [
         { id: 1, texto: "Pagar boleto da escola", valor: "450,00", done: true },
         { id: 2, texto: "Comprar ração", valor: "", done: false }
       ],
       mural: [
-        { id: 1, autor: "Isabela", texto: "Deixei a autorização na mochila da Duda" }
+        { id: 1, data: todayStr, autor: "Isabela", texto: "Deixei a autorização na mochila da Duda" }
       ],
       logistica: {
         leva: "Paulo (07:30)",
         busca: "Isabela (12:00)"
+      },
+      logisticaPorDia: {
+        [todayStr]: {
+          leva: "Paulo (07:30)",
+          busca: "Isabela (12:00)"
+        }
       },
       agenda: [
         { id: 1, categoria: "Duda", data: todayStr, hora: "07:30", texto: "Escola · Paulo leva / Isabela busca" },
@@ -749,7 +901,13 @@
         { id: 3, turno: "Tarde", emoji: "✏️", titulo: "Fazer lição de casa", done: false },
         { id: 4, turno: "Tarde", emoji: "🧸", titulo: "Guardar brinquedos", done: false },
         { id: 5, turno: "Noite", emoji: "👕", titulo: "Separar uniforme de amanhã", done: false }
-      ]
+      ],
+      historicoMissoes: {
+        [todayStr]: {
+          completedIds: [],
+          totalCount: 5
+        }
+      }
     };
 
     function normalizeSaudeState(saudeObj) {
@@ -790,21 +948,88 @@
       };
     }
 
-    let appState = JSON.parse(localStorage.getItem('familia_alves_v22')) || defaultState;
-    appState.pins = normalizePins(appState);
-    appState.saude = normalizeSaudeState(appState.saude);
-    if (!Array.isArray(appState.desejos)) appState.desejos = defaultState.desejos;
+    function normalizeStateData(st) {
+      const hoje = getTodayISO();
+      st.pins = normalizePins(st);
+      st.saude = normalizeSaudeState(st.saude);
+      if (!Array.isArray(st.desejos)) st.desejos = [];
+      if (!Array.isArray(st.casalHoje)) st.casalHoje = [];
+      if (!Array.isArray(st.pendencias)) st.pendencias = [];
+      if (!Array.isArray(st.mural)) st.mural = [];
+      if (!Array.isArray(st.agenda)) st.agenda = [];
+      if (!Array.isArray(st.mercado)) st.mercado = [];
+      if (!Array.isArray(st.missoes)) st.missoes = [];
 
+      // Garante data nos itens legados de casalHoje e mural
+      st.casalHoje.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
+      st.mural.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
+
+      // Garante logisticaPorDia
+      if (!st.logisticaPorDia || typeof st.logisticaPorDia !== 'object') {
+        st.logisticaPorDia = {};
+      }
+      if (!st.logistica) {
+        st.logistica = { leva: "Paulo (07:30)", busca: "Isabela (12:00)" };
+      }
+      if (!st.logisticaPorDia[hoje]) {
+        st.logisticaPorDia[hoje] = { ...st.logistica };
+      }
+
+      // Garante historicoMissoes
+      if (!st.historicoMissoes || typeof st.historicoMissoes !== 'object') {
+        st.historicoMissoes = {};
+      }
+      if (!st.historicoMissoes[hoje]) {
+        const doneIds = st.missoes.filter(m => m.done).map(m => m.id);
+        st.historicoMissoes[hoje] = {
+          completedIds: doneIds,
+          totalCount: st.missoes.length
+        };
+      }
+      return st;
+    }
+
+    let appState = normalizeStateData(JSON.parse(localStorage.getItem('familia_alves_v22')) || defaultState);
+
+    let hojeSelectedDateISO = todayStr;
+    let dudaSelectedDateISO = todayStr;
     let currentFilter = 'Todos';
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
     let selectedDateISO = todayStr;
 
+    function syncTodayMissionHistory() {
+      const hoje = getTodayISO();
+      if (!appState.historicoMissoes) appState.historicoMissoes = {};
+      appState.historicoMissoes[hoje] = {
+        completedIds: (appState.missoes || []).filter(m => m.done).map(m => m.id),
+        totalCount: (appState.missoes || []).length
+      };
+    }
+
     function checkDailyReset() {
       const hoje = getTodayISO();
       if (appState.lastResetDate !== hoje) {
+        // Preserva o histórico do dia anterior antes de zerar as missões de hoje
+        const prevDate = appState.lastResetDate;
+        if (prevDate && (!appState.historicoMissoes || !appState.historicoMissoes[prevDate])) {
+          if (!appState.historicoMissoes) appState.historicoMissoes = {};
+          appState.historicoMissoes[prevDate] = {
+            completedIds: (appState.missoes || []).filter(m => m.done).map(m => m.id),
+            totalCount: (appState.missoes || []).length
+          };
+        }
         appState.lastResetDate = hoje;
         appState.missoes = (appState.missoes || []).map(m => ({ ...m, done: false }));
+        appState.historicoMissoes[hoje] = {
+          completedIds: [],
+          totalCount: appState.missoes.length
+        };
+        if (!appState.logisticaPorDia[hoje]) {
+          appState.logisticaPorDia[hoje] = { ...(appState.logistica || { leva: "Paulo (07:30)", busca: "Isabela (12:00)" }) };
+        }
+        if (hojeSelectedDateISO < hoje) hojeSelectedDateISO = hoje;
+        dudaSelectedDateISO = hoje;
         saveState();
       }
     }
@@ -822,10 +1047,7 @@
       db.on('value', (snapshot) => {
         const remoteData = snapshot.val();
         if (remoteData) {
-          appState = { ...defaultState, ...remoteData };
-          appState.pins = normalizePins(remoteData);
-          appState.saude = normalizeSaudeState(remoteData.saude);
-          if (!Array.isArray(appState.desejos)) appState.desejos = [];
+          appState = normalizeStateData({ ...defaultState, ...remoteData });
           checkDailyReset();
           localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
           renderAll();
@@ -836,9 +1058,10 @@
     }
 
     // ============================================================================
-    // 4. CONTROLE DE PERFIS & SEGURANÇA POR SENHA (PAULO, ISABELA, APOIO E DUDA)
+    // 4. CONTROLE DE PERFIS & SEGURANÇA POR SENHA
     // ============================================================================
     let pendingAdultTarget = null;
+    let modalSelectedWho = 'Paulo';
 
     function initProfile() {
       checkDailyReset();
@@ -854,7 +1077,6 @@
         return;
       }
 
-      // Verifica se há uma sessão desbloqueada NESTA aba/abertura (sessionStorage zera ao fechar o app)
       const activeSessionProfile = sessionStorage.getItem('familia_alves_session_profile');
       if (activeSessionProfile === 'Paulo' || activeSessionProfile === 'Isabela') {
         applyProfileView(activeSessionProfile);
@@ -862,7 +1084,6 @@
         return;
       }
 
-      // Se o aparelho estava travado em Modo Duda ou Modo Apoio explicitamente, mantém neles
       const lockedPublicMode = localStorage.getItem('familia_alves_public_mode');
       if (lockedPublicMode === 'Duda' || lockedPublicMode === 'Apoio') {
         applyProfileView(lockedPublicMode);
@@ -870,12 +1091,9 @@
         return;
       }
 
-      // Caso contrário (abriu pelo link, fechou e abriu de novo, ou primeiro acesso): exige escolha + senha!
       document.getElementById('profile-gate').classList.remove('hidden');
       renderAll();
     }
-
-    let modalSelectedWho = 'Paulo';
 
     function selectPinWho(who) {
       modalSelectedWho = who;
@@ -898,6 +1116,7 @@
       sessionStorage.removeItem('familia_alves_session_profile');
       localStorage.setItem('familia_alves_public_mode', profile);
       document.getElementById('profile-gate').classList.add('hidden');
+      if (profile === 'Duda') dudaSelectedDateISO = getTodayISO();
       applyProfileView(profile);
       renderAll();
     }
@@ -987,14 +1206,43 @@
     }
 
     // ============================================================================
-    // 5. NAVEGAÇÃO ENTRE ABAS & CALENDÁRIO MENSAL
+    // 5. NAVEGAÇÃO ENTRE ABAS, SELETOR DE DIA E CALENDÁRIO MENSAL
     // ============================================================================
     function switchTab(tabId, title, btn) {
       document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabId}`).classList.add('active');
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
       document.getElementById('header-title').textContent = title;
+    }
+
+    function shiftHojeDay(delta) {
+      hojeSelectedDateISO = addDaysISO(hojeSelectedDateISO, delta);
+      selectedDateISO = hojeSelectedDateISO;
+      const dt = parseISODate(hojeSelectedDateISO);
+      calYear = dt.getFullYear();
+      calMonth = dt.getMonth();
+      renderHoje();
+      renderCalendar();
+      renderAgenda();
+    }
+
+    function goHojeToday() {
+      hojeSelectedDateISO = getTodayISO();
+      selectedDateISO = hojeSelectedDateISO;
+      const dt = parseISODate(hojeSelectedDateISO);
+      calYear = dt.getFullYear();
+      calMonth = dt.getMonth();
+      renderHoje();
+      renderCalendar();
+      renderAgenda();
+    }
+
+    function openDayInHojeTab() {
+      hojeSelectedDateISO = selectedDateISO;
+      const btnHoje = document.getElementById('nav-btn-hoje');
+      switchTab('hoje', 'Família Alves · Dia', btnHoje);
+      renderHoje();
     }
 
     function setAgendaFilter(filter, btn) {
@@ -1018,6 +1266,12 @@
       renderAgenda();
     }
 
+    function getDayLogistica(iso) {
+      const porDia = appState.logisticaPorDia || {};
+      if (porDia[iso]) return porDia[iso];
+      return appState.logistica || { leva: "Paulo (07:30)", busca: "Isabela (12:00)" };
+    }
+
     function renderCalendar() {
       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       document.getElementById('cal-month-label').textContent = `${monthNames[calMonth]} ${calYear}`;
@@ -1035,9 +1289,14 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const iso = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const eventsOnDay = (appState.agenda || []).filter(e => e.data === iso && (currentFilter === 'Todos' || e.categoria === currentFilter));
+        const hasMuralOrLog = (appState.mural || []).some(m => m.data === iso) || Boolean((appState.logisticaPorDia || {})[iso]);
         const isToday = iso === hoje ? 'today' : '';
         const isSelected = iso === selectedDateISO ? 'selected' : '';
-        const dots = eventsOnDay.slice(0, 3).map(e => `<span class="cal-dot ${e.categoria}"></span>`).join('');
+
+        let dots = eventsOnDay.slice(0, 3).map(e => `<span class="cal-dot ${e.categoria}"></span>`).join('');
+        if (!dots && hasMuralOrLog && currentFilter === 'Todos') {
+          dots = `<span class="cal-dot Duda" style="opacity:0.45;"></span>`;
+        }
 
         html += `
           <div class="cal-day ${isToday} ${isSelected}" onclick="selectCalendarDay('${iso}')">
@@ -1050,7 +1309,7 @@
     }
 
     // ============================================================================
-    // 6. RENDERIZAÇÃO DAS TELAS
+    // 6. RENDERIZAÇÃO DAS TELAS (HOJE, FAMÍLIA, SAÚDE, DUDA E ADMIN SEMANAL)
     // ============================================================================
     function renderAll() {
       renderHoje();
@@ -1064,32 +1323,94 @@
     }
 
     function renderHoje() {
-      const casalEl = document.getElementById('casal-hoje-list');
-      casalEl.innerHTML = (appState.casalHoje || []).map((item, idx) => `
-        <div class="row-item">
-          <span>• ${item.texto}</span>
-          <small style="cursor:pointer;" onclick="deleteCasal(${idx})">✕</small>
-        </div>
-      `).join('');
+      const hoje = getTodayISO();
+      const ontem = addDaysISO(hoje, -1);
+      const amanha = addDaysISO(hoje, 1);
 
+      let prefixo = formatDateBR(hojeSelectedDateISO);
+      if (hojeSelectedDateISO === hoje) prefixo = `Hoje · ${formatDateBR(hojeSelectedDateISO)}`;
+      else if (hojeSelectedDateISO === ontem) prefixo = `Ontem · ${formatDateBR(hojeSelectedDateISO)}`;
+      else if (hojeSelectedDateISO === amanha) prefixo = `Amanhã · ${formatDateBR(hojeSelectedDateISO)}`;
+
+      document.getElementById('hoje-day-label').textContent = prefixo;
+      document.getElementById('hoje-day-sublabel').textContent = getWeekdayNamePT(hojeSelectedDateISO);
+
+      const backTodayBtn = document.getElementById('btn-back-today');
+      if (hojeSelectedDateISO === hoje) backTodayBtn.classList.add('hidden');
+      else backTodayBtn.classList.remove('hidden');
+
+      // Compromissos do Casal filtrados pelo dia selecionado
+      const casalEl = document.getElementById('casal-hoje-list');
+      const casalDoDia = (appState.casalHoje || [])
+        .map((item, idx) => ({ item, idx }))
+        .filter(({ item }) => (item.data || hoje) === hojeSelectedDateISO);
+
+      if (casalDoDia.length === 0) {
+        casalEl.innerHTML = `<p class="hint" style="margin:2px 0 6px;">Nenhum compromisso do casal registrado neste dia.</p>`;
+      } else {
+        casalEl.innerHTML = casalDoDia.map(({ item, idx }) => `
+          <div class="row-item">
+            <span>• ${item.texto}</span>
+            <div class="item-actions-inline">
+              <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteCasal(${idx})">🗑️</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Pendências da Casa (globais, com editar e excluir)
       const pendEl = document.getElementById('pendencias-list');
-      pendEl.innerHTML = (appState.pendencias || []).map((item, idx) => `
-        <div class="check-item ${item.done ? 'done' : ''}" onclick="togglePendencia(${idx})">
-          <span>${item.done ? '✅' : '⬜'} ${item.texto} ${item.valor ? `<span class="valor-pill">R$ ${item.valor}</span>` : ''}</span>
-          <small onclick="event.stopPropagation(); deletePendencia(${idx})">🗑️</small>
-        </div>
-      `).join('');
+      if ((appState.pendencias || []).length === 0) {
+        pendEl.innerHTML = `<p class="hint" style="margin:2px 0;">Nenhuma pendência cadastrada.</p>`;
+      } else {
+        pendEl.innerHTML = (appState.pendencias || []).map((item, idx) => `
+          <div class="check-item ${item.done ? 'done' : ''}" onclick="togglePendencia(${idx})">
+            <span>${item.done ? '✅' : '⬜'} ${item.texto} ${item.valor ? `<span class="valor-pill">R$ ${item.valor}</span>` : ''}</span>
+            <div class="item-actions-inline" onclick="event.stopPropagation()">
+              <span class="act-icon" title="Editar" onclick="openModalEditarPendencia(${idx})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deletePendencia(${idx})">🗑️</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Mural Rápido vinculado ao dia selecionado (não apaga ao virar o dia!)
+      document.getElementById('mural-card-title').textContent = hojeSelectedDateISO === hoje
+        ? '📌 Mural Rápido · Hoje'
+        : `📌 Mural · ${formatDateBR(hojeSelectedDateISO)}`;
 
       const muralEl = document.getElementById('mural-list');
-      muralEl.innerHTML = (appState.mural || []).map((m, idx) => `
-        <div class="check-item" style="border:none; padding:4px 0;">
-          <span><strong>${m.autor}:</strong> ${m.texto}</span>
-          <small onclick="deleteMural(${idx})">✕</small>
-        </div>
-      `).join('');
+      const muralDoDia = (appState.mural || [])
+        .map((m, idx) => ({ m, idx }))
+        .filter(({ m }) => (m.data || hoje) === hojeSelectedDateISO);
 
-      document.getElementById('hoje-leva').textContent = appState.logistica.leva;
-      document.getElementById('hoje-busca').textContent = appState.logistica.busca;
+      if (muralDoDia.length === 0) {
+        muralEl.innerHTML = `<p class="hint" style="margin:0;">Nenhum recado fixado neste dia.</p>`;
+      } else {
+        muralEl.innerHTML = muralDoDia.map(({ m, idx }) => `
+          <div class="check-item" style="border:none; padding:4px 0; cursor:default;">
+            <span><strong>${m.autor}:</strong> ${m.texto}</span>
+            <div class="item-actions-inline">
+              <span class="act-icon" title="Editar" onclick="openModalEditarMural(${idx})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteMural(${idx})">🗑️</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Logística do dia selecionado
+      const logDia = getDayLogistica(hojeSelectedDateISO);
+      document.getElementById('hoje-leva').textContent = logDia.leva;
+      document.getElementById('hoje-busca').textContent = logDia.busca;
+
+      // Progresso de missões da Duda naquele dia
+      const stats = getDayMissionStats(hojeSelectedDateISO);
+      document.getElementById('adult-duda-progress-label').textContent = hojeSelectedDateISO === hoje
+        ? 'Missões de hoje'
+        : `Missões de ${formatDateBR(hojeSelectedDateISO)}`;
+      document.getElementById('adult-duda-progress-text').textContent = `${stats.done} de ${stats.total} (${stats.pct}%)`;
+      document.getElementById('adult-duda-progress-fill').style.width = `${stats.pct}%`;
     }
 
     function renderAgenda() {
@@ -1110,7 +1431,10 @@
             <span class="agenda-tag ${item.categoria}">${item.categoria}</span>
             ${item.hora ? `<strong>${item.hora} · </strong>` : ''}${item.texto}
           </div>
-          <small style="cursor:pointer;" onclick="deleteAgenda(${item.originalIdx})">🗑️</small>
+          <div class="item-actions-inline">
+            <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${item.originalIdx})">✏️</span>
+            <span class="act-icon" title="Excluir" onclick="deleteAgenda(${item.originalIdx})">🗑️</span>
+          </div>
         </div>
       `).join('');
     }
@@ -1120,7 +1444,10 @@
       mercEl.innerHTML = (appState.mercado || []).map((item, idx) => `
         <div class="check-item ${item.done ? 'done' : ''}" onclick="toggleMercado(${idx})">
           <span>${item.done ? '✅' : '⬜'} ${item.texto}</span>
-          <small onclick="event.stopPropagation(); deleteMercado(${idx})">🗑️</small>
+          <div class="item-actions-inline" onclick="event.stopPropagation()">
+            <span class="act-icon" title="Editar" onclick="openModalEditarMercado(${idx})">✏️</span>
+            <span class="act-icon" title="Excluir" onclick="deleteMercado(${idx})">🗑️</span>
+          </div>
         </div>
       `).join('');
     }
@@ -1224,8 +1551,11 @@
     }
 
     function renderApoio() {
-      document.getElementById('apoio-leva').textContent = appState.logistica.leva;
-      document.getElementById('apoio-busca').textContent = appState.logistica.busca;
+      const hoje = getTodayISO();
+      const logHoje = getDayLogistica(hoje);
+      document.getElementById('apoio-leva').textContent = logHoje.leva;
+      document.getElementById('apoio-busca').textContent = logHoje.busca;
+
       const s = appState.saude;
       const remedios = s.remedios || [];
       document.getElementById('apoio-remedio-box').innerHTML = remedios.length === 0
@@ -1245,29 +1575,155 @@
       `;
     }
 
-    function renderMissoes() {
+    // --- CÁLCULO SEMANAL (SEG A DOM) PARA DUDA E ADMIN ---
+    function getDayMissionStats(iso) {
+      const hoje = getTodayISO();
       const missoes = appState.missoes || [];
-      const total = missoes.length;
-      const feitas = missoes.filter(m => m.done).length;
-      const pct = total > 0 ? Math.round((feitas / total) * 100) : 0;
+      if (iso === hoje) {
+        const total = missoes.length;
+        const done = missoes.filter(m => m.done).length;
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        return { done, total, pct, completedIds: missoes.filter(m => m.done).map(m => m.id) };
+      }
+      const entry = (appState.historicoMissoes || {})[iso];
+      if (!entry) {
+        return { done: 0, total: missoes.length, pct: 0, completedIds: [] };
+      }
+      const completedIds = Array.isArray(entry.completedIds) ? entry.completedIds : [];
+      const total = Number(entry.totalCount) || missoes.length;
+      const done = completedIds.length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      return { done, total, pct, completedIds };
+    }
 
-      document.getElementById('adult-duda-progress-text').textContent = `${feitas} de ${total} (${pct}%)`;
-      document.getElementById('adult-duda-progress-fill').style.width = `${pct}%`;
+    function getWeekStarsEarned(mondayISO) {
+      const days = getWeekDaysArray(mondayISO);
+      return days.reduce((sum, d) => sum + getDayMissionStats(d.iso).done, 0);
+    }
 
-      document.getElementById('duda-counter-text').textContent = `${feitas} de ${total} Missões Feitas!`;
-      document.getElementById('duda-progress-fill').style.width = `${pct}%`;
+    function getPastWeeksSummary() {
+      const hoje = getTodayISO();
+      const currentMonday = getMondayOfWeekISO(hoje);
+      const hist = appState.historicoMissoes || {};
+      const weekMap = {};
+
+      Object.keys(hist).forEach(iso => {
+        const mon = getMondayOfWeekISO(iso);
+        if (mon < currentMonday) {
+          if (!weekMap[mon]) {
+            weekMap[mon] = { mondayISO: mon, sundayISO: addDaysISO(mon, 6), stars: 0, totalTasks: 0 };
+          }
+          const st = getDayMissionStats(iso);
+          weekMap[mon].stars += st.done;
+          weekMap[mon].totalTasks += st.total;
+        }
+      });
+
+      return Object.values(weekMap).sort((a, b) => b.mondayISO.localeCompare(a.mondayISO));
+    }
+
+    function selectDudaWeekDay(iso) {
+      const hoje = getTodayISO();
+      if (iso > hoje) return; // Não seleciona dias futuros
+      dudaSelectedDateISO = iso;
+      renderMissoes();
+    }
+
+    function renderMissoes() {
+      const hoje = getTodayISO();
+      if (dudaSelectedDateISO > hoje) dudaSelectedDateISO = hoje;
+
+      const missoes = appState.missoes || [];
+      const isViewingToday = dudaSelectedDateISO === hoje;
+      const dayStats = getDayMissionStats(dudaSelectedDateISO);
+
+      const currentMonday = getMondayOfWeekISO(hoje);
+      const currentSunday = addDaysISO(currentMonday, 6);
+      const weekStars = getWeekStarsEarned(currentMonday);
+      const walletStars = appState.estrelasTotal || 0;
+
+      // Hero Duda
+      document.getElementById('duda-total-stars').textContent = `💰 Saldo: ${walletStars} ⭐`;
+      document.getElementById('duda-week-stars').textContent = `📅 Semana: ${weekStars} ⭐`;
+      document.getElementById('duda-counter-text').textContent = isViewingToday
+        ? `${dayStats.done} de ${dayStats.total} Missões Feitas!`
+        : `${formatDateBR(dudaSelectedDateISO)}: ${dayStats.done} de ${dayStats.total} Feitas`;
+      document.getElementById('duda-progress-fill').style.width = `${dayStats.pct}%`;
 
       const celeb = document.getElementById('duda-celebration-msg');
-      if (total > 0 && feitas === total) {
+      if (isViewingToday && dayStats.total > 0 && dayStats.done === dayStats.total) {
         celeb.classList.remove('hidden');
       } else {
         celeb.classList.add('hidden');
       }
 
-      const stars = appState.estrelasTotal || 0;
-      document.getElementById('duda-total-stars').textContent = `⭐ ${stars} ${stars === 1 ? 'Estrela' : 'Estrelas'}`;
-      document.getElementById('admin-estrelas-count').textContent = `⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}`;
+      // Barrinha Semanal (Seg a Dom) na tela da Duda e na tela Admin
+      const weekDays = getWeekDaysArray(currentMonday);
+      const stripHTML = weekDays.map(d => {
+        const st = getDayMissionStats(d.iso);
+        const isToday = d.iso === hoje;
+        const isFuture = d.iso > hoje;
+        const isSelected = d.iso === dudaSelectedDateISO;
+        let icon = '·';
+        if (isFuture) icon = '⏳';
+        else if (st.total > 0 && st.done === st.total) icon = '🌟';
+        else if (st.done > 0) icon = `${st.done}⭐`;
+        else if (!isToday) icon = '0⭐';
+        else icon = '🎯';
 
+        return `
+          <div class="week-day-pill ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFuture ? 'future' : ''}"
+               onclick="${isFuture ? '' : `selectDudaWeekDay('${d.iso}')`}">
+            <small>${d.label}</small>
+            <strong>${d.dayNum}</strong>
+            <span>${icon}</span>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('duda-week-title').textContent = `📆 Semana (${formatDateBR(currentMonday)} a ${formatDateBR(currentSunday)})`;
+      document.getElementById('duda-week-strip').innerHTML = stripHTML;
+
+      const readonlyBanner = document.getElementById('duda-readonly-banner');
+      if (isViewingToday) readonlyBanner.classList.add('hidden');
+      else readonlyBanner.classList.remove('hidden');
+
+      // Espelho no Admin
+      document.getElementById('admin-week-range-label').textContent =
+        `Semana atual (${formatDateBR(currentMonday)} a ${formatDateBR(currentSunday)}): ${weekStars} ⭐ conquistadas`;
+      document.getElementById('admin-week-strip').innerHTML = weekDays.map(d => {
+        const st = getDayMissionStats(d.iso);
+        const isToday = d.iso === hoje;
+        const isFuture = d.iso > hoje;
+        return `
+          <div class="week-day-pill ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''}" style="cursor:default;">
+            <small>${d.label}</small>
+            <strong>${d.dayNum}</strong>
+            <span>${isFuture ? '-' : `${st.done}/${st.total}`}</span>
+          </div>
+        `;
+      }).join('');
+
+      const pastWeeks = getPastWeeksSummary();
+      const adminPastEl = document.getElementById('admin-past-weeks-list');
+      if (pastWeeks.length === 0) {
+        adminPastEl.innerHTML = `<p class="hint" style="margin:0;">O histórico das próximas semanas fechadas (Seg a Dom) aparecerá automaticamente aqui.</p>`;
+      } else {
+        adminPastEl.innerHTML = pastWeeks.map(w => `
+          <div class="week-history-row">
+            <div>
+              <strong>Semana ${formatDateBR(w.mondayISO)} a ${formatDateBR(w.sundayISO)}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">${w.stars} de ${w.totalTasks} missões cumpridas</div>
+            </div>
+            <span class="week-badge-stars">+${w.stars} ⭐</span>
+          </div>
+        `).join('');
+      }
+
+      // Saldo Admin
+      document.getElementById('admin-estrelas-count').textContent = `⭐ ${walletStars} ${walletStars === 1 ? 'estrela' : 'estrelas'}`;
+
+      // Lista de missões na tela da Duda (editável apenas se isViewingToday)
       const turnos = ['Manhã', 'Tarde', 'Noite'];
       const icons = { 'Manhã': '☀️', 'Tarde': '🌤️', 'Noite': '🌙' };
       const dudaContainer = document.getElementById('duda-missoes-container');
@@ -1277,28 +1733,53 @@
         if (doTurno.length === 0) return '';
         return `
           <h3 class="duda-turno-title">${icons[turno]} ${turno}</h3>
-          ${doTurno.map(m => `
-            <div class="duda-mission-card ${m.done ? 'completed' : ''}" onclick="toggleMissao(${m.idx})">
-              <div class="mission-left">
-                <span class="mission-emoji">${m.emoji || '⭐'}</span>
-                <span>${m.titulo}</span>
+          ${doTurno.map(m => {
+            const isDone = isViewingToday ? m.done : dayStats.completedIds.includes(m.id);
+            return `
+              <div class="duda-mission-card ${isDone ? 'completed' : ''} ${!isViewingToday ? 'locked-past' : ''}"
+                   onclick="${isViewingToday ? `toggleMissao(${m.idx})` : ''}">
+                <div class="mission-left">
+                  <span class="mission-emoji">${m.emoji || '⭐'}</span>
+                  <span>${m.titulo}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span class="mission-star-tag">${isDone ? '+1 ⭐' : '1 ⭐'}</span>
+                  <div class="mission-circle">${isDone ? '✓' : ''}</div>
+                </div>
               </div>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span class="mission-star-tag">${m.done ? '+1 ⭐' : '1 ⭐'}</span>
-                <div class="mission-circle">${m.done ? '✓' : ''}</div>
-              </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         `;
       }).join('');
 
+      // Lista de missões no Admin
       const adminEl = document.getElementById('admin-missoes-list');
       adminEl.innerHTML = missoes.map((m, idx) => `
         <div class="check-item">
           <span>${m.emoji || '⭐'} <strong>[${m.turno}]</strong> ${m.titulo} ${m.done ? '✅' : ''}</span>
-          <small onclick="deleteMissao(${idx})">🗑️</small>
+          <div class="item-actions-inline">
+            <span class="act-icon" title="Editar" onclick="openModalEditarMissao(${idx})">✏️</span>
+            <span class="act-icon" title="Excluir" onclick="deleteMissao(${idx})">🗑️</span>
+          </div>
         </div>
       `).join('');
+    }
+
+    function openModalSemanasAnterioresDuda() {
+      const pastWeeks = getPastWeeksSummary();
+      const bodyHTML = pastWeeks.length === 0
+        ? `<p class="hint">Esta é a sua primeira semana por aqui! Assim que chegar segunda-feira, o resumo desta semana ficará guardado aqui. 🌟</p>`
+        : pastWeeks.map(w => `
+            <div class="week-history-row">
+              <div>
+                <strong>Semana ${formatDateBR(w.mondayISO)} a ${formatDateBR(w.sundayISO)}</strong>
+                <div style="font-size:12px; color:var(--text-muted);">${w.stars} de ${w.totalTasks} missões feitas</div>
+              </div>
+              <span class="week-badge-stars">+${w.stars} ⭐</span>
+            </div>
+          `).join('');
+
+      openSheet('📜 Minhas Semanas Anteriores', bodyHTML, () => {});
     }
 
     function renderDesejos() {
@@ -1367,7 +1848,7 @@
     }
 
     // ============================================================================
-    // 7. BOTTOM SHEET MODALS
+    // 7. BOTTOM SHEET MODALS (INCLUINDO EDIÇÃO COMPLETA EM HOJE E FAMÍLIA)
     // ============================================================================
     function openSheet(title, bodyHTML, onSave) {
       document.getElementById('sheet-title').textContent = title;
@@ -1394,7 +1875,7 @@
       document.getElementById(hiddenInputId).value = el.dataset.val;
     }
 
-    // --- MODAIS DE SAÚDE (MÚLTIPLOS REMÉDIOS + CORREÇÃO/EXCLUSÃO DE DOSES) ---
+    // --- MODAIS DE SAÚDE ---
     function buildRemedioFormHTML(rem) {
       const r = rem || { nome: '', intervaloHoras: 6, horarioFixo: '' };
       const intVal = r.intervaloHoras || 6;
@@ -1594,10 +2075,11 @@
       saveState();
     }
 
+    // --- DESEJOS & PIN ---
     function openModalDesejoDuda() {
       const stars = appState.estrelasTotal || 0;
       openSheet('Qual é o seu desejo, Duda? 🌟', `
-        <p class="hint">Você tem <strong>⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}</strong> agora. Escreva o que você quer pedir:</p>
+        <p class="hint">Você tem <strong>⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}</strong> disponíveis. Escreva o que você quer pedir:</p>
         <label>Meu desejo</label>
         <input type="text" id="inp-desejo-txt" placeholder="Ex: Tomar sorvete ou escolher o filme" />
         <label>Quantas estrelas você quer oferecer?</label>
@@ -1660,8 +2142,14 @@
     }
 
     function openModalEstrelasManual() {
-      openSheet('Ajustar Saldo de Estrelas', `
-        <label>Quantidade total de estrelas</label>
+      openSheet('Atribuir / Ajustar Estrelas ⭐', `
+        <p class="hint">Use os atalhos para somar estrelas extras (ex: se a Duda esqueceu de marcar ontem) ou defina o saldo total diretamente:</p>
+        <div class="chip-group" style="margin-bottom:10px;">
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 1">+1 ⭐</button>
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 3">+3 ⭐</button>
+          <button type="button" class="chip-opt" onclick="document.getElementById('inp-estrelas-qtd').value = Number(document.getElementById('inp-estrelas-qtd').value || 0) + 5">+5 ⭐</button>
+        </div>
+        <label>Saldo Disponível Total</label>
         <input type="number" id="inp-estrelas-qtd" min="0" value="${appState.estrelasTotal || 0}" />
       `, () => {
         const qtd = Math.max(0, Number(document.getElementById('inp-estrelas-qtd').value) || 0);
@@ -1670,32 +2158,60 @@
       });
     }
 
+    // --- CASAL (ADICIONAR E EDITAR + VÍNCULO COM DATA) ---
     function openModalCasal() {
       const user = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      openSheet('Compromisso do Casal Hoje', `
+      openSheet(`Compromisso do Casal · ${formatDateBR(hojeSelectedDateISO)}`, `
         <label>Quem</label>
         <input type="hidden" id="inp-casal-quem" value="${user}" />
         <div class="chip-group">
           <button type="button" class="chip-opt ${user==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-casal-quem')">Paulo</button>
           <button type="button" class="chip-opt ${user==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-casal-quem')">Isabela</button>
         </div>
+        <label>Data</label>
+        <input type="date" id="inp-casal-data" value="${hojeSelectedDateISO}" />
         <label>Descrição / Horário</label>
         <input type="text" id="inp-casal-txt" placeholder="Ex: Turno até 18h ou Dentista 15h" />
       `, () => {
         const quem = document.getElementById('inp-casal-quem').value;
+        const data = document.getElementById('inp-casal-data').value || hojeSelectedDateISO;
         const txt = document.getElementById('inp-casal-txt').value.trim();
         if (txt) {
-          appState.casalHoje.push({ id: Date.now(), texto: `${quem}: ${txt}` });
+          const textoFinal = `${quem}: ${txt}`;
+          appState.casalHoje.push({ id: Date.now(), data, texto: textoFinal });
+          appState.agenda.push({ id: Date.now() + 1, categoria: 'Casal', data, hora: '', texto: textoFinal });
+          hojeSelectedDateISO = data;
+          selectedDateISO = data;
           saveState();
         }
       });
     }
 
+    function openModalEditarCasal(idx) {
+      const item = appState.casalHoje[idx];
+      if (!item) return;
+      openSheet('Editar Compromisso do Casal', `
+        <label>Data</label>
+        <input type="date" id="inp-edit-casal-data" value="${item.data || hojeSelectedDateISO}" />
+        <label>Descrição</label>
+        <input type="text" id="inp-edit-casal-txt" value="${item.texto}" />
+      `, () => {
+        const data = document.getElementById('inp-edit-casal-data').value || item.data || hojeSelectedDateISO;
+        const txt = document.getElementById('inp-edit-casal-txt').value.trim();
+        if (txt) {
+          item.data = data;
+          item.texto = txt;
+          saveState();
+        }
+      });
+    }
+
+    // --- PENDÊNCIAS DA CASA (ADICIONAR E EDITAR) ---
     function openModalPendencia() {
       openSheet('Nova Pendência da Casa', `
         <label>Tarefa</label>
         <input type="text" id="inp-pend-txt" placeholder="Ex: Pagar boleto da escola" />
-        <label>Valor R$ (Opcional - p/ integração futura)</label>
+        <label>Valor R$ (Opcional)</label>
         <input type="text" id="inp-pend-val" inputmode="decimal" placeholder="Ex: 120,00" />
       `, () => {
         const texto = document.getElementById('inp-pend-txt').value.trim();
@@ -1707,33 +2223,88 @@
       });
     }
 
-    function openModalMural() {
-      const autor = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      openSheet('Fixar Recado no Mural', `
-        <label>Mensagem rápida (${autor})</label>
-        <input type="text" id="inp-mural-txt" placeholder="Ex: Deixei a autorização na mochila" />
+    function openModalEditarPendencia(idx) {
+      const item = appState.pendencias[idx];
+      if (!item) return;
+      openSheet('Editar Pendência da Casa', `
+        <label>Tarefa</label>
+        <input type="text" id="inp-edit-pend-txt" value="${item.texto}" />
+        <label>Valor R$ (Opcional)</label>
+        <input type="text" id="inp-edit-pend-val" inputmode="decimal" value="${item.valor || ''}" />
       `, () => {
-        const texto = document.getElementById('inp-mural-txt').value.trim();
+        const texto = document.getElementById('inp-edit-pend-txt').value.trim();
+        const valor = document.getElementById('inp-edit-pend-val').value.trim();
         if (texto) {
-          appState.mural.unshift({ id: Date.now(), autor, texto });
+          item.texto = texto;
+          item.valor = valor;
           saveState();
         }
       });
     }
 
-    function openModalLogistica() {
-      openSheet('Logística Escolar de Hoje', `
-        <label>Quem Leva</label>
-        <input type="text" id="inp-log-leva" value="${appState.logistica.leva}" />
-        <label>Quem Busca</label>
-        <input type="text" id="inp-log-busca" value="${appState.logistica.busca}" />
+    // --- MURAL RÁPIDO POR DIA (ADICIONAR E EDITAR) ---
+    function openModalMural() {
+      const autor = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
+      openSheet(`Fixar Recado · ${formatDateBR(hojeSelectedDateISO)}`, `
+        <label>Data do Recado</label>
+        <input type="date" id="inp-mural-data" value="${hojeSelectedDateISO}" />
+        <label>Mensagem rápida (${autor})</label>
+        <input type="text" id="inp-mural-txt" placeholder="Ex: Deixei a autorização na mochila" />
       `, () => {
-        appState.logistica.leva = document.getElementById('inp-log-leva').value.trim() || appState.logistica.leva;
-        appState.logistica.busca = document.getElementById('inp-log-busca').value.trim() || appState.logistica.busca;
+        const data = document.getElementById('inp-mural-data').value || hojeSelectedDateISO;
+        const texto = document.getElementById('inp-mural-txt').value.trim();
+        if (texto) {
+          appState.mural.unshift({ id: Date.now(), data, autor, texto });
+          hojeSelectedDateISO = data;
+          saveState();
+        }
+      });
+    }
+
+    function openModalEditarMural(idx) {
+      const item = appState.mural[idx];
+      if (!item) return;
+      openSheet('Editar Recado do Mural', `
+        <label>Data do Recado</label>
+        <input type="date" id="inp-edit-mural-data" value="${item.data || hojeSelectedDateISO}" />
+        <label>Autor</label>
+        <input type="text" id="inp-edit-mural-autor" value="${item.autor}" />
+        <label>Mensagem</label>
+        <input type="text" id="inp-edit-mural-txt" value="${item.texto}" />
+      `, () => {
+        const data = document.getElementById('inp-edit-mural-data').value || item.data || hojeSelectedDateISO;
+        const autor = document.getElementById('inp-edit-mural-autor').value.trim() || item.autor;
+        const texto = document.getElementById('inp-edit-mural-txt').value.trim();
+        if (texto) {
+          item.data = data;
+          item.autor = autor;
+          item.texto = texto;
+          saveState();
+        }
+      });
+    }
+
+    // --- LOGÍSTICA ESCOLAR POR DIA + VÍNCULO COM AGENDA ---
+    function openModalLogistica() {
+      const currentLog = getDayLogistica(hojeSelectedDateISO);
+      openSheet(`Logística Escolar · ${formatDateBR(hojeSelectedDateISO)}`, `
+        <label>Quem Leva</label>
+        <input type="text" id="inp-log-leva" value="${currentLog.leva}" />
+        <label>Quem Busca</label>
+        <input type="text" id="inp-log-busca" value="${currentLog.busca}" />
+      `, () => {
+        const leva = document.getElementById('inp-log-leva').value.trim() || currentLog.leva;
+        const busca = document.getElementById('inp-log-busca').value.trim() || currentLog.busca;
+        if (!appState.logisticaPorDia) appState.logisticaPorDia = {};
+        appState.logisticaPorDia[hojeSelectedDateISO] = { leva, busca };
+        if (hojeSelectedDateISO === getTodayISO()) {
+          appState.logistica = { leva, busca };
+        }
         saveState();
       });
     }
 
+    // --- AGENDA / CALENDÁRIO (ADICIONAR E EDITAR) ---
     function openModalAgenda() {
       openSheet('Novo Evento no Calendário', `
         <label>Categoria</label>
@@ -1762,6 +2333,40 @@
       });
     }
 
+    function openModalEditarAgenda(idx) {
+      const item = appState.agenda[idx];
+      if (!item) return;
+      openSheet('Editar Evento do Calendário', `
+        <label>Categoria</label>
+        <input type="hidden" id="inp-edit-ag-cat" value="${item.categoria}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${item.categoria==='Duda'?'selected':''}" data-val="Duda" onclick="selectChip(this, 'inp-edit-ag-cat')">Duda</button>
+          <button type="button" class="chip-opt ${item.categoria==='Casal'?'selected':''}" data-val="Casal" onclick="selectChip(this, 'inp-edit-ag-cat')">Casal</button>
+          <button type="button" class="chip-opt ${item.categoria==='Casa'?'selected':''}" data-val="Casa" onclick="selectChip(this, 'inp-edit-ag-cat')">Casa</button>
+        </div>
+        <label>Data</label>
+        <input type="date" id="inp-edit-ag-data" value="${item.data}" />
+        <label>Horário (Opcional)</label>
+        <input type="time" id="inp-edit-ag-hora" value="${item.hora || ''}" />
+        <label>Descrição</label>
+        <input type="text" id="inp-edit-ag-txt" value="${item.texto}" />
+      `, () => {
+        const categoria = document.getElementById('inp-edit-ag-cat').value;
+        const data = document.getElementById('inp-edit-ag-data').value || item.data;
+        const hora = document.getElementById('inp-edit-ag-hora').value;
+        const texto = document.getElementById('inp-edit-ag-txt').value.trim();
+        if (texto) {
+          item.categoria = categoria;
+          item.data = data;
+          item.hora = hora;
+          item.texto = texto;
+          selectedDateISO = data;
+          saveState();
+        }
+      });
+    }
+
+    // --- LISTA COMPARTILHADA / MERCADO (ADICIONAR E EDITAR) ---
     function openModalMercado() {
       openSheet('Adicionar à Lista Compartilhada', `
         <label>Item</label>
@@ -1775,6 +2380,22 @@
       });
     }
 
+    function openModalEditarMercado(idx) {
+      const item = appState.mercado[idx];
+      if (!item) return;
+      openSheet('Editar Item da Lista', `
+        <label>Item</label>
+        <input type="text" id="inp-edit-merc-txt" value="${item.texto}" />
+      `, () => {
+        const texto = document.getElementById('inp-edit-merc-txt').value.trim();
+        if (texto) {
+          item.texto = texto;
+          saveState();
+        }
+      });
+    }
+
+    // --- FICHA & MISSÕES (ADICIONAR E EDITAR) ---
     function openModalFicha() {
       const s = appState.saude;
       openSheet('Editar Ficha Rápida', `
@@ -1818,6 +2439,31 @@
         const titulo = document.getElementById('inp-mis-txt').value.trim();
         if (titulo) {
           appState.missoes.push({ id: Date.now(), turno, emoji, titulo, done: false });
+          syncTodayMissionHistory();
+          saveState();
+        }
+      });
+    }
+
+    function openModalEditarMissao(idx) {
+      const m = appState.missoes[idx];
+      if (!m) return;
+      openSheet('Editar Missão', `
+        <label>Turno do Dia</label>
+        <input type="hidden" id="inp-edit-mis-turno" value="${m.turno}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${m.turno==='Manhã'?'selected':''}" data-val="Manhã" onclick="selectChip(this, 'inp-edit-mis-turno')">☀️ Manhã</button>
+          <button type="button" class="chip-opt ${m.turno==='Tarde'?'selected':''}" data-val="Tarde" onclick="selectChip(this, 'inp-edit-mis-turno')">🌤️ Tarde</button>
+          <button type="button" class="chip-opt ${m.turno==='Noite'?'selected':''}" data-val="Noite" onclick="selectChip(this, 'inp-edit-mis-turno')">🌙 Noite</button>
+        </div>
+        <label>Descrição da Missão</label>
+        <input type="text" id="inp-edit-mis-txt" value="${m.titulo}" />
+      `, () => {
+        const turno = document.getElementById('inp-edit-mis-turno').value;
+        const titulo = document.getElementById('inp-edit-mis-txt').value.trim();
+        if (titulo) {
+          m.turno = turno;
+          m.titulo = titulo;
           saveState();
         }
       });
@@ -1833,10 +2479,15 @@
     function deleteAgenda(idx) { appState.agenda.splice(idx, 1); saveState(); }
     function toggleMercado(idx) { appState.mercado[idx].done = !appState.mercado[idx].done; saveState(); }
     function deleteMercado(idx) { appState.mercado.splice(idx, 1); saveState(); }
-    function deleteMissao(idx) { appState.missoes.splice(idx, 1); saveState(); }
+    function deleteMissao(idx) {
+      appState.missoes.splice(idx, 1);
+      syncTodayMissionHistory();
+      saveState();
+    }
     function resetEstrelas() { appState.estrelasTotal = 0; saveState(); }
 
     function toggleMissao(idx) {
+      if (dudaSelectedDateISO !== getTodayISO()) return; // Bloqueia alteração retroativa pela Duda
       const missao = appState.missoes[idx];
       if (!missao) return;
       missao.done = !missao.done;
@@ -1845,6 +2496,7 @@
       } else {
         appState.estrelasTotal = Math.max(0, (appState.estrelasTotal || 0) - 1);
       }
+      syncTodayMissionHistory();
       saveState();
     }
 
@@ -1854,7 +2506,7 @@
       const saldo = appState.estrelasTotal || 0;
       const custo = Number(desejo.custo) || 0;
       if (saldo < custo) {
-        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode ajustar o saldo de estrelas se quiser aprovar mesmo assim.`);
+        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode atribuir/ajustar o saldo de estrelas se quiser aprovar mesmo assim.`);
         return;
       }
       appState.estrelasTotal = saldo - custo;
