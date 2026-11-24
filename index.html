@@ -112,6 +112,8 @@
       transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn-theme-pill:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .modal-box input {
+      width: 164px; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 11px;
       margin: 16px 0; border: 2px solid var(--border); border-radius: 16px; font-weight: 800;
       background: var(--card-bg); color: var(--text-main);
     }
@@ -263,12 +265,6 @@
       background: var(--glance-bg);
       border-radius: 24px; padding: 16px; margin-bottom: 14px;
       border: 1.5px solid var(--glance-border); box-shadow: 0 4px 14px rgba(31, 41, 51, 0.06);
-    }
-    .check-item:last-child { border-bottom: none; }
-    .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
-    .valor-pill {
-      font-size: 11px; font-weight: 700; background: var(--pill-bg); color: var(--pill-text);
-      padding: 2px 8px; border-radius: 8px; margin-left: 6px;
     }
     .hoje-glance-top {
       display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
@@ -875,11 +871,10 @@
           <div class="card-header">
             <h2>🗓️ Linha do Tempo · Dia & Missões</h2>
             <div class="btn-group-mini">
-              <button type="button" class="btn-mini" onclick="openModalCasal()">+ Compromisso</button>
-              <button type="button" class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+              <button type="button" class="btn-mini" onclick="openModalAgenda(null, hojeSelectedDateISO)">+ Compromisso</button>
             </div>
           </div>
-          <p class="hint">Compromissos individuais, da família e missões da Duda em ordem do dia.</p>
+          <p class="hint">Compromissos da família, individuais e missões da Duda em ordem do dia.</p>
           <div id="hoje-timeline-list" class="timeline-feed"></div>
         </div>
       </section>
@@ -905,7 +900,7 @@
             <h2 id="selected-day-title">📅 Eventos do Dia</h2>
             <div class="btn-group-mini">
               <button type="button" class="btn-mini" onclick="openDayInHojeTab()">Abrir Dia ↗</button>
-              <button type="button" class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+              <button type="button" class="btn-mini" onclick="openModalAgenda(null, selectedDateISO)">+ Compromisso</button>
             </div>
           </div>
           <div id="agenda-list" class="agenda-list"></div>
@@ -1409,6 +1404,34 @@
       };
     }
 
+    // Extrai a lista normalizada de participantes de um evento ou compromisso
+    function getItemParticipants(item) {
+      if (!item) return ['Família'];
+      if (Array.isArray(item.participantes) && item.participantes.length > 0) {
+        return item.participantes.map(normalizeCategoriaName);
+      }
+      if (item.categoria) return [normalizeCategoriaName(item.categoria)];
+      if (item.membro) return [normalizeCategoriaName(item.membro)];
+      return ['Família'];
+    }
+
+    // Verifica se um evento/compromisso deve aparecer no filtro ativo
+    function itemMatchesFilter(item, filter) {
+      if (!filter || filter === 'Todos') return true;
+      const parts = getItemParticipants(item);
+      if (filter === 'Família') return parts.includes('Família');
+      return parts.includes(filter) || parts.includes('Família');
+    }
+
+    // Gera os selos (tags) visuais para um ou mais participantes
+    function renderParticipantTagsHTML(participants) {
+      const list = Array.isArray(participants) && participants.length > 0 ? participants : ['Família'];
+      return list.map(name => {
+        const meta = getMemberMeta(name);
+        return `<span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}</span>`;
+      }).join('');
+    }
+
     const todayStr = getTodayISO();
 
     function createDefaultState() {
@@ -1604,15 +1627,51 @@
           const prefix = String(item.texto || '').split(':')[0].trim();
           item.membro = prefix || 'Paulo';
         }
+        if (!Array.isArray(item.participantes) || item.participantes.length === 0) {
+          item.participantes = [normalizeCategoriaName(item.membro)];
+        } else {
+          item.participantes = item.participantes.map(normalizeCategoriaName);
+        }
         if (!item.recorrencia) item.recorrencia = 'nenhuma';
         if (!Array.isArray(item.diasSemana)) item.diasSemana = [];
       });
       st.mural.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
       st.agenda.forEach(item => {
         item.categoria = normalizeCategoriaName(item.categoria);
+        if (!Array.isArray(item.participantes) || item.participantes.length === 0) {
+          item.participantes = [item.categoria];
+        } else {
+          item.participantes = item.participantes.map(normalizeCategoriaName);
+        }
         if (!item.recorrencia) item.recorrencia = 'nenhuma';
         if (!Array.isArray(item.diasSemana)) item.diasSemana = [];
       });
+
+      // Migra compromissos antigos de casalHoje para a agenda unificada (evita perda de dados)
+      if (Array.isArray(st.casalHoje) && st.casalHoje.length > 0) {
+        st.casalHoje.forEach(c => {
+          const alreadyMigrated = st.agenda.some(a => a.migratedFromCasalId === c.id);
+          if (!alreadyMigrated) {
+            const parts = Array.isArray(c.participantes) && c.participantes.length > 0
+              ? c.participantes
+              : [normalizeCategoriaName(c.membro)];
+            st.agenda.push({
+              id: c.id || (Date.now() + Math.random()),
+              migratedFromCasalId: c.id,
+              categoria: parts[0] || 'Família',
+              participantes: parts,
+              data: c.data || hoje,
+              hora: c.horaInicio || '',
+              horaFim: c.horaFim || '',
+              recorrencia: c.recorrencia || 'nenhuma',
+              diasSemana: Array.isArray(c.diasSemana) ? c.diasSemana : [],
+              dataFimRecorrencia: c.dataFimRecorrencia || '',
+              texto: c.texto || ''
+            });
+          }
+        });
+        st.casalHoje = [];
+      }
 
       if (!st.logisticaPorDia || typeof st.logisticaPorDia !== 'object') {
         st.logisticaPorDia = {};
@@ -2231,10 +2290,7 @@
       const grid = document.getElementById('cal-days-grid');
       const hoje = getTodayISO();
 
-      const filteredAgenda = (appState.agenda || []).filter(e => {
-        const catNorm = normalizeCategoriaName(e.categoria);
-        return currentFilter === 'Todos' || catNorm === currentFilter;
-      });
+      const filteredAgenda = (appState.agenda || []).filter(e => itemMatchesFilter(e, currentFilter));
 
       const muralDates = new Set((appState.mural || []).map(m => m.data));
       const logDates = new Set(Object.keys(appState.logisticaPorDia || {}));
@@ -2251,10 +2307,17 @@
         const isToday = iso === hoje ? 'today' : '';
         const isSelected = iso === selectedDateISO ? 'selected' : '';
 
-        let dots = eventsOnDay.slice(0, 3).map(e => {
-          const meta = getMemberMeta(e.categoria);
-          return `<span class="cal-dot" style="background:${meta.palette.dot};"></span>`;
-        }).join('');
+        let dotsList = [];
+        eventsOnDay.forEach(e => {
+          const parts = getItemParticipants(e);
+          parts.forEach(pName => {
+            if (dotsList.length < 3) {
+              const meta = getMemberMeta(pName);
+              dotsList.push(`<span class="cal-dot" style="background:${meta.palette.dot};"></span>`);
+            }
+          });
+        });
+        let dots = dotsList.join('');
         if (!dots && hasMuralOrLog && currentFilter === 'Todos') {
           dots = `<span class="cal-dot" style="opacity:0.45;"></span>`;
         }
@@ -2349,43 +2412,19 @@
 
       const timelineEntries = [];
 
-      (appState.casalHoje || []).forEach((item, idx) => {
-        if (matchesRecurrenceOnDate(item, hojeSelectedDateISO)) {
-          const horaMatch = String(item.texto || '').match(/\b(\d{1,2}:\d{2})\b/);
-          const hIni = item.horaInicio || (horaMatch ? horaMatch[1] : '');
-          const hFim = item.horaFim || '';
-          const membroNome = item.membro || String(item.texto || '').split(':')[0].trim() || 'Família';
-          const meta = getMemberMeta(membroNome);
-          const recTxt = formatRecurrenceLabel(item);
-          timelineEntries.push({
-            sortKey: hIni || '09:00',
-            timeLabel: formatTimeRange(hIni, hFim, membroNome),
-            badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tag: `${meta.emoji} ${meta.nome}`,
-            title: item.texto,
-            meta: [`Compromisso · ${meta.nome}`, recTxt].filter(Boolean).join(' · '),
-            done: false,
-            actionsHTML: `
-              <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
-              <span class="act-icon" title="Excluir" onclick="deleteCasal(${idx})">🗑️</span>
-            `
-          });
-        }
-      });
-
       (appState.agenda || []).forEach((ev, originalIdx) => {
         if (matchesRecurrenceOnDate(ev, hojeSelectedDateISO)) {
-          const meta = getMemberMeta(ev.categoria);
+          const parts = getItemParticipants(ev);
+          const primaryMeta = getMemberMeta(parts[0]);
           const recTxt = formatRecurrenceLabel(ev);
+          const whoSummary = parts.join(', ');
           timelineEntries.push({
             sortKey: ev.hora || '12:00',
-            timeLabel: formatTimeRange(ev.hora, ev.horaFim, meta.nome),
-            badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tag: `${meta.emoji} ${meta.nome}`,
+            timeLabel: formatTimeRange(ev.hora, ev.horaFim, parts.length > 1 ? `${parts.length} pess.` : primaryMeta.nome),
+            badgeStyle: `background:${primaryMeta.palette.bg}; color:${primaryMeta.palette.text};`,
+            tagsHTML: renderParticipantTagsHTML(parts),
             title: ev.texto,
-            meta: ['Evento no calendário', recTxt].filter(Boolean).join(' · '),
+            meta: [whoSummary, recTxt].filter(Boolean).join(' · '),
             done: false,
             actionsHTML: `
               <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${originalIdx})">✏️</span>
@@ -2404,8 +2443,7 @@
           sortKey: turnoOrdem[m.turno] || '15:00',
           timeLabel: m.turno || 'Duda',
           badgeStyle: `background:${dudaMeta.palette.bg}; color:${dudaMeta.palette.text};`,
-          tagStyle: `background:${dudaMeta.palette.bg}; color:${dudaMeta.palette.text};`,
-          tag: '🌟 Duda · Missão',
+          tagsHTML: `<span class="agenda-tag" style="background:${dudaMeta.palette.bg}; color:${dudaMeta.palette.text};">🌟 Duda · Missão</span>`,
           title: `${m.emoji || '⭐'} ${m.titulo}`,
           meta: isDone ? 'Concluída (+1 ⭐)' : 'Pendente da Duda',
           done: isDone,
@@ -2428,7 +2466,7 @@
                    style="${entry.onToggle ? 'cursor:pointer;' : ''}"
                    ${entry.onToggle ? `onclick="${entry.onToggle}"` : ''}>
                 ${entry.onToggle ? `<span>${entry.done ? '✅' : '⬜'}</span>` : ''}
-                <span class="agenda-tag" style="${entry.tagStyle}">${escapeHTML(entry.tag)}</span>
+                ${entry.tagsHTML}
                 <span>${escapeHTML(entry.title)}</span>
               </div>
               <div class="timeline-meta">${escapeHTML(entry.meta)}</div>
@@ -2445,10 +2483,7 @@
       const agendaEl = document.getElementById('agenda-list');
       const filtered = (appState.agenda || [])
         .map((item, originalIdx) => ({ ...item, originalIdx }))
-        .filter(a => {
-          const catNorm = normalizeCategoriaName(a.categoria);
-          return matchesRecurrenceOnDate(a, selectedDateISO) && (currentFilter === 'Todos' || catNorm === currentFilter);
-        })
+        .filter(a => matchesRecurrenceOnDate(a, selectedDateISO) && itemMatchesFilter(a, currentFilter))
         .sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'));
 
       if (filtered.length === 0) {
@@ -2457,13 +2492,15 @@
       }
 
       agendaEl.innerHTML = filtered.map(item => {
-        const meta = getMemberMeta(item.categoria);
+        const parts = getItemParticipants(item);
         const timeRange = formatTimeRange(item.hora, item.horaFim);
         const recTxt = formatRecurrenceLabel(item);
         return `
           <div class="agenda-item">
             <div>
-              <span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}</span>
+              <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">
+                ${renderParticipantTagsHTML(parts)}
+              </div>
               ${timeRange ? `<strong>${escapeHTML(timeRange)} · </strong>` : ''}${escapeHTML(item.texto)}
               ${recTxt ? `<div class="hint" style="margin:3px 0 0;">${escapeHTML(recTxt)}</div>` : ''}
             </div>
@@ -3274,6 +3311,58 @@
       document.getElementById(hiddenInputId).value = el.getAttribute('data-val');
     }
 
+    // Alterna seleção de múltiplos participantes (com suporte exclusivo para "Família")
+    function toggleMultiMemberChip(el, hiddenInputId) {
+      const group = el.parentElement;
+      const val = el.getAttribute('data-val');
+      const allChips = Array.from(group.querySelectorAll('.chip-opt'));
+
+      if (val === 'Família') {
+        allChips.forEach(c => c.classList.toggle('selected', c === el));
+      } else {
+        const famChip = allChips.find(c => c.getAttribute('data-val') === 'Família');
+        if (famChip) famChip.classList.remove('selected');
+        el.classList.toggle('selected');
+      }
+
+      const selectedVals = allChips
+        .filter(c => c.classList.contains('selected'))
+        .map(c => c.getAttribute('data-val'));
+
+      document.getElementById(hiddenInputId).value = JSON.stringify(selectedVals);
+    }
+
+    function buildMultiMemberChipsHTML(hiddenId, selectedNames = ['Família']) {
+      const members = appState.integrantes || DEFAULT_INTEGRANTES;
+      const normalizedSelected = (Array.isArray(selectedNames) && selectedNames.length > 0
+        ? selectedNames
+        : ['Família']
+      ).map(normalizeCategoriaName);
+
+      return `
+        <input type="hidden" id="${hiddenId}" value='${escapeHTML(JSON.stringify(normalizedSelected))}' />
+        <div class="chip-group">
+          ${members.map(m => {
+            const isSel = normalizedSelected.includes(m.nome);
+            return `
+              <button type="button" class="chip-opt ${isSel ? 'selected' : ''}"
+                data-val="${escapeHTML(m.nome)}" onclick="toggleMultiMemberChip(this, '${hiddenId}')">${escapeHTML(m.emoji || '👤')} ${escapeHTML(m.nome)}</button>
+            `;
+          }).join('')}
+        </div>
+        <p class="hint" style="margin:5px 0 0;">Toque para marcar ou desmarcar quem participa (pode escolher mais de uma pessoa).</p>
+      `;
+    }
+
+    function readMultiMemberValues(hiddenId) {
+      try {
+        const raw = document.getElementById(hiddenId)?.value || '[]';
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) return arr.map(normalizeCategoriaName).filter(Boolean);
+      } catch (e) {}
+      return [];
+    }
+
     function buildMemberChipsHTML(hiddenId, selectedName, includeTodos = false) {
       const members = appState.integrantes || DEFAULT_INTEGRANTES;
       const list = includeTodos ? [{ nome: 'Todos', emoji: '✨' }, ...members] : members;
@@ -3390,69 +3479,77 @@
       return { recorrencia, diasSemana, dataFimRecorrencia };
     }
 
-    function openModalCasal(editIdx = null) {
-      const isEdit = editIdx !== null && appState.casalHoje[editIdx];
-      const existing = isEdit ? appState.casalHoje[editIdx] : null;
-      const defaultMember = existing ? (existing.membro || 'Paulo') : 'Paulo';
-      const defaultData = existing ? (existing.data || hojeSelectedDateISO) : hojeSelectedDateISO;
-      const defaultIni = existing ? (existing.horaInicio || '') : '';
-      const defaultFim = existing ? (existing.horaFim || '') : '';
+    function openModalAgenda(editIdx = null, prefillDateISO = null) {
+      const isEdit = editIdx !== null && appState.agenda[editIdx];
+      const existing = isEdit ? appState.agenda[editIdx] : null;
+      const defaultMembers = existing
+        ? getItemParticipants(existing)
+        : [currentFilter !== 'Todos' ? currentFilter : 'Família'];
+      const defaultData = existing ? existing.data : (prefillDateISO || selectedDateISO);
+      const defaultHora = existing ? (existing.hora || '') : '';
+      const defaultHoraFim = existing ? (existing.horaFim || '') : '';
       const defaultRec = existing ? (existing.recorrencia || 'nenhuma') : 'nenhuma';
       const defaultDias = existing ? (existing.diasSemana || []) : [];
       const defaultFimRec = existing ? (existing.dataFimRecorrencia || '') : '';
       const defaultTexto = existing ? existing.texto : '';
 
-      openSheet(isEdit ? 'Editar Compromisso do Dia' : `Compromisso · ${formatDateBR(hojeSelectedDateISO)}`, `
-        <label>Integrante</label>
-        ${buildMemberChipsHTML('inp-casal-membro', defaultMember)}
+      openSheet(isEdit ? 'Editar Compromisso / Evento' : 'Novo Compromisso / Evento', `
+        <label>Quem participa (selecione 1 ou mais)</label>
+        ${buildMultiMemberChipsHTML('inp-ag-cat', defaultMembers)}
         <label>Data de Início</label>
-        <input type="date" id="inp-casal-data" value="${defaultData}" />
+        <input type="date" id="inp-ag-data" value="${defaultData}" />
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <div>
             <label>Horário Início</label>
-            <input type="time" id="inp-casal-ini" value="${defaultIni}" />
+            <input type="time" id="inp-ag-hora" value="${defaultHora}" />
           </div>
           <div>
             <label>Horário Fim</label>
-            <input type="time" id="inp-casal-fim" value="${defaultFim}" />
+            <input type="time" id="inp-ag-hora-fim" value="${defaultHoraFim}" />
           </div>
         </div>
-        ${buildRecurrenceFieldsHTML('inp-casal', defaultRec, defaultDias, defaultData, defaultFimRec)}
-        <label>Compromisso / Descrição</label>
-        <input type="text" id="inp-casal-texto" value="${escapeHTML(defaultTexto)}" placeholder="Ex: Turno de trabalho, Aula de inglês, Consulta..." />
+        ${buildRecurrenceFieldsHTML('inp-ag', defaultRec, defaultDias, defaultData, defaultFimRec)}
+        <label>Descrição</label>
+        <input type="text" id="inp-ag-texto" value="${escapeHTML(defaultTexto)}" placeholder="Ex: Ir ao mercado, Turno, Natação, Consulta..." />
       `, () => {
-        const membro = document.getElementById('inp-casal-membro').value || 'Paulo';
-        const data = document.getElementById('inp-casal-data').value || hojeSelectedDateISO;
-        const horaInicio = document.getElementById('inp-casal-ini').value;
-        const horaFim = document.getElementById('inp-casal-fim').value;
-        const { recorrencia, diasSemana, dataFimRecorrencia } = readRecurrenceValues('inp-casal', data);
-        let texto = document.getElementById('inp-casal-texto').value.trim();
-        if (!texto) {
-          showToast('Digite a descrição do compromisso.', true);
+        const participantes = readMultiMemberValues('inp-ag-cat');
+        const data = document.getElementById('inp-ag-data').value;
+        const hora = document.getElementById('inp-ag-hora').value;
+        const horaFim = document.getElementById('inp-ag-hora-fim').value;
+        const { recorrencia, diasSemana, dataFimRecorrencia } = readRecurrenceValues('inp-ag', data);
+        const texto = document.getElementById('inp-ag-texto').value.trim();
+
+        if (participantes.length === 0) {
+          showToast('Selecione pelo menos um integrante.', true);
           return false;
         }
-        if (horaInicio && horaFim && horaFim < horaInicio) {
+        if (!data || !texto) {
+          showToast('Preencha a data e a descrição.', true);
+          return false;
+        }
+        if (hora && horaFim && horaFim < hora) {
           showToast('O horário de fim não pode ser anterior ao de início.', true);
           return false;
         }
-        if (!texto.toLowerCase().startsWith(membro.toLowerCase())) {
-          texto = `${membro}: ${texto}`;
-        }
+
+        const categoriaPrincipal = participantes[0];
         if (isEdit) {
-          existing.membro = membro;
+          existing.categoria = categoriaPrincipal;
+          existing.participantes = participantes;
           existing.data = data;
-          existing.horaInicio = horaInicio;
+          existing.hora = hora;
           existing.horaFim = horaFim;
           existing.recorrencia = recorrencia;
           existing.diasSemana = diasSemana;
           existing.dataFimRecorrencia = dataFimRecorrencia;
           existing.texto = texto;
         } else {
-          appState.casalHoje.push({
+          appState.agenda.push({
             id: Date.now(),
+            categoria: categoriaPrincipal,
+            participantes,
             data,
-            membro,
-            horaInicio,
+            hora,
             horaFim,
             recorrencia,
             diasSemana,
@@ -3460,21 +3557,17 @@
             texto
           });
         }
+        selectedDateISO = data;
+        const dt = parseISODate(data);
+        calYear = dt.getFullYear();
+        calMonth = dt.getMonth();
         saveState();
         showToast(recorrencia !== 'nenhuma' ? 'Compromisso recorrente salvo!' : 'Compromisso salvo!');
       });
     }
 
-    function openModalEditarCasal(idx) {
-      openModalCasal(idx);
-    }
-
-    function deleteCasal(idx) {
-      openConfirmSheet('Excluir Compromisso', 'Deseja excluir este compromisso (e suas repetições, se houver)?', () => {
-        appState.casalHoje.splice(idx, 1);
-        saveState();
-        showToast('Compromisso excluído.');
-      }, 'Excluir');
+    function openModalEditarAgenda(idx) {
+      openModalAgenda(idx);
     }
 
     function openModalPendencia(editIdx = null) {
@@ -3556,86 +3649,6 @@
         saveState();
         showToast('Recado excluído.');
       }, 'Excluir');
-    }
-
-    function openModalAgenda(editIdx = null) {
-      const isEdit = editIdx !== null && appState.agenda[editIdx];
-      const existing = isEdit ? appState.agenda[editIdx] : null;
-      const defaultCat = existing ? normalizeCategoriaName(existing.categoria) : (currentFilter !== 'Todos' ? currentFilter : 'Família');
-      const defaultData = existing ? existing.data : selectedDateISO;
-      const defaultHora = existing ? (existing.hora || '') : '';
-      const defaultHoraFim = existing ? (existing.horaFim || '') : '';
-      const defaultRec = existing ? (existing.recorrencia || 'nenhuma') : 'nenhuma';
-      const defaultDias = existing ? (existing.diasSemana || []) : [];
-      const defaultFimRec = existing ? (existing.dataFimRecorrencia || '') : '';
-      const defaultTexto = existing ? existing.texto : '';
-
-      openSheet(isEdit ? 'Editar Evento / Compromisso' : 'Novo Evento / Compromisso', `
-        <label>Integrante / Categoria</label>
-        ${buildMemberChipsHTML('inp-ag-cat', defaultCat)}
-        <label>Data de Início</label>
-        <input type="date" id="inp-ag-data" value="${defaultData}" />
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <label>Horário Início</label>
-            <input type="time" id="inp-ag-hora" value="${defaultHora}" />
-          </div>
-          <div>
-            <label>Horário Fim</label>
-            <input type="time" id="inp-ag-hora-fim" value="${defaultHoraFim}" />
-          </div>
-        </div>
-        ${buildRecurrenceFieldsHTML('inp-ag', defaultRec, defaultDias, defaultData, defaultFimRec)}
-        <label>Descrição</label>
-        <input type="text" id="inp-ag-texto" value="${escapeHTML(defaultTexto)}" placeholder="Ex: Natação, Reunião escolar, Consulta..." />
-      `, () => {
-        const categoria = normalizeCategoriaName(document.getElementById('inp-ag-cat').value);
-        const data = document.getElementById('inp-ag-data').value;
-        const hora = document.getElementById('inp-ag-hora').value;
-        const horaFim = document.getElementById('inp-ag-hora-fim').value;
-        const { recorrencia, diasSemana, dataFimRecorrencia } = readRecurrenceValues('inp-ag', data);
-        const texto = document.getElementById('inp-ag-texto').value.trim();
-        if (!data || !texto) {
-          showToast('Preencha a data e a descrição.', true);
-          return false;
-        }
-        if (hora && horaFim && horaFim < hora) {
-          showToast('O horário de fim não pode ser anterior ao de início.', true);
-          return false;
-        }
-        if (isEdit) {
-          existing.categoria = categoria;
-          existing.data = data;
-          existing.hora = hora;
-          existing.horaFim = horaFim;
-          existing.recorrencia = recorrencia;
-          existing.diasSemana = diasSemana;
-          existing.dataFimRecorrencia = dataFimRecorrencia;
-          existing.texto = texto;
-        } else {
-          appState.agenda.push({
-            id: Date.now(),
-            categoria,
-            data,
-            hora,
-            horaFim,
-            recorrencia,
-            diasSemana,
-            dataFimRecorrencia,
-            texto
-          });
-        }
-        selectedDateISO = data;
-        const dt = parseISODate(data);
-        calYear = dt.getFullYear();
-        calMonth = dt.getMonth();
-        saveState();
-        showToast(recorrencia !== 'nenhuma' ? 'Evento recorrente salvo!' : 'Evento salvo!');
-      });
-    }
-
-    function openModalEditarAgenda(idx) {
-      openModalAgenda(idx);
     }
 
     function deleteAgenda(idx) {
