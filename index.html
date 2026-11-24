@@ -2,9 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Família Alves · Rotina & Missões</title>
-  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#4A7C59" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,7 +72,7 @@
     .sheet-handle { width: 42px; height: 4px; background: #D6CFC2; border-radius: 99px; margin: 0 auto 14px; }
     .sheet-box h3 { font-size: 18px; margin-bottom: 12px; color: var(--text-main); font-weight: 800; }
     .sheet-body label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 0.45px; }
-    .sheet-body input, .sheet-body select {
+    .sheet-body input, .sheet-body select, .sheet-body textarea {
       width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 15px; background: var(--card-bg); color: var(--text-main);
     }
     .chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
@@ -155,9 +154,6 @@
 
     .divider { border: none; border-top: 1px solid #EFECE5; margin: 12px 0; }
     .sub-title { font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.45px; }
-    .sub-list .row-item {
-      display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; gap: 8px;
-    }
     .item-actions-inline { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .act-icon { cursor: pointer; font-size: 13px; opacity: 0.82; padding: 3px 5px; border-radius: 8px; }
     .act-icon:hover { background: var(--bg-adult); opacity: 1; }
@@ -174,7 +170,7 @@
       padding: 2px 8px; border-radius: 8px; margin-left: 6px;
     }
 
-    /* NOVO LAYOUT UNIFICADO DA ABA HOJE */
+    /* RELANCE DA ABA HOJE */
     .hoje-glance-card {
       background: linear-gradient(160deg, #FFFFFF 0%, #F5F9F6 100%);
       border-radius: 24px; padding: 16px; margin-bottom: 14px;
@@ -212,12 +208,10 @@
     }
     .timeline-row:last-child { border-bottom: none; padding-bottom: 2px; }
     .timeline-time-col {
-      width: 52px; flex-shrink: 0; font-size: 11px; font-weight: 800;
+      width: 60px; flex-shrink: 0; font-size: 11px; font-weight: 800;
       color: var(--primary-dark); background: var(--primary-soft);
       padding: 4px 6px; border-radius: 10px; text-align: center; margin-top: 1px;
     }
-    .timeline-time-col.casal { background: var(--accent-soft); color: #8A452B; }
-    .timeline-time-col.duda { background: var(--note-bg); color: #854D0E; border: 1px solid var(--note-border); }
     .timeline-main-col { flex: 1; min-width: 0; }
     .timeline-title-line {
       display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
@@ -445,7 +439,7 @@
     /* TEMA INFANTIL (MODO DUDA) */
     .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%); padding: 16px 16px 60px; font-family: 'Nunito', sans-serif; }
     .duda-theme * { font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif; }
-    .duda-theme .app-content, .duda-content { max-width: 520px; margin: 0 auto; }
+    .duda-content { max-width: 520px; margin: 0 auto; }
     .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; max-width: 520px; margin-left: auto; margin-right: auto; }
     .duda-header h1 { font-size: 25px; color: var(--text-main); font-weight: 900; }
     .btn-lock {
@@ -575,10 +569,10 @@
     <div class="gate-card">
       <h1>Família Alves</h1>
       <p>Quem está usando este aparelho?</p>
-      <button class="btn-profile" onclick="requestAdultProfile('Paulo')">👨 Paulo (Pai)</button>
-      <button class="btn-profile" onclick="requestAdultProfile('Isabela')">👩 Isabela (Madrasta)</button>
-      <button class="btn-profile apoio" onclick="selectPublicProfile('Apoio')">👵 Rede de Apoio (Consulta)</button>
-      <button class="btn-profile duda" onclick="selectPublicProfile('Duda')">🌟 Duda (Modo Missões)</button>
+      <button type="button" class="btn-profile" onclick="requestAdultProfile('Paulo')">🧔🏾 Paulo</button>
+      <button type="button" class="btn-profile" onclick="requestAdultProfile('Isabela')">👩 Isabela</button>
+      <button type="button" class="btn-profile apoio" onclick="selectPublicProfile('Apoio')">👵 Rede de Apoio (Consulta)</button>
+      <button type="button" class="btn-profile duda" onclick="selectPublicProfile('Duda')">🌟 Duda (Modo Missões)</button>
     </div>
   </div>
 
@@ -588,13 +582,13 @@
       <h3 id="pin-modal-title">Área dos Responsáveis</h3>
       <p class="hint" id="pin-modal-subtitle">Digite sua senha de 4 dígitos para acessar</p>
       <div id="pin-who-selector" class="chip-group hidden" style="justify-content:center; margin:10px 0 2px;">
-        <button type="button" class="chip-opt selected" id="pin-who-paulo" onclick="selectPinWho('Paulo')">👨 Paulo</button>
+        <button type="button" class="chip-opt selected" id="pin-who-paulo" onclick="selectPinWho('Paulo')">🧔🏾 Paulo</button>
         <button type="button" class="chip-opt" id="pin-who-isabela" onclick="selectPinWho('Isabela')">👩 Isabela</button>
       </div>
       <input type="password" id="pin-input" maxlength="4" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter') verifyPin()" />
       <div class="modal-actions">
-        <button class="btn-secondary" onclick="closePinModal()">Cancelar</button>
-        <button class="btn-primary" onclick="verifyPin()">Entrar</button>
+        <button type="button" class="btn-secondary" onclick="closePinModal()">Cancelar</button>
+        <button type="button" class="btn-primary" onclick="verifyPin()">Entrar</button>
       </div>
     </div>
   </div>
@@ -605,9 +599,9 @@
       <div class="sheet-handle"></div>
       <h3 id="sheet-title">Adicionar</h3>
       <div id="sheet-body" class="sheet-body"></div>
-      <div class="sheet-actions">
-        <button class="btn-secondary" onclick="forceCloseSheet()">Cancelar</button>
-        <button class="btn-primary" id="sheet-save-btn">Salvar</button>
+      <div class="sheet-actions" id="sheet-actions-bar">
+        <button type="button" class="btn-secondary" id="sheet-cancel-btn" onclick="forceCloseSheet()">Cancelar</button>
+        <button type="button" class="btn-primary" id="sheet-save-btn">Salvar</button>
       </div>
     </div>
   </div>
@@ -622,7 +616,7 @@
         <h1>Resumo da Duda</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-duda-switch" onclick="openPinModal()">🔒 Responsáveis</button>
+        <button type="button" class="btn-duda-switch" onclick="openPinModal()">🔒 Responsáveis</button>
       </div>
     </header>
     <main class="app-content">
@@ -655,8 +649,8 @@
         <h1 id="header-title">Família Alves · Dia</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
-        <button class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
+        <button type="button" class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
+        <button type="button" class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
       </div>
     </header>
 
@@ -664,13 +658,13 @@
       <!-- ABA 1: HOJE / DIÁRIO NAVEGÁVEL -->
       <section id="tab-hoje" class="tab-view active">
         <div class="day-switcher-bar">
-          <button class="day-nav-btn" onclick="shiftHojeDay(-1)" title="Dia anterior">◀</button>
+          <button type="button" class="day-nav-btn" onclick="shiftHojeDay(-1)" title="Dia anterior">◀</button>
           <div class="day-center-info">
             <strong id="hoje-day-label">Hoje · 23/11</strong>
             <small id="hoje-day-sublabel">Segunda-feira</small>
           </div>
-          <button id="btn-back-today" class="btn-today-pill hidden" onclick="goHojeToday()">Hoje</button>
-          <button class="day-nav-btn" onclick="shiftHojeDay(1)" title="Próximo dia">▶</button>
+          <button type="button" id="btn-back-today" class="btn-today-pill hidden" onclick="goHojeToday()">Hoje</button>
+          <button type="button" class="day-nav-btn" onclick="shiftHojeDay(1)" title="Próximo dia">▶</button>
         </div>
 
         <!-- BLOCO DE RELANCE: LOGÍSTICA, PROGRESSO E PENDÊNCIAS RÁPIDAS -->
@@ -681,7 +675,7 @@
               <h2 class="hoje-glance-title" id="logistica-card-title">Duda · Logística & Missões</h2>
               <p class="hoje-glance-sub" id="hoje-glance-summary">Acompanhamento rápido da rotina e da casa</p>
             </div>
-            <button class="btn-mini" onclick="openModalLogistica()">Editar / ⇄</button>
+            <button type="button" class="btn-mini" onclick="openModalLogistica()">Editar / ⇄</button>
           </div>
 
           <div class="logistica-box">
@@ -702,7 +696,7 @@
           <div class="hoje-mini-pendencias">
             <div class="hoje-mini-pendencias-head">
               <span class="sub-title" style="margin:0;">Pendências da Casa</span>
-              <button class="btn-mini" onclick="openModalPendencia()">+ Tarefa</button>
+              <button type="button" class="btn-mini" onclick="openModalPendencia()">+ Tarefa</button>
             </div>
             <div id="pendencias-list" class="check-list"></div>
           </div>
@@ -712,18 +706,18 @@
         <div class="card card-note">
           <div class="card-header">
             <h2 id="mural-card-title">📌 Mural do Dia</h2>
-            <button class="btn-mini" onclick="openModalMural()">+ Recado</button>
+            <button type="button" class="btn-mini" onclick="openModalMural()">+ Recado</button>
           </div>
           <div id="mural-list"></div>
         </div>
 
-        <!-- LINHA DO TEMPO UNIFICADA DO DIA (INTEGRANTES, AGENDA E MISSÕES DUDA) -->
+        <!-- LINHA DO TEMPO UNIFICADA DO DIA -->
         <div class="card">
           <div class="card-header">
             <h2>🗓️ Linha do Tempo · Dia & Missões</h2>
             <div class="btn-group-mini">
-              <button class="btn-mini" onclick="openModalCasal()">+ Compromisso</button>
-              <button class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+              <button type="button" class="btn-mini" onclick="openModalCasal()">+ Compromisso</button>
+              <button type="button" class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
             </div>
           </div>
           <p class="hint">Compromissos individuais, da família e missões da Duda em ordem do dia.</p>
@@ -733,14 +727,13 @@
 
       <!-- ABA 2: FAMÍLIA -->
       <section id="tab-familia" class="tab-view">
-        <!-- Pílulas dinâmicas de integrantes (Todos, Família, Paulo, Isabela, Duda + novos) -->
         <div id="familia-filter-pills" class="filter-pills"></div>
 
         <div class="card calendar-card">
           <div class="cal-header">
-            <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+            <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
             <h2 id="cal-month-label">Novembro 2026</h2>
-            <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+            <button type="button" class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
           </div>
           <div class="cal-weekdays">
             <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
@@ -752,8 +745,8 @@
           <div class="card-header">
             <h2 id="selected-day-title">📅 Eventos do Dia</h2>
             <div class="btn-group-mini">
-              <button class="btn-mini" onclick="openDayInHojeTab()">Abrir Dia ↗</button>
-              <button class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
+              <button type="button" class="btn-mini" onclick="openDayInHojeTab()">Abrir Dia ↗</button>
+              <button type="button" class="btn-mini" onclick="openModalAgenda()">+ Evento</button>
             </div>
           </div>
           <div id="agenda-list" class="agenda-list"></div>
@@ -762,7 +755,7 @@
         <div class="card">
           <div class="card-header">
             <h2>🛒 Lista Compartilhada</h2>
-            <button class="btn-mini" onclick="openModalMercado()">+ Item</button>
+            <button type="button" class="btn-mini" onclick="openModalMercado()">+ Item</button>
           </div>
           <div id="mercado-list" class="check-list"></div>
         </div>
@@ -770,7 +763,7 @@
         <div class="card">
           <div class="card-header">
             <h2>💸 Despesas Compartilhadas</h2>
-            <button class="btn-mini" onclick="openModalDespesa()">+ Despesa</button>
+            <button type="button" class="btn-mini" onclick="openModalDespesa()">+ Despesa</button>
           </div>
           <div id="familia-despesas-summary"></div>
           <div id="familia-despesas-list"></div>
@@ -783,8 +776,8 @@
           <div class="card-header">
             <h2>💊 Remédios Ativos</h2>
             <div class="btn-group-mini">
-              <button class="btn-mini" onclick="openModalNovoRemedio()">+ Remédio</button>
-              <button class="btn-mini" onclick="openModalLancarDoseAvulsa()">+ Dose</button>
+              <button type="button" class="btn-mini" onclick="openModalNovoRemedio()">+ Remédio</button>
+              <button type="button" class="btn-mini" onclick="openModalLancarDoseAvulsa()">+ Dose</button>
             </div>
           </div>
           <div id="remedio-box"></div>
@@ -801,13 +794,13 @@
         <div class="card">
           <div class="card-header">
             <h2>🩺 Ficha Rápida & Vacinas</h2>
-            <button class="btn-mini" onclick="openModalFicha()">Editar</button>
+            <button type="button" class="btn-mini" onclick="openModalFicha()">Editar</button>
           </div>
           <div id="ficha-saude-box" class="ficha-grid"></div>
           <hr class="divider" />
           <div class="card-header" style="margin-bottom:6px;">
             <span class="sub-title" style="margin:0;">Carteirinha & Próximas Vacinas</span>
-            <button class="btn-mini" onclick="openModalVacina()">+ Vacina</button>
+            <button type="button" class="btn-mini" onclick="openModalVacina()">+ Vacina</button>
           </div>
           <div id="vacinas-list-box"></div>
         </div>
@@ -830,8 +823,8 @@
           <div class="card-header">
             <h2>🏆 Saldo & Transparência de Estrelas</h2>
             <div class="btn-group-mini">
-              <button class="btn-mini" onclick="openModalEstrelasManual('bonus')">+ Bônus</button>
-              <button class="btn-mini penalty" onclick="openModalEstrelasManual('penalty')">- Penalidade</button>
+              <button type="button" class="btn-mini" onclick="openModalEstrelasManual('bonus')">+ Bônus</button>
+              <button type="button" class="btn-mini penalty" onclick="openModalEstrelasManual('penalty')">- Penalidade</button>
             </div>
           </div>
           <div class="meta-admin-box">
@@ -839,7 +832,7 @@
               <strong style="font-size:18px; color:var(--primary);" id="admin-estrelas-count">⭐ 0 estrelas</strong>
               <p class="hint" style="margin:4px 0 0;">Toda penalidade ou bônus exige um motivo claro, exibido na tela da Duda para que ela entenda cada ajuste.</p>
             </div>
-            <button class="btn-secondary" onclick="resetEstrelas()">Zerar</button>
+            <button type="button" class="btn-secondary" onclick="resetEstrelas()">Zerar</button>
           </div>
           <hr class="divider" />
           <p class="sub-title">Extrato Transparente (Penalidades, Bônus & Resgates)</p>
@@ -857,7 +850,7 @@
         <div class="card">
           <div class="card-header">
             <h2>🌟 Missões Recorrentes</h2>
-            <button class="btn-mini" onclick="openModalMissao()">+ Missão</button>
+            <button type="button" class="btn-mini" onclick="openModalMissao()">+ Missão</button>
           </div>
           <p class="hint">Cada missão concluída rende +1 estrela na hora para a Duda. Reiniciam todo dia.</p>
           <div id="admin-missoes-list"></div>
@@ -866,7 +859,7 @@
         <div class="card">
           <div class="card-header">
             <h2>👨‍👩‍👧 Integrantes & Lançamentos</h2>
-            <button class="btn-mini" onclick="openModalNovoIntegrante()">+ Integrante</button>
+            <button type="button" class="btn-mini" onclick="openModalNovoIntegrante()">+ Integrante</button>
           </div>
           <p class="hint">Gerencie quem aparece nos filtros e lançamentos individuais (além de Família, Paulo, Isabela e Duda).</p>
           <div id="admin-integrantes-list"></div>
@@ -875,30 +868,30 @@
         <div class="card">
           <div class="card-header">
             <h2>⚙️ Configurações & Segurança</h2>
-            <button class="btn-mini" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
+            <button type="button" class="btn-mini" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
           </div>
           <p class="hint">Cada responsável tem sua própria senha de 4 dígitos (padrão inicial: 1234). Ao fechar o app ou abrir por link, a senha será exigida.</p>
           <div class="row-buttons">
-            <button class="btn-secondary" onclick="switchAdultProfile('Paulo')">👨 Paulo</button>
-            <button class="btn-secondary" onclick="switchAdultProfile('Isabela')">👩 Isabela</button>
-            <button class="btn-secondary" onclick="enterApoioMode()">👵 Apoio</button>
-            <button class="btn-secondary" onclick="lockApp()">🔒 Bloquear Agora</button>
+            <button type="button" class="btn-secondary" onclick="switchAdultProfile('Paulo')">🧔🏾 Paulo</button>
+            <button type="button" class="btn-secondary" onclick="switchAdultProfile('Isabela')">👩 Isabela</button>
+            <button type="button" class="btn-secondary" onclick="enterApoioMode()">👵 Apoio</button>
+            <button type="button" class="btn-secondary" onclick="lockApp()">🔒 Bloquear Agora</button>
           </div>
         </div>
       </section>
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" id="nav-btn-hoje" onclick="switchTab('hoje', 'Família Alves · Dia', this)">
+      <button type="button" class="nav-item active" id="nav-btn-hoje" onclick="switchTab('hoje', 'Família Alves · Dia', this)">
         <span>🏠</span><small>Hoje</small>
       </button>
-      <button class="nav-item" id="nav-btn-familia" onclick="switchTab('familia', 'Calendário & Família', this)">
+      <button type="button" class="nav-item" id="nav-btn-familia" onclick="switchTab('familia', 'Calendário & Família', this)">
         <span>📅</span><small>Família</small>
       </button>
-      <button class="nav-item" id="nav-btn-saude" onclick="switchTab('saude', 'Saúde · Duda', this)">
+      <button type="button" class="nav-item" id="nav-btn-saude" onclick="switchTab('saude', 'Saúde · Duda', this)">
         <span>❤️</span><small>Saúde</small>
       </button>
-      <button class="nav-item" id="nav-btn-duda" onclick="switchTab('duda-admin', 'Missões Duda', this)">
+      <button type="button" class="nav-item" id="nav-btn-duda" onclick="switchTab('duda-admin', 'Missões Duda', this)">
         <span>🚀</span><small>Duda</small>
       </button>
     </nav>
@@ -908,7 +901,7 @@
   <div id="duda-app" class="duda-theme hidden">
     <header class="duda-header">
       <h1>Olá, Duda! 🌟</h1>
-      <button class="btn-lock" onclick="openPinModal()">🔒 Sair</button>
+      <button type="button" class="btn-lock" onclick="openPinModal()">🔒 Sair</button>
     </header>
 
     <div class="duda-hero-card">
@@ -927,7 +920,7 @@
     <div id="duda-transparency-box" class="duda-transparency-card hidden">
       <div class="duda-transparency-head">
         <h3>⚖️ Por que perdi estrelinhas?</h3>
-        <button class="btn-past-weeks" style="background:#fff; color:#8A452B;" onclick="openModalExtratoEstrelasDuda()">Ver Tudo</button>
+        <button type="button" class="btn-past-weeks" style="background:#fff; color:#8A452B;" onclick="openModalExtratoEstrelasDuda()">Ver Tudo</button>
       </div>
       <p style="font-size:12px; color:#8A452B; font-weight:700;">Aqui está explicado direitinho o motivo de cada desconto nas suas estrelas:</p>
       <div id="duda-penalties-list"></div>
@@ -936,7 +929,7 @@
     <div class="duda-week-card">
       <div class="duda-week-header">
         <h3 id="duda-week-title">📆 Minha Semana (Seg a Dom)</h3>
-        <button class="btn-past-weeks" onclick="openModalSemanasAnterioresDuda()">📜 Semanas Anteriores</button>
+        <button type="button" class="btn-past-weeks" onclick="openModalSemanasAnterioresDuda()">📜 Semanas Anteriores</button>
       </div>
       <div id="duda-week-strip" class="week-strip-grid"></div>
       <div id="duda-readonly-banner" class="readonly-banner hidden">
@@ -947,7 +940,7 @@
     <div class="duda-wish-box">
       <div class="duda-wish-top">
         <h3>✨ Meus Desejos</h3>
-        <button class="btn-wish-open" onclick="openModalDesejoDuda()">🎁 Pedir Desejo</button>
+        <button type="button" class="btn-wish-open" onclick="openModalDesejoDuda()">🎁 Pedir Desejo</button>
       </div>
       <div id="duda-wishes-list" class="duda-wish-list"></div>
     </div>
@@ -975,20 +968,39 @@
     let db = null;
     const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.databaseURL);
 
-    if (isFirebaseConfigured) {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.database().ref('familia_alves');
-      firebase.database().ref('.info/connected').on('value', (snap) => {
-        const dot = document.getElementById('sync-dot');
-        if (dot) {
-          dot.className = snap.val() === true ? 'sync-dot online' : 'sync-dot offline';
-        }
-      });
+    if (isFirebaseConfigured && typeof firebase !== 'undefined') {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database().ref('familia_alves');
+        firebase.database().ref('.info/connected').on('value', (snap) => {
+          const dot = document.getElementById('sync-dot');
+          if (dot) {
+            dot.className = snap.val() === true ? 'sync-dot online' : 'sync-dot offline';
+          }
+        });
+      } catch (err) {
+        console.warn('Firebase offline/indisponível, operando em modo local:', err);
+        db = null;
+      }
     }
 
     // ============================================================================
-    // 2. UTILITÁRIOS DE DATA, SEMANA (SEG A DOM) E HORA
+    // 2. UTILITÁRIOS DE SEGURANÇA, DATA, SEMANA (SEG A DOM) E HORA
     // ============================================================================
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttrJS(str) {
+      return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
     function toISODate(dt) {
       const y = dt.getFullYear();
       const m = String(dt.getMonth() + 1).padStart(2, '0');
@@ -997,8 +1009,8 @@
     }
 
     function parseISODate(iso) {
-      const [y, m, d] = iso.split('-').map(Number);
-      return new Date(y, m - 1, d);
+      const parts = String(iso || getTodayISO()).split('-').map(Number);
+      return new Date(parts[0] || 2026, (parts[1] || 1) - 1, parts[2] || 1);
     }
 
     function addDaysISO(iso, delta) {
@@ -1012,8 +1024,8 @@
     }
 
     function formatDateBR(iso) {
-      if (!iso) return '';
-      const [, m, d] = iso.split('-');
+      if (!iso || !String(iso).includes('-')) return '';
+      const [, m, d] = String(iso).split('-');
       return `${d}/${m}`;
     }
 
@@ -1055,6 +1067,7 @@
     function formatDoseDisplay(ts) {
       if (!ts) return '-';
       const dt = new Date(Number(ts));
+      if (isNaN(dt.getTime())) return '-';
       const hojeISO = getTodayISO();
       const itemISO = toISODate(dt);
       const hora = dt.toTimeString().slice(0, 5);
@@ -1066,17 +1079,17 @@
     // 3. INTEGRANTES DA FAMÍLIA & PALETA DE CORES
     // ============================================================================
     const MEMBER_PALETTES = [
-      { bg: '#EBF3EE', text: '#365E42', dot: '#4A7C59' }, // Verde Sálvia
-      { bg: '#FDF3EF', text: '#9C4B31', dot: '#C96A48' }, // Terracota
-      { bg: '#EDF2FA', text: '#34537A', dot: '#4A77B5' }, // Azul Sereno
-      { bg: '#FDFBF5', text: '#854D0E', dot: '#B7791F' }, // Âmbar Quente
-      { bg: '#F3EEFA', text: '#5B3A82', dot: '#7C52B3' }, // Lavanda Suave
-      { bg: '#E8F6F8', text: '#245E68', dot: '#348996' }  // Petróleo Claro
+      { bg: '#EBF3EE', text: '#365E42', dot: '#4A7C59' },
+      { bg: '#FDF3EF', text: '#9C4B31', dot: '#C96A48' },
+      { bg: '#EDF2FA', text: '#34537A', dot: '#4A77B5' },
+      { bg: '#FDFBF5', text: '#854D0E', dot: '#B7791F' },
+      { bg: '#F3EEFA', text: '#5B3A82', dot: '#7C52B3' },
+      { bg: '#E8F6F8', text: '#245E68', dot: '#348996' }
     ];
 
     const DEFAULT_INTEGRANTES = [
       { id: 'familia', nome: 'Família', emoji: '🏡', colorIdx: 3, isSystem: true },
-      { id: 'paulo', nome: 'Paulo', emoji: '👨', colorIdx: 0, isSystem: true },
+      { id: 'paulo', nome: 'Paulo', emoji: '🧔🏾', colorIdx: 0, isSystem: true },
       { id: 'isabela', nome: 'Isabela', emoji: '👩', colorIdx: 1, isSystem: true },
       { id: 'duda', nome: 'Duda', emoji: '🌟', colorIdx: 2, isSystem: true }
     ];
@@ -1089,17 +1102,17 @@
 
     function getMemberMeta(nome) {
       const norm = normalizeCategoriaName(nome);
-      const list = Array.isArray(appState.integrantes) && appState.integrantes.length > 0
+      const list = (typeof appState !== 'undefined' && Array.isArray(appState.integrantes) && appState.integrantes.length > 0)
         ? appState.integrantes
         : DEFAULT_INTEGRANTES;
-      const found = list.find(m => m.nome.toLowerCase() === String(norm).toLowerCase());
+      const found = list.find(m => m && m.nome && m.nome.toLowerCase() === String(norm).toLowerCase());
       if (found) {
-        const pal = MEMBER_PALETTES[found.colorIdx % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
+        const pal = MEMBER_PALETTES[(Number(found.colorIdx) || 0) % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
         return { ...found, palette: pal };
       }
       const fallbackIdx = Math.abs(String(norm).split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % MEMBER_PALETTES.length;
       return {
-        id: norm.toLowerCase(),
+        id: String(norm).toLowerCase(),
         nome: norm,
         emoji: '👤',
         colorIdx: fallbackIdx,
@@ -1109,94 +1122,102 @@
     }
 
     // ============================================================================
-    // 4. ESTADO INICIAL E MIGRAÇÃO DE DADOS
+    // 4. ESTADO INICIAL E MIGRAÇÃO DE DADOS (COM PROTEÇÃO CONTRA NULL/FIREBASE)
     // ============================================================================
     const todayStr = getTodayISO();
 
-    const defaultState = {
-      pins: {
-        Paulo: "1234",
-        Isabela: "1234"
-      },
-      integrantes: JSON.parse(JSON.stringify(DEFAULT_INTEGRANTES)),
-      lastResetDate: todayStr,
-      estrelasTotal: 4,
-      historicoEstrelas: [],
-      desejos: [
-        { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
-      ],
-      casalHoje: [
-        { id: 1, data: todayStr, membro: "Paulo", texto: "Paulo: Turno até 18h" },
-        { id: 2, data: todayStr, membro: "Isabela", texto: "Isabela: Compromisso às 15h" }
-      ],
-      pendencias: [
-        { id: 1, texto: "Pagar boleto da escola", valor: "450,00", done: true },
-        { id: 2, texto: "Comprar ração", valor: "", done: false }
-      ],
-      mural: [
-        { id: 1, data: todayStr, autor: "Isabela", texto: "Deixei a autorização na mochila da Duda" }
-      ],
-      logistica: {
-        leva: "Paulo (07:30)",
-        busca: "Isabela (12:00)"
-      },
-      logisticaPorDia: {
-        [todayStr]: {
+    function createDefaultState() {
+      const hoje = getTodayISO();
+      return {
+        pins: { Paulo: "1234", Isabela: "1234" },
+        integrantes: JSON.parse(JSON.stringify(DEFAULT_INTEGRANTES)),
+        lastResetDate: hoje,
+        estrelasTotal: 4,
+        historicoEstrelas: [],
+        desejos: [
+          { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
+        ],
+        casalHoje: [
+          { id: 1, data: hoje, membro: "Paulo", texto: "Paulo: Turno até 18h" },
+          { id: 2, data: hoje, membro: "Isabela", texto: "Isabela: Compromisso às 15h" }
+        ],
+        pendencias: [
+          { id: 1, texto: "Pagar boleto da escola", valor: "450,00", done: true },
+          { id: 2, texto: "Comprar ração", valor: "", done: false }
+        ],
+        mural: [
+          { id: 1, data: hoje, autor: "Isabela", texto: "Deixei a autorização na mochila da Duda" }
+        ],
+        logistica: {
           leva: "Paulo (07:30)",
           busca: "Isabela (12:00)"
-        }
-      },
-      agenda: [
-        { id: 1, categoria: "Duda", data: todayStr, hora: "07:30", texto: "Escola · Paulo leva / Isabela busca" },
-        { id: 2, categoria: "Família", data: todayStr, hora: "19:30", texto: "Alinhar programação do fim de semana" }
-      ],
-      despesas: [
-        { id: 1, titulo: "Material escolar & cadernos", valor: 180.00, pagoPor: "Paulo", split: "50/50", status: "aprovada" },
-        { id: 2, titulo: "Consulta pediatra / check-up", valor: 240.00, pagoPor: "Isabela", split: "50/50", status: "pendente" }
-      ],
-      mercado: [
-        { id: 1, texto: "Frutas para lancheira", done: false },
-        { id: 2, texto: "Leite e café", done: false }
-      ],
-      saude: {
-        remedios: [
-          {
-            id: 1,
-            nome: "Dipirona 20 gotas",
-            intervaloHoras: 6,
-            horarioFixo: "",
-            ultimaDoseTimestamp: null,
-            ultimaDoseResponsavel: ""
+        },
+        logisticaPorDia: {
+          [hoje]: {
+            leva: "Paulo (07:30)",
+            busca: "Isabela (12:00)"
           }
+        },
+        agenda: [
+          { id: 1, categoria: "Duda", data: hoje, hora: "07:30", texto: "Escola · Paulo leva / Isabela busca" },
+          { id: 2, categoria: "Família", data: hoje, hora: "19:30", texto: "Alinhar programação do fim de semana" }
         ],
-        historicoDoses: [],
-        vacinasLista: [
-          { id: 1, nome: "Reforço vacinal anual", status: "Em dia", detalhe: "Carteirinha conferida" },
-          { id: 2, nome: "Acompanhamento de rotina", status: "Em breve", detalhe: "Sem urgência · revisar na próxima consulta" }
+        despesas: [
+          { id: 1, titulo: "Material escolar & cadernos", valor: 180.00, pagoPor: "Paulo", split: "50/50", status: "aprovada" },
+          { id: 2, titulo: "Consulta pediatra / check-up", valor: 240.00, pagoPor: "Isabela", split: "50/50", status: "pendente" }
         ],
-        alergias: "Nenhuma registrada",
-        tipoSanguineo: "O+",
-        vacinas: "Em dia"
-      },
-      missoes: [
-        { id: 1, turno: "Manhã", emoji: "🦷", titulo: "Escovar os dentes", done: false },
-        { id: 2, turno: "Manhã", emoji: "🎒", titulo: "Arrumar a mochila", done: false },
-        { id: 3, turno: "Tarde", emoji: "✏️", titulo: "Fazer lição de casa", done: false },
-        { id: 4, turno: "Tarde", emoji: "🧸", titulo: "Guardar brinquedos", done: false },
-        { id: 5, turno: "Noite", emoji: "👕", titulo: "Separar uniforme de amanhã", done: false }
-      ],
-      historicoMissoes: {
-        [todayStr]: {
-          completedIds: [],
-          totalCount: 5
+        mercado: [
+          { id: 1, texto: "Frutas para lancheira", done: false },
+          { id: 2, texto: "Leite e café", done: false }
+        ],
+        saude: {
+          remedios: [
+            {
+              id: 1,
+              nome: "Dipirona 20 gotas",
+              intervaloHoras: 6,
+              horarioFixo: "",
+              ultimaDoseTimestamp: null,
+              ultimaDoseResponsavel: ""
+            }
+          ],
+          historicoDoses: [],
+          vacinasLista: [
+            { id: 1, nome: "Reforço vacinal anual", status: "Em dia", detalhe: "Carteirinha conferida" },
+            { id: 2, nome: "Acompanhamento de rotina", status: "Em breve", detalhe: "Sem urgência · revisar na próxima consulta" }
+          ],
+          alergias: "Nenhuma registrada",
+          tipoSanguineo: "O+",
+          vacinas: "Em dia"
+        },
+        missoes: [
+          { id: 1, turno: "Manhã", emoji: "🦷", titulo: "Escovar os dentes", done: false },
+          { id: 2, turno: "Manhã", emoji: "🎒", titulo: "Arrumar a mochila", done: false },
+          { id: 3, turno: "Tarde", emoji: "✏️", titulo: "Fazer lição de casa", done: false },
+          { id: 4, turno: "Tarde", emoji: "🧸", titulo: "Guardar brinquedos", done: false },
+          { id: 5, turno: "Noite", emoji: "👕", titulo: "Separar uniforme de amanhã", done: false }
+        ],
+        historicoMissoes: {
+          [hoje]: {
+            completedIds: [],
+            totalCount: 5
+          }
         }
-      }
-    };
+      };
+    }
+
+    function toCleanArray(val) {
+      if (Array.isArray(val)) return val.filter(Boolean);
+      if (val && typeof val === 'object') return Object.values(val).filter(Boolean);
+      return [];
+    }
 
     function normalizeSaudeState(saudeObj) {
       const base = saudeObj || {};
-      let remedios = Array.isArray(base.remedios) ? base.remedios : null;
-      let historicoDoses = Array.isArray(base.historicoDoses) ? base.historicoDoses : [];
+      let remedios = Array.isArray(base.remedios)
+        ? base.remedios.filter(Boolean)
+        : (base.remedios && typeof base.remedios === 'object' ? Object.values(base.remedios).filter(Boolean) : null);
+      let historicoDoses = toCleanArray(base.historicoDoses);
 
       if (!remedios) {
         if (base.remedioNome && base.remedioNome !== 'Nenhum remédio ativo') {
@@ -1216,9 +1237,7 @@
       return {
         remedios,
         historicoDoses,
-        vacinasLista: Array.isArray(base.vacinasLista) ? base.vacinasLista : [
-          { id: 1, nome: "Reforço vacinal da idade", status: "Em dia", detalhe: "Sem pendências" }
-        ],
+        vacinasLista: toCleanArray(base.vacinasLista),
         alergias: base.alergias || "Nenhuma registrada",
         tipoSanguineo: base.tipoSanguineo || "O+",
         vacinas: base.vacinas || "Em dia"
@@ -1234,31 +1253,38 @@
       };
     }
 
-    function normalizeStateData(st) {
+    function normalizeStateData(rawSt) {
       const hoje = getTodayISO();
+      const st = (rawSt && typeof rawSt === 'object') ? { ...createDefaultState(), ...rawSt } : createDefaultState();
+
       st.pins = normalizePins(st);
       st.saude = normalizeSaudeState(st.saude);
+      st.estrelasTotal = Math.max(0, Number(st.estrelasTotal) || 0);
 
-      if (!Array.isArray(st.integrantes) || st.integrantes.length === 0) {
+      const rawInt = toCleanArray(st.integrantes);
+      if (rawInt.length === 0) {
         st.integrantes = JSON.parse(JSON.stringify(DEFAULT_INTEGRANTES));
       } else {
-        // Garante que os 4 pilares (Família, Paulo, Isabela, Duda) existam
+        st.integrantes = rawInt;
         DEFAULT_INTEGRANTES.forEach(def => {
-          if (!st.integrantes.some(m => m.nome.toLowerCase() === def.nome.toLowerCase())) {
+          const existing = st.integrantes.find(m => m && m.nome && m.nome.toLowerCase() === def.nome.toLowerCase());
+          if (!existing) {
             st.integrantes.push({ ...def });
+          } else if (existing.id === 'paulo' && existing.emoji === '👨') {
+            existing.emoji = '🧔🏾';
           }
         });
       }
 
-      if (!Array.isArray(st.historicoEstrelas)) st.historicoEstrelas = [];
-      if (!Array.isArray(st.desejos)) st.desejos = [];
-      if (!Array.isArray(st.despesas)) st.despesas = [];
-      if (!Array.isArray(st.casalHoje)) st.casalHoje = [];
-      if (!Array.isArray(st.pendencias)) st.pendencias = [];
-      if (!Array.isArray(st.mural)) st.mural = [];
-      if (!Array.isArray(st.agenda)) st.agenda = [];
-      if (!Array.isArray(st.mercado)) st.mercado = [];
-      if (!Array.isArray(st.missoes)) st.missoes = [];
+      st.historicoEstrelas = toCleanArray(st.historicoEstrelas);
+      st.desejos = toCleanArray(st.desejos);
+      st.despesas = toCleanArray(st.despesas);
+      st.casalHoje = toCleanArray(st.casalHoje);
+      st.pendencias = toCleanArray(st.pendencias);
+      st.mural = toCleanArray(st.mural);
+      st.agenda = toCleanArray(st.agenda);
+      st.mercado = toCleanArray(st.mercado);
+      st.missoes = toCleanArray(st.missoes);
 
       st.casalHoje.forEach(item => {
         if (!item.data) item.data = st.lastResetDate || hoje;
@@ -1275,7 +1301,7 @@
       if (!st.logisticaPorDia || typeof st.logisticaPorDia !== 'object') {
         st.logisticaPorDia = {};
       }
-      if (!st.logistica) {
+      if (!st.logistica || typeof st.logistica !== 'object') {
         st.logistica = { leva: "Paulo (07:30)", busca: "Isabela (12:00)" };
       }
       if (!st.logisticaPorDia[hoje]) {
@@ -1285,6 +1311,13 @@
       if (!st.historicoMissoes || typeof st.historicoMissoes !== 'object') {
         st.historicoMissoes = {};
       }
+      Object.keys(st.historicoMissoes).forEach(k => {
+        const entry = st.historicoMissoes[k];
+        if (entry && typeof entry === 'object') {
+          entry.completedIds = toCleanArray(entry.completedIds);
+          entry.totalCount = Number(entry.totalCount) || st.missoes.length;
+        }
+      });
       if (!st.historicoMissoes[hoje]) {
         const doneIds = st.missoes.filter(m => m.done).map(m => m.id);
         st.historicoMissoes[hoje] = {
@@ -1295,7 +1328,17 @@
       return st;
     }
 
-    let appState = normalizeStateData(JSON.parse(localStorage.getItem('familia_alves_v22')) || defaultState);
+    function loadInitialLocalState() {
+      try {
+        const raw = localStorage.getItem('familia_alves_v22');
+        if (!raw) return createDefaultState();
+        return normalizeStateData(JSON.parse(raw));
+      } catch (e) {
+        return createDefaultState();
+      }
+    }
+
+    let appState = loadInitialLocalState();
 
     let hojeSelectedDateISO = todayStr;
     let dudaSelectedDateISO = todayStr;
@@ -1340,11 +1383,14 @@
     }
 
     function saveState() {
-      localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
+      try {
+        localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
+      } catch (e) {
+        console.warn('Erro ao salvar no localStorage:', e);
+      }
+      renderAll();
       if (db) {
-        db.set(appState);
-      } else {
-        renderAll();
+        db.set(appState).catch(err => console.warn('Erro ao sincronizar Firebase:', err));
       }
     }
 
@@ -1352,9 +1398,11 @@
       db.on('value', (snapshot) => {
         const remoteData = snapshot.val();
         if (remoteData) {
-          appState = normalizeStateData({ ...defaultState, ...remoteData });
+          appState = normalizeStateData(remoteData);
           checkDailyReset();
-          localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
+          try {
+            localStorage.setItem('familia_alves_v22', JSON.stringify(appState));
+          } catch (e) {}
           renderAll();
         } else {
           db.set(appState);
@@ -1363,7 +1411,72 @@
     }
 
     // ============================================================================
-    // 5. CONTROLE DE PERFIS & SEGURANÇA POR SENHA
+    // 5. SISTEMA DE BOTTOM SHEET MODAL
+    // ============================================================================
+    let currentSheetSaveFn = null;
+
+    function openSheet(title, bodyHtml, onSave, saveLabel = 'Salvar', isPenalty = false, infoOnly = false) {
+      document.getElementById('sheet-title').textContent = title;
+      document.getElementById('sheet-body').innerHTML = bodyHtml;
+      const cancelBtn = document.getElementById('sheet-cancel-btn');
+      const saveBtn = document.getElementById('sheet-save-btn');
+
+      if (infoOnly) {
+        cancelBtn.classList.add('hidden');
+        saveBtn.textContent = saveLabel || 'Fechar';
+        saveBtn.className = 'btn-primary';
+        currentSheetSaveFn = null;
+      } else {
+        cancelBtn.classList.remove('hidden');
+        saveBtn.textContent = saveLabel;
+        saveBtn.className = isPenalty ? 'btn-primary penalty' : 'btn-primary';
+        currentSheetSaveFn = onSave;
+      }
+
+      document.getElementById('sheet-modal').classList.remove('hidden');
+      setTimeout(() => {
+        const firstInput = document.querySelector('#sheet-body input:not([type="hidden"]), #sheet-body textarea');
+        if (firstInput) firstInput.focus();
+      }, 60);
+    }
+
+    function forceCloseSheet() {
+      document.getElementById('sheet-modal').classList.add('hidden');
+      currentSheetSaveFn = null;
+    }
+
+    function closeSheetModal(e) {
+      if (e.target.id === 'sheet-modal') forceCloseSheet();
+    }
+
+    function selectChip(btn, inputId) {
+      const group = btn.parentElement;
+      group.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+      const hiddenEl = document.getElementById(inputId);
+      if (hiddenEl) hiddenEl.value = btn.dataset.val;
+    }
+
+    document.getElementById('sheet-save-btn').addEventListener('click', () => {
+      if (currentSheetSaveFn) {
+        const keepOpen = currentSheetSaveFn() === false;
+        if (!keepOpen) forceCloseSheet();
+      } else {
+        forceCloseSheet();
+      }
+    });
+
+    function buildMemberChipsHTML(inputId, selectedName) {
+      const members = appState.integrantes || DEFAULT_INTEGRANTES;
+      const normSel = normalizeCategoriaName(selectedName || 'Família');
+      return members.map(m => {
+        const isSel = m.nome.toLowerCase() === normSel.toLowerCase();
+        return `<button type="button" class="chip-opt ${isSel ? 'selected' : ''}" data-val="${escapeHTML(m.nome)}" onclick="selectChip(this, '${inputId}')">${escapeHTML(m.emoji || '👤')} ${escapeHTML(m.nome)}</button>`;
+      }).join('');
+    }
+
+    // ============================================================================
+    // 6. CONTROLE DE PERFIS & SEGURANÇA POR SENHA
     // ============================================================================
     let pendingAdultTarget = null;
     let modalSelectedWho = 'Paulo';
@@ -1510,8 +1623,33 @@
       }
     }
 
+    function openModalAlterarPin() {
+      const current = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
+      openSheet(`Alterar Senha · ${current}`, `
+        <label>Qual responsável?</label>
+        <input type="hidden" id="inp-pin-who" value="${escapeHTML(current)}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${current==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-pin-who')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${current==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-pin-who')">👩 Isabela</button>
+        </div>
+        <label>Nova senha (4 números)</label>
+        <input type="password" id="inp-pin-new" maxlength="4" inputmode="numeric" placeholder="••••" />
+      `, () => {
+        const who = document.getElementById('inp-pin-who').value;
+        const novo = document.getElementById('inp-pin-new').value.trim();
+        if (!/^\d{4}$/.test(novo)) {
+          alert('Digite exatamente 4 números.');
+          return false;
+        }
+        appState.pins = normalizePins(appState);
+        appState.pins[who] = novo;
+        saveState();
+        alert(`Senha de ${who} atualizada com sucesso!`);
+      });
+    }
+
     // ============================================================================
-    // 6. NAVEGAÇÃO ENTRE ABAS, FILTROS POR INTEGRANTE E CALENDÁRIO MENSAL
+    // 7. NAVEGAÇÃO ENTRE ABAS, FILTROS POR INTEGRANTE E CALENDÁRIO MENSAL
     // ============================================================================
     function switchTab(tabId, title, btn) {
       document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
@@ -1568,12 +1706,12 @@
       const todosPill = `<button type="button" class="pill ${currentFilter === 'Todos' ? 'active' : ''}" onclick="setAgendaFilter('Todos')">Todos</button>`;
       const memberPills = members.map(m => {
         const isActive = currentFilter === m.nome;
-        const pal = MEMBER_PALETTES[m.colorIdx % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
+        const pal = MEMBER_PALETTES[(Number(m.colorIdx) || 0) % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
         const activeStyle = isActive ? `background:${pal.dot}; border-color:${pal.dot}; color:#fff;` : '';
         return `
-          <button type="button" class="pill ${isActive ? 'active' : ''}" style="${activeStyle}" onclick="setAgendaFilter('${m.nome.replace(/'/g, "\\'")}')">
-            <span>${m.emoji || '👤'}</span>
-            <span>${m.nome}</span>
+          <button type="button" class="pill ${isActive ? 'active' : ''}" style="${activeStyle}" onclick="setAgendaFilter('${escapeAttrJS(m.nome)}')">
+            <span>${escapeHTML(m.emoji || '👤')}</span>
+            <span>${escapeHTML(m.nome)}</span>
           </button>
         `;
       }).join('');
@@ -1587,13 +1725,13 @@
       if (!listEl) return;
       const members = appState.integrantes || DEFAULT_INTEGRANTES;
       listEl.innerHTML = members.map((m, idx) => {
-        const pal = MEMBER_PALETTES[m.colorIdx % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
+        const pal = MEMBER_PALETTES[(Number(m.colorIdx) || 0) % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
         return `
           <div class="check-item" style="cursor:default;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:${pal.bg}; color:${pal.text}; font-size:15px;">${m.emoji || '👤'}</span>
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:${pal.bg}; color:${pal.text}; font-size:15px;">${escapeHTML(m.emoji || '👤')}</span>
               <div>
-                <strong>${m.nome}</strong>
+                <strong>${escapeHTML(m.nome)}</strong>
                 <div style="font-size:11px; color:var(--text-muted);">${m.isSystem ? 'Integrante principal' : 'Integrante adicional'}</div>
               </div>
             </div>
@@ -1628,7 +1766,7 @@
         const nome = document.getElementById('inp-mem-nome').value.trim();
         const emoji = document.getElementById('inp-mem-emoji').value || '👤';
         const colorIdx = Number(document.getElementById('inp-mem-color').value) || 0;
-        if (!nome) return;
+        if (!nome) return false;
         if (!Array.isArray(appState.integrantes)) {
           appState.integrantes = JSON.parse(JSON.stringify(DEFAULT_INTEGRANTES));
         }
@@ -1720,7 +1858,7 @@
     }
 
     // ============================================================================
-    // 7. RENDERIZAÇÃO DAS TELAS (HOJE, FAMÍLIA, SAÚDE, DUDA E ADMIN SEMANAL)
+    // 8. RENDERIZAÇÃO DAS TELAS (HOJE, FAMÍLIA, SAÚDE, DUDA, APOIO & ADMIN)
     // ============================================================================
     function renderAll() {
       renderHoje();
@@ -1778,7 +1916,7 @@
       } else {
         pendEl.innerHTML = (appState.pendencias || []).map((item, idx) => `
           <div class="check-item ${item.done ? 'done' : ''}" onclick="togglePendencia(${idx})">
-            <span>${item.done ? '✅' : '⬜'} ${item.texto} ${item.valor ? `<span class="valor-pill">R$ ${item.valor}</span>` : ''}</span>
+            <span>${item.done ? '✅' : '⬜'} ${escapeHTML(item.texto)} ${item.valor ? `<span class="valor-pill">R$ ${escapeHTML(item.valor)}</span>` : ''}</span>
             <div class="item-actions-inline" onclick="event.stopPropagation()">
               <span class="act-icon" title="Editar" onclick="openModalEditarPendencia(${idx})">✏️</span>
               <span class="act-icon" title="Excluir" onclick="deletePendencia(${idx})">🗑️</span>
@@ -1801,7 +1939,7 @@
       } else {
         muralEl.innerHTML = muralDoDia.map(({ m, idx }) => `
           <div class="check-item" style="border:none; padding:5px 0; cursor:default;">
-            <span><strong>${m.autor}:</strong> ${m.texto}</span>
+            <span><strong>${escapeHTML(m.autor)}:</strong> ${escapeHTML(m.texto)}</span>
             <div class="item-actions-inline">
               <span class="act-icon" title="Editar" onclick="openModalEditarMural(${idx})">✏️</span>
               <span class="act-icon" title="Excluir" onclick="deleteMural(${idx})">🗑️</span>
@@ -1810,7 +1948,6 @@
         `).join('');
       }
 
-      // Linha do tempo unificada do dia: Compromissos individuais + Agenda + Missões da Duda
       const timelineEntries = [];
 
       (appState.casalHoje || []).forEach((item, idx) => {
@@ -1819,13 +1956,13 @@
           const membroNome = item.membro || String(item.texto || '').split(':')[0].trim() || 'Família';
           const meta = getMemberMeta(membroNome);
           timelineEntries.push({
-            sortKey: horaMatch ? horaMatch[1] : '09:00',
-            timeLabel: horaMatch ? horaMatch[1] : membroNome,
+            sortKey: horaMatch ? horaMatch[1].padStart(5, '0') : '09:00',
+            timeLabel: escapeHTML(horaMatch ? horaMatch[1] : membroNome),
             badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tag: `${meta.emoji} ${meta.nome}`,
-            title: item.texto,
-            meta: `Compromisso · ${meta.nome}`,
+            tag: `${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}`,
+            title: escapeHTML(item.texto),
+            meta: `Compromisso · ${escapeHTML(meta.nome)}`,
             done: false,
             actionsHTML: `
               <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
@@ -1839,12 +1976,12 @@
         if (ev.data === hojeSelectedDateISO) {
           const meta = getMemberMeta(ev.categoria);
           timelineEntries.push({
-            sortKey: ev.hora || '12:00',
-            timeLabel: ev.hora || meta.nome,
+            sortKey: ev.hora ? String(ev.hora).padStart(5, '0') : '12:00',
+            timeLabel: escapeHTML(ev.hora || meta.nome),
             badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
-            tag: `${meta.emoji} ${meta.nome}`,
-            title: ev.texto,
+            tag: `${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}`,
+            title: escapeHTML(ev.texto),
             meta: 'Evento no calendário',
             done: false,
             actionsHTML: `
@@ -1862,11 +1999,11 @@
         const isDone = isViewingToday ? Boolean(m.done) : stats.completedIds.includes(m.id);
         timelineEntries.push({
           sortKey: turnoOrdem[m.turno] || '15:00',
-          timeLabel: m.turno || 'Duda',
+          timeLabel: escapeHTML(m.turno || 'Duda'),
           badgeStyle: `background:${dudaMeta.palette.bg}; color:${dudaMeta.palette.text};`,
           tagStyle: `background:${dudaMeta.palette.bg}; color:${dudaMeta.palette.text};`,
           tag: '🌟 Duda · Missão',
-          title: `${m.emoji || '⭐'} ${m.titulo}`,
+          title: `${escapeHTML(m.emoji || '⭐')} ${escapeHTML(m.titulo)}`,
           meta: isDone ? 'Concluída (+1 ⭐)' : 'Pendente da Duda',
           done: isDone,
           onToggle: isViewingToday ? `toggleMissao(${idx})` : '',
@@ -1911,7 +2048,7 @@
         });
 
       if (filtered.length === 0) {
-        agendaEl.innerHTML = `<p class="hint" style="margin:6px 0;">Nenhum compromisso${currentFilter !== 'Todos' ? ` de ${currentFilter}` : ''} neste dia.</p>`;
+        agendaEl.innerHTML = `<p class="hint" style="margin:6px 0;">Nenhum compromisso${currentFilter !== 'Todos' ? ` de ${escapeHTML(currentFilter)}` : ''} neste dia.</p>`;
         return;
       }
 
@@ -1920,8 +2057,8 @@
         return `
           <div class="agenda-item">
             <div>
-              <span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${meta.emoji} ${meta.nome}</span>
-              ${item.hora ? `<strong>${item.hora} · </strong>` : ''}${item.texto}
+              <span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}</span>
+              ${item.hora ? `<strong>${escapeHTML(item.hora)} · </strong>` : ''}${escapeHTML(item.texto)}
             </div>
             <div class="item-actions-inline">
               <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${item.originalIdx})">✏️</span>
@@ -1934,9 +2071,14 @@
 
     function renderMercado() {
       const mercEl = document.getElementById('mercado-list');
+      if (!mercEl) return;
+      if ((appState.mercado || []).length === 0) {
+        mercEl.innerHTML = `<p class="hint" style="margin:2px 0;">Nenhum item na lista.</p>`;
+        return;
+      }
       mercEl.innerHTML = (appState.mercado || []).map((item, idx) => `
         <div class="check-item ${item.done ? 'done' : ''}" onclick="toggleMercado(${idx})">
-          <span>${item.done ? '✅' : '⬜'} ${item.texto}</span>
+          <span>${item.done ? '✅' : '⬜'} ${escapeHTML(item.texto)}</span>
           <div class="item-actions-inline" onclick="event.stopPropagation()">
             <span class="act-icon" title="Editar" onclick="openModalEditarMercado(${idx})">✏️</span>
             <span class="act-icon" title="Excluir" onclick="deleteMercado(${idx})">🗑️</span>
@@ -1996,13 +2138,13 @@
           <div class="despesa-row">
             <div>
               <div>
-                <strong>${d.titulo}</strong>
+                <strong>${escapeHTML(d.titulo)}</strong>
                 <span class="despesa-status-badge ${isAprovada ? 'aprovada' : ''}">${isAprovada ? 'Aprovada' : 'Pendente'}</span>
               </div>
-              <div class="hint" style="margin:2px 0 0;">${formatBRL(d.valor)} · Pago por ${d.pagoPor || 'Paulo'} · ${d.split || '50/50'}</div>
+              <div class="hint" style="margin:2px 0 0;">${formatBRL(d.valor)} · Pago por ${escapeHTML(d.pagoPor || 'Paulo')} · ${escapeHTML(d.split || '50/50')}</div>
             </div>
             <div class="item-actions-inline">
-              ${!isAprovada ? `<button class="btn-mini" onclick="aprovarDespesa(${idx})">✓ Aprovar</button>` : ''}
+              ${!isAprovada ? `<button type="button" class="btn-mini" onclick="aprovarDespesa(${idx})">✓ Aprovar</button>` : ''}
               <span class="act-icon" title="Excluir" onclick="deleteDespesa(${idx})">🗑️</span>
             </div>
           </div>
@@ -2017,10 +2159,10 @@
           const nextMs = Number(rem.ultimaDoseTimestamp) + (Number(rem.intervaloHoras) * 3600000);
           return formatDoseDisplay(nextMs);
         }
-        if (rem.horarioFixo) return `Horário fixo às ${rem.horarioFixo}`;
+        if (rem.horarioFixo) return `Horário fixo às ${escapeHTML(rem.horarioFixo)}`;
         return 'Conforme necessidade';
       }
-      if (rem.horarioFixo) return `Fixo às ${rem.horarioFixo}`;
+      if (rem.horarioFixo) return `Fixo às ${escapeHTML(rem.horarioFixo)}`;
       if (rem.intervaloHoras && Number(rem.intervaloHoras) > 0) {
         return `A cada ${rem.intervaloHoras}h (registre a 1ª dose)`;
       }
@@ -2056,28 +2198,28 @@
         remBox.innerHTML = sortedRemedios.map(({ rem, idx }) => {
           const overdue = isRemedioOverdue(rem);
           const regraTag = rem.horarioFixo
-            ? `Horário: ${rem.horarioFixo}${rem.intervaloHoras ? ` · ${rem.intervaloHoras}/${rem.intervaloHoras}h` : ''}`
+            ? `Horário: ${escapeHTML(rem.horarioFixo)}${rem.intervaloHoras ? ` · ${rem.intervaloHoras}/${rem.intervaloHoras}h` : ''}`
             : `A cada ${rem.intervaloHoras || 6}h`;
 
           return `
             <div class="remedio-card ${overdue ? 'overdue' : ''}">
               <div class="remedio-top">
                 <div>
-                  <strong>${rem.nome}</strong>
+                  <strong>${escapeHTML(rem.nome)}</strong>
                   <span class="valor-pill">${regraTag}</span>
                 </div>
                 <div class="remedio-actions-top">
-                  <button class="icon-btn-tiny" title="Editar remédio" onclick="openModalEditarRemedio(${idx})">✏️</button>
-                  <button class="icon-btn-tiny" title="Excluir remédio" onclick="deleteRemedio(${idx})">🗑️</button>
+                  <button type="button" class="icon-btn-tiny" title="Editar remédio" onclick="openModalEditarRemedio(${idx})">✏️</button>
+                  <button type="button" class="icon-btn-tiny" title="Excluir remédio" onclick="deleteRemedio(${idx})">🗑️</button>
                 </div>
               </div>
               <p style="font-size:13px; margin-top:6px;">
-                Última dose: <strong>${rem.ultimaDoseTimestamp ? `${formatDoseDisplay(rem.ultimaDoseTimestamp)}${rem.ultimaDoseResponsavel ? ` (${rem.ultimaDoseResponsavel})` : ''}` : '-'}</strong>
+                Última dose: <strong>${rem.ultimaDoseTimestamp ? `${formatDoseDisplay(rem.ultimaDoseTimestamp)}${rem.ultimaDoseResponsavel ? ` (${escapeHTML(rem.ultimaDoseResponsavel)})` : ''}` : '-'}</strong>
               </p>
               <p style="font-size:13px; margin-top:2px;">
                 Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong> ${overdue ? '· Horário atingido' : ''}
               </p>
-              <button class="btn-dose" onclick="registrarDoseRemedio(${idx})">✔️ Registrar Dose Agora</button>
+              <button type="button" class="btn-dose" onclick="registrarDoseRemedio(${idx})">✔️ Registrar Dose Agora</button>
             </div>
           `;
         }).join('');
@@ -2091,21 +2233,21 @@
         histBox.innerHTML = hist.map((item, idx) => `
           <div class="dose-log-row">
             <div class="dose-log-main">
-              <strong>💊 ${item.remedioNome}</strong>
-              <div class="dose-log-meta">${formatDoseDisplay(item.timestamp)} · Por ${item.responsavel || 'Responsável'}${item.obs ? ` · ${item.obs}` : ''}</div>
+              <strong>💊 ${escapeHTML(item.remedioNome)}</strong>
+              <div class="dose-log-meta">${formatDoseDisplay(item.timestamp)} · Por ${escapeHTML(item.responsavel || 'Responsável')}${item.obs ? ` · ${escapeHTML(item.obs)}` : ''}</div>
             </div>
             <div class="dose-log-btns">
-              <button class="icon-btn-tiny" title="Corrigir dose" onclick="openModalEditarDose(${idx})">✏️</button>
-              <button class="icon-btn-tiny" title="Excluir dose" onclick="deleteDoseHistorico(${idx})">🗑️</button>
+              <button type="button" class="icon-btn-tiny" title="Corrigir dose" onclick="openModalEditarDose(${idx})">✏️</button>
+              <button type="button" class="icon-btn-tiny" title="Excluir dose" onclick="deleteDoseHistorico(${idx})">🗑️</button>
             </div>
           </div>
         `).join('');
       }
 
       document.getElementById('ficha-saude-box').innerHTML = `
-        <p><strong>Alergias:</strong> ${s.alergias}</p>
-        <p><strong>Tipo Sanguíneo:</strong> ${s.tipoSanguineo}</p>
-        <p><strong>Vacinas:</strong> ${s.vacinas}</p>
+        <p><strong>Alergias:</strong> ${escapeHTML(s.alergias)}</p>
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(s.tipoSanguineo)}</p>
+        <p><strong>Vacinas:</strong> ${escapeHTML(s.vacinas)}</p>
       `;
 
       const vacEl = document.getElementById('vacinas-list-box');
@@ -2118,11 +2260,11 @@
               return `
                 <div class="vaccine-row">
                   <div>
-                    <strong>${v.nome}</strong>
-                    ${v.detalhe ? `<div class="hint" style="margin:2px 0 0;">${v.detalhe}</div>` : ''}
+                    <strong>${escapeHTML(v.nome)}</strong>
+                    ${v.detalhe ? `<div class="hint" style="margin:2px 0 0;">${escapeHTML(v.detalhe)}</div>` : ''}
                   </div>
                   <div class="item-actions-inline">
-                    <span class="vaccine-pill ${isUpcoming ? 'upcoming' : ''}">${v.status}</span>
+                    <span class="vaccine-pill ${isUpcoming ? 'upcoming' : ''}">${escapeHTML(v.status)}</span>
                     <span class="act-icon" title="Excluir" onclick="deleteVacina(${idx})">🗑️</span>
                   </div>
                 </div>
@@ -2143,20 +2285,22 @@
         ? `<p class="hint" style="margin:0;">Nenhum remédio ativo no momento.</p>`
         : remedios.map(rem => `
             <div class="remedio-card">
-              <strong>${rem.nome}</strong>
+              <strong>${escapeHTML(rem.nome)}</strong>
               <p style="font-size:13px; margin-top:4px;">Última dose: <strong>${rem.ultimaDoseTimestamp ? formatDoseDisplay(rem.ultimaDoseTimestamp) : '-'}</strong></p>
               <p style="font-size:13px;">Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong></p>
             </div>
           `).join('');
 
       document.getElementById('apoio-ficha-box').innerHTML = `
-        <p><strong>Alergias:</strong> ${s.alergias}</p>
-        <p><strong>Tipo Sanguíneo:</strong> ${s.tipoSanguineo}</p>
-        <p><strong>Vacinas:</strong> ${s.vacinas}</p>
+        <p><strong>Alergias:</strong> ${escapeHTML(s.alergias)}</p>
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(s.tipoSanguineo)}</p>
+        <p><strong>Vacinas:</strong> ${escapeHTML(s.vacinas)}</p>
       `;
     }
 
-    // --- CÁLCULO SEMANAL (SEG A DOM) PARA DUDA E ADMIN ---
+    // ============================================================================
+    // 9. MISSÕES, ESTRELAS, DESEJOS & RESUMO SEMANAL (DUDA & ADMIN)
+    // ============================================================================
     function getDayMissionStats(iso) {
       const hoje = getTodayISO();
       const missoes = appState.missoes || [];
@@ -2248,8 +2392,8 @@
             return `
               <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
                 <div>
-                  <strong>${item.tipo === 'penalidade' ? '⚠️ Penalidade' : item.tipo === 'resgate' ? '🎁 Resgate de Desejo' : '✨ Bônus'}: ${item.motivo}</strong>
-                  <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · Por ${item.autor}${vistoBadge}</div>
+                  <strong>${item.tipo === 'penalidade' ? '⚠️ Penalidade' : item.tipo === 'resgate' ? '🎁 Resgate de Desejo' : '✨ Bônus'}: ${escapeHTML(item.motivo)}</strong>
+                  <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · Por ${escapeHTML(item.autor)}${vistoBadge}</div>
                 </div>
                 <span class="star-log-delta">${sign} ⭐</span>
               </div>
@@ -2269,10 +2413,10 @@
           dudaPenaltiesEl.innerHTML = penalidadesPendentes.map(p => `
             <div class="duda-penalty-item">
               <div>
-                <strong>${p.delta} ⭐ · ${p.motivo}</strong>
-                <small>Explicado por ${p.autor} · ${formatDoseDisplay(p.timestamp)}</small>
+                <strong>${p.delta} ⭐ · ${escapeHTML(p.motivo)}</strong>
+                <small>Explicado por ${escapeHTML(p.autor)} · ${formatDoseDisplay(p.timestamp)}</small>
               </div>
-              <button class="btn-duda-ack" onclick="confirmarLeituraPenalidadeDuda(${p.id})">Entendi ✓</button>
+              <button type="button" class="btn-duda-ack" onclick="confirmarLeituraPenalidadeDuda(${p.id})">Entendi ✓</button>
             </div>
           `).join('');
         }
@@ -2292,8 +2436,8 @@
               return `
                 <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
                   <div>
-                    <strong>${item.tipo === 'penalidade' ? '⚠️ Desconto' : item.tipo === 'resgate' ? '🎁 Desejo' : '🌟 Bônus'}: ${item.motivo}</strong>
-                    <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · ${item.autor}</div>
+                    <strong>${item.tipo === 'penalidade' ? '⚠️ Desconto' : item.tipo === 'resgate' ? '🎁 Desejo' : '🌟 Bônus'}: ${escapeHTML(item.motivo)}</strong>
+                    <div class="hint" style="margin:2px 0 0;">${formatDoseDisplay(item.timestamp)} · ${escapeHTML(item.autor)}</div>
                   </div>
                   <span class="star-log-delta">${sign} ⭐</span>
                 </div>
@@ -2301,7 +2445,7 @@
             }).join('')}</div>`
         }
       `;
-      openSheet('💰 Extrato das Minhas Estrelas', bodyHTML, () => {});
+      openSheet('💰 Extrato das Minhas Estrelas', bodyHTML, null, 'Fechar', false, true);
     }
 
     function renderMissoes() {
@@ -2411,8 +2555,8 @@
               <div class="duda-mission-card ${isDone ? 'completed' : ''} ${!isViewingToday ? 'locked-past' : ''}"
                    onclick="${isViewingToday ? `toggleMissao(${m.idx})` : ''}">
                 <div class="mission-left">
-                  <span class="mission-emoji">${m.emoji || '⭐'}</span>
-                  <span>${m.titulo}</span>
+                  <span class="mission-emoji">${escapeHTML(m.emoji || '⭐')}</span>
+                  <span>${escapeHTML(m.titulo)}</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
                   <span class="mission-star-tag">${isDone ? '+1 ⭐' : '1 ⭐'}</span>
@@ -2426,8 +2570,8 @@
 
       const adminEl = document.getElementById('admin-missoes-list');
       adminEl.innerHTML = missoes.map((m, idx) => `
-        <div class="check-item">
-          <span>${m.emoji || '⭐'} <strong>[${m.turno}]</strong> ${m.titulo} ${m.done ? '✅' : ''}</span>
+        <div class="check-item" style="cursor:default;">
+          <span>${escapeHTML(m.emoji || '⭐')} <strong>[${escapeHTML(m.turno)}]</strong> ${escapeHTML(m.titulo)} ${m.done ? '✅' : ''}</span>
           <div class="item-actions-inline">
             <span class="act-icon" title="Editar" onclick="openModalEditarMissao(${idx})">✏️</span>
             <span class="act-icon" title="Excluir" onclick="deleteMissao(${idx})">🗑️</span>
@@ -2450,7 +2594,7 @@
             </div>
           `).join('');
 
-      openSheet('📜 Minhas Semanas Anteriores', bodyHTML, () => {});
+      openSheet('📜 Minhas Semanas Anteriores', bodyHTML, null, 'Fechar', false, true);
     }
 
     function renderDesejos() {
@@ -2470,12 +2614,12 @@
           return `
             <div class="duda-wish-item ${d.status === 'aprovado' ? 'approved' : d.status === 'recusado' ? 'rejected' : ''}" style="flex-direction:column; align-items:stretch; gap:6px;">
               <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                <span>🎁 ${d.texto} <small style="opacity:0.75;">(${d.custo} ⭐)</small></span>
+                <span>🎁 ${escapeHTML(d.texto)} <small style="opacity:0.75;">(${d.custo} ⭐)</small></span>
                 <span class="wish-tag-mini">${badgeMap[d.status] || 'Pendente'}</span>
               </div>
               ${d.status === 'recusado' && d.motivoRecusa ? `
                 <div style="background:rgba(255,255,255,0.75); padding:8px 10px; border-radius:10px; font-size:13px; font-weight:600; color:#7F1D1D;">
-                  💬 ${d.recusadoPor ? `<strong>${d.recusadoPor}:</strong> ` : ''}${d.motivoRecusa}
+                  💬 ${d.recusadoPor ? `<strong>${escapeHTML(d.recusadoPor)}:</strong> ` : ''}${escapeHTML(d.motivoRecusa)}
                 </div>
               ` : ''}
             </div>
@@ -2493,23 +2637,23 @@
             <div class="wish-admin-card">
               <div class="wish-admin-top">
                 <div>
-                  <strong>🎁 ${d.texto}</strong>
+                  <strong>🎁 ${escapeHTML(d.texto)}</strong>
                   <p class="hint" style="margin:3px 0 0;">Custo sugerido: <strong>${d.custo} ⭐</strong> (Saldo atual: ${appState.estrelasTotal || 0} ⭐)</p>
                   ${d.status === 'recusado' && d.motivoRecusa ? `
                     <p style="font-size:12px; color:#991B1B; margin-top:5px; background:#FEE2E2; padding:6px 8px; border-radius:8px;">
-                      💬 <strong>Motivo (${d.recusadoPor || 'Responsável'}):</strong> ${d.motivoRecusa}
+                      💬 <strong>Motivo (${escapeHTML(d.recusadoPor || 'Responsável')}):</strong> ${escapeHTML(d.motivoRecusa)}
                     </p>
                   ` : ''}
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
                   <span class="wish-status-pill ${statusClass}">${statusLabel}</span>
-                  <small style="cursor:pointer;" onclick="deleteDesejo(${idx})">✕</small>
+                  <span class="act-icon" title="Excluir" onclick="deleteDesejo(${idx})">✕</span>
                 </div>
               </div>
               ${d.status === 'pendente' ? `
                 <div class="wish-actions">
-                  <button class="btn-approve" onclick="aprovarDesejo(${idx})">✓ Aprovar (-${d.custo} ⭐)</button>
-                  <button class="btn-reject" onclick="recusarDesejo(${idx})">✕ Recusar</button>
+                  <button type="button" class="btn-approve" onclick="aprovarDesejo(${idx})">✓ Aprovar (-${d.custo} ⭐)</button>
+                  <button type="button" class="btn-reject" onclick="recusarDesejo(${idx})">✕ Recusar</button>
                 </div>
               ` : ''}
             </div>
@@ -2519,526 +2663,69 @@
     }
 
     // ============================================================================
-    // 8. BOTTOM SHEET MODALS (INCLUINDO INTEGRANTES EM HOJE E CALENDÁRIO)
+    // 10. AÇÕES INTERATIVAS E MODAIS DE EDIÇÃO / CRIAÇÃO
     // ============================================================================
-    function buildMemberChipsHTML(inputId, selectedName) {
-      const members = appState.integrantes || DEFAULT_INTEGRANTES;
-      const normSel = normalizeCategoriaName(selectedName || 'Família');
-      return members.map(m => {
-        const isSel = m.nome.toLowerCase() === normSel.toLowerCase();
-        return `<button type="button" class="chip-opt ${isSel ? 'selected' : ''}" data-val="${m.nome}" onclick="selectChip(this, '${inputId}')">${m.emoji || '👤'} ${m.nome}</button>`;
-      }).join('');
-    }
 
-    function openSheet(title, bodyHTML, onSave, isPenalty = false) {
-      document.getElementById('sheet-title').textContent = title;
-      document.getElementById('sheet-body').innerHTML = bodyHTML;
-      const saveBtn = document.getElementById('sheet-save-btn');
-      saveBtn.className = isPenalty ? 'btn-primary penalty' : 'btn-primary';
-      saveBtn.onclick = () => {
-        const result = onSave();
-        if (result === false) return;
-        forceCloseSheet();
-      };
-      document.getElementById('sheet-modal').classList.remove('hidden');
-    }
-
-    function closeSheetModal(e) {
-      if (e.target.id === 'sheet-modal') forceCloseSheet();
-    }
-
-    function forceCloseSheet() {
-      document.getElementById('sheet-modal').classList.add('hidden');
-    }
-
-    function selectChip(el, hiddenInputId) {
-      el.parentElement.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-      document.getElementById(hiddenInputId).value = el.dataset.val;
-    }
-
-    // --- MODAIS DE SAÚDE ---
-    function buildRemedioFormHTML(rem) {
-      const r = rem || { nome: '', intervaloHoras: 6, horarioFixo: '' };
-      const intVal = r.intervaloHoras || 6;
-      return `
-        <label>Nome do Medicamento e Dose</label>
-        <input type="text" id="inp-rem-nome" value="${r.nome}" placeholder="Ex: Dipirona 20 gotas ou Amoxicilina" />
-        <label>Intervalo entre Doses (em horas)</label>
-        <input type="hidden" id="inp-rem-int" value="${intVal}" />
-        <div class="chip-group">
-          <button type="button" class="chip-opt ${intVal==2?'selected':''}" data-val="2" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=2;">2/2h</button>
-          <button type="button" class="chip-opt ${intVal==3?'selected':''}" data-val="3" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=3;">3/3h</button>
-          <button type="button" class="chip-opt ${intVal==4?'selected':''}" data-val="4" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=4;">4/4h</button>
-          <button type="button" class="chip-opt ${intVal==6?'selected':''}" data-val="6" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=6;">6/6h</button>
-          <button type="button" class="chip-opt ${intVal==8?'selected':''}" data-val="8" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=8;">8/8h</button>
-          <button type="button" class="chip-opt ${intVal==12?'selected':''}" data-val="12" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=12;">12/12h</button>
-          <button type="button" class="chip-opt ${intVal==24?'selected':''}" data-val="24" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=24;">24/24h</button>
-          <button type="button" class="chip-opt ${intVal==0?'selected':''}" data-val="0" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=0;">Sem intervalo</button>
-        </div>
-        <label>Ou digite outro intervalo em horas (Ex: 1, 5, 10)</label>
-        <input type="number" id="inp-rem-int-custom" min="0" step="0.5" value="${intVal}" oninput="document.getElementById('inp-rem-int').value = this.value; this.previousElementSibling.querySelectorAll('.chip-opt').forEach(c => c.classList.toggle('selected', Number(c.dataset.val) === Number(this.value)));" />
-        <label>Horário Base / Fixo (Opcional)</label>
-        <input type="time" id="inp-rem-hora" value="${r.horarioFixo || ''}" />
-      `;
-    }
-
-    function openModalNovoRemedio() {
-      openSheet('Adicionar Novo Remédio', buildRemedioFormHTML(null), () => {
-        const nome = document.getElementById('inp-rem-nome').value.trim();
-        const customEl = document.getElementById('inp-rem-int-custom');
-        const intervalo = customEl ? (Number(customEl.value) || 0) : (Number(document.getElementById('inp-rem-int').value) || 0);
-        const horarioFixo = document.getElementById('inp-rem-hora').value;
-        if (nome) {
-          appState.saude.remedios.push({
-            id: Date.now(),
-            nome,
-            intervaloHoras: intervalo,
-            horarioFixo,
-            ultimaDoseTimestamp: null,
-            ultimaDoseResponsavel: ""
-          });
-          saveState();
-        }
-      });
-    }
-
-    function openModalEditarRemedio(idx) {
-      const rem = appState.saude.remedios[idx];
-      if (!rem) return;
-      openSheet('Editar Remédio', buildRemedioFormHTML(rem), () => {
-        const nome = document.getElementById('inp-rem-nome').value.trim();
-        const customEl = document.getElementById('inp-rem-int-custom');
-        const intervalo = customEl ? (Number(customEl.value) || 0) : (Number(document.getElementById('inp-rem-int').value) || 0);
-        const horarioFixo = document.getElementById('inp-rem-hora').value;
-        if (nome) {
-          rem.nome = nome;
-          rem.intervaloHoras = intervalo;
-          rem.horarioFixo = horarioFixo;
-          saveState();
-        }
-      });
-    }
-
-    function deleteRemedio(idx) {
-      if (!confirm("Remover este remédio da lista ativa?")) return;
-      appState.saude.remedios.splice(idx, 1);
+    // --- PENDÊNCIAS ---
+    function togglePendencia(idx) {
+      if (!appState.pendencias[idx]) return;
+      appState.pendencias[idx].done = !appState.pendencias[idx].done;
       saveState();
     }
 
-    function syncRemedioLastDoseFromHistory(remedioId) {
-      const hist = appState.saude.historicoDoses || [];
-      const matching = hist
-        .filter(h => String(h.remedioId) === String(remedioId))
-        .sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
-
-      const rem = (appState.saude.remedios || []).find(r => String(r.id) === String(remedioId));
-      if (rem) {
-        if (matching.length > 0) {
-          rem.ultimaDoseTimestamp = matching[0].timestamp;
-          rem.ultimaDoseResponsavel = matching[0].responsavel || '';
-        } else {
-          rem.ultimaDoseTimestamp = null;
-          rem.ultimaDoseResponsavel = '';
-        }
-      }
-    }
-
-    function registrarDoseRemedio(idx) {
-      const rem = appState.saude.remedios[idx];
-      if (!rem) return;
-      const quem = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      const agoraMs = Date.now();
-
-      rem.ultimaDoseTimestamp = agoraMs;
-      rem.ultimaDoseResponsavel = quem;
-
-      if (!Array.isArray(appState.saude.historicoDoses)) appState.saude.historicoDoses = [];
-      appState.saude.historicoDoses.unshift({
-        id: agoraMs,
-        remedioId: rem.id,
-        remedioNome: rem.nome,
-        timestamp: agoraMs,
-        responsavel: quem,
-        obs: ''
-      });
-      appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+    function deletePendencia(idx) {
+      if (!confirm('Excluir esta pendência?')) return;
+      appState.pendencias.splice(idx, 1);
       saveState();
     }
 
-    function openModalLancarDoseAvulsa() {
-      const remedios = appState.saude.remedios || [];
-      const quemPadrao = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      const optionsHTML = remedios.length > 0
-        ? remedios.map(r => `<option value="${r.id}">${r.nome}</option>`).join('')
-        : `<option value="avulso">Dose avulsa</option>`;
-
-      openSheet('Lançar Dose Manual / Corrigir Hora', `
-        <label>Medicamento</label>
-        <select id="inp-dose-rem">${optionsHTML}</select>
-        <label>Data e Hora da Dose</label>
-        <input type="datetime-local" id="inp-dose-dt" value="${formatDateTimeLocalInput(Date.now())}" />
-        <label>Quem deu</label>
-        <input type="text" id="inp-dose-resp" value="${quemPadrao}" />
-        <label>Observação (Opcional)</label>
-        <input type="text" id="inp-dose-obs" placeholder="Ex: Lançado após o retorno da escola" />
-      `, () => {
-        const selVal = document.getElementById('inp-dose-rem').value;
-        const dtStr = document.getElementById('inp-dose-dt').value;
-        const resp = document.getElementById('inp-dose-resp').value.trim() || quemPadrao;
-        const obs = document.getElementById('inp-dose-obs').value.trim();
-        const ts = dtStr ? new Date(dtStr).getTime() : Date.now();
-        if (isNaN(ts)) return;
-
-        const remObj = remedios.find(r => String(r.id) === String(selVal));
-        const remNome = remObj ? remObj.nome : 'Dose avulsa';
-
-        appState.saude.historicoDoses.push({
-          id: Date.now(),
-          remedioId: remObj ? remObj.id : 'avulso',
-          remedioNome: remNome,
-          timestamp: ts,
-          responsavel: resp,
-          obs
-        });
-        appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
-        if (remObj) syncRemedioLastDoseFromHistory(remObj.id);
-        saveState();
-      });
-    }
-
-    function openModalEditarDose(idx) {
-      const item = appState.saude.historicoDoses[idx];
-      if (!item) return;
-      const remedios = appState.saude.remedios || [];
-      const optionsHTML = remedios.length > 0
-        ? remedios.map(r => `<option value="${r.id}" ${String(r.id)===String(item.remedioId)?'selected':''}>${r.nome}</option>`).join('') +
-          `<option value="avulso" ${item.remedioId==='avulso'?'selected':''}>${item.remedioNome}</option>`
-        : `<option value="avulso">${item.remedioNome}</option>`;
-
-      openSheet('Corrigir Lançamento de Dose', `
-        <label>Medicamento</label>
-        <select id="inp-edit-dose-rem">${optionsHTML}</select>
-        <label>Data e Hora Correta</label>
-        <input type="datetime-local" id="inp-edit-dose-dt" value="${formatDateTimeLocalInput(item.timestamp)}" />
-        <label>Responsável</label>
-        <input type="text" id="inp-edit-dose-resp" value="${item.responsavel || ''}" />
-        <label>Observação</label>
-        <input type="text" id="inp-edit-dose-obs" value="${item.obs || ''}" />
-      `, () => {
-        const oldRemId = item.remedioId;
-        const selVal = document.getElementById('inp-edit-dose-rem').value;
-        const dtStr = document.getElementById('inp-edit-dose-dt').value;
-        const resp = document.getElementById('inp-edit-dose-resp').value.trim() || 'Responsável';
-        const obs = document.getElementById('inp-edit-dose-obs').value.trim();
-        const ts = dtStr ? new Date(dtStr).getTime() : item.timestamp;
-        if (isNaN(ts)) return;
-
-        const remObj = remedios.find(r => String(r.id) === String(selVal));
-        item.remedioId = remObj ? remObj.id : selVal;
-        item.remedioNome = remObj ? remObj.nome : item.remedioNome;
-        item.timestamp = ts;
-        item.responsavel = resp;
-        item.obs = obs;
-
-        appState.saude.historicoDoses.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
-        if (oldRemId) syncRemedioLastDoseFromHistory(oldRemId);
-        if (item.remedioId) syncRemedioLastDoseFromHistory(item.remedioId);
-        saveState();
-      });
-    }
-
-    function deleteDoseHistorico(idx) {
-      if (!confirm("Excluir este registro de dose do histórico?")) return;
-      const removed = appState.saude.historicoDoses.splice(idx, 1)[0];
-      if (removed && removed.remedioId) {
-        syncRemedioLastDoseFromHistory(removed.remedioId);
-      }
-      saveState();
-    }
-
-    // --- DESEJOS & PIN ---
-    function openModalDesejoDuda() {
-      const stars = appState.estrelasTotal || 0;
-      openSheet('Qual é o seu desejo, Duda? 🌟', `
-        <p class="hint">Você tem <strong>⭐ ${stars} ${stars === 1 ? 'estrela' : 'estrelas'}</strong> disponíveis. Escreva o que você quer pedir:</p>
-        <label>Meu desejo</label>
-        <input type="text" id="inp-desejo-txt" placeholder="Ex: Tomar sorvete ou escolher o filme" />
-        <label>Quantas estrelas você quer oferecer?</label>
-        <input type="hidden" id="inp-desejo-custo" value="5" />
-        <div class="chip-group">
-          <button type="button" class="chip-opt" data-val="3" onclick="selectChip(this, 'inp-desejo-custo')">3 ⭐</button>
-          <button type="button" class="chip-opt selected" data-val="5" onclick="selectChip(this, 'inp-desejo-custo')">5 ⭐</button>
-          <button type="button" class="chip-opt" data-val="10" onclick="selectChip(this, 'inp-desejo-custo')">10 ⭐</button>
-          <button type="button" class="chip-opt" data-val="15" onclick="selectChip(this, 'inp-desejo-custo')">15 ⭐</button>
-        </div>
-      `, () => {
-        const texto = document.getElementById('inp-desejo-txt').value.trim();
-        const custo = Number(document.getElementById('inp-desejo-custo').value) || 5;
-        if (texto) {
-          appState.desejos.unshift({
-            id: Date.now(),
-            texto,
-            custo,
-            status: 'pendente'
-          });
-          saveState();
-        }
-      });
-    }
-
-    function openModalAlterarPin() {
-      const currentUser = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
-      openSheet(`Alterar Minha Senha · ${currentUser} 🔑`, `
-        <p class="hint">Você está alterando apenas a senha individual de <strong>${currentUser}</strong> (4 dígitos).</p>
-        <label>Senha Atual de ${currentUser}</label>
-        <input type="password" id="inp-pin-atual" maxlength="4" inputmode="numeric" placeholder="••••" />
-        <label>Nova Senha (4 dígitos)</label>
-        <input type="password" id="inp-pin-nova" maxlength="4" inputmode="numeric" placeholder="••••" />
-        <label>Confirmar Nova Senha</label>
-        <input type="password" id="inp-pin-confirma" maxlength="4" inputmode="numeric" placeholder="••••" />
-      `, () => {
-        const atual = document.getElementById('inp-pin-atual').value.trim();
-        const nova = document.getElementById('inp-pin-nova').value.trim();
-        const confirma = document.getElementById('inp-pin-confirma').value.trim();
-        appState.pins = normalizePins(appState);
-        const pinSalvo = String(appState.pins[currentUser] || '1234');
-
-        if (atual !== pinSalvo) {
-          alert(`A senha atual de ${currentUser} está incorreta.`);
-          return false;
-        }
-        if (!/^\d{4}$/.test(nova)) {
-          alert('A nova senha deve ter exatamente 4 números.');
-          return false;
-        }
-        if (nova !== confirma) {
-          alert('A confirmação da nova senha não confere.');
-          return false;
-        }
-
-        appState.pins[currentUser] = nova;
-        saveState();
-        alert(`Senha de ${currentUser} alterada com sucesso!`);
-      });
-    }
-
-    function openModalEstrelasManual(initialMode = 'bonus') {
-      const isPenalty = initialMode === 'penalty';
-      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
-
-      const bodyHTML = isPenalty ? `
-        <p class="hint">Saldo atual: <strong>⭐ ${appState.estrelasTotal || 0}</strong>. O motivo abaixo será mostrado diretamente na tela da Duda para que ela entenda o desconto:</p>
-        <label>Quantas estrelas descontar?</label>
-        <input type="hidden" id="inp-pen-qtd" value="1" />
-        <div class="chip-group">
-          <button type="button" class="chip-opt penalty selected" data-val="1" onclick="selectChip(this, 'inp-pen-qtd')">-1 ⭐</button>
-          <button type="button" class="chip-opt penalty" data-val="2" onclick="selectChip(this, 'inp-pen-qtd')">-2 ⭐</button>
-          <button type="button" class="chip-opt penalty" data-val="3" onclick="selectChip(this, 'inp-pen-qtd')">-3 ⭐</button>
-          <button type="button" class="chip-opt penalty" data-val="5" onclick="selectChip(this, 'inp-pen-qtd')">-5 ⭐</button>
-        </div>
-        <label>Motivo claro para a Duda (Obrigatório)</label>
-        <div class="chip-group" style="margin-bottom:8px;">
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Não cumpriu combinado de horário'">⏰ Horário</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Deixou bagunça sem guardar'">🧸 Bagunça</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-pen-motivo').value='Desrespeitou combinado da casa'">💬 Combinado</button>
-        </div>
-        <input type="text" id="inp-pen-motivo" placeholder="Ex: Não guardou os brinquedos após aviso" />
-      ` : `
-        <p class="hint">Saldo atual: <strong>⭐ ${appState.estrelasTotal || 0}</strong>. Adicione estrelinhas extras com uma mensagem positiva para a Duda:</p>
-        <label>Quantas estrelas somar?</label>
-        <input type="hidden" id="inp-bonus-qtd" value="1" />
-        <div class="chip-group">
-          <button type="button" class="chip-opt selected" data-val="1" onclick="selectChip(this, 'inp-bonus-qtd')">+1 ⭐</button>
-          <button type="button" class="chip-opt" data-val="2" onclick="selectChip(this, 'inp-bonus-qtd')">+2 ⭐</button>
-          <button type="button" class="chip-opt" data-val="3" onclick="selectChip(this, 'inp-bonus-qtd')">+3 ⭐</button>
-          <button type="button" class="chip-opt" data-val="5" onclick="selectChip(this, 'inp-bonus-qtd')">+5 ⭐</button>
-        </div>
-        <label>Motivo / Elogio</label>
-        <input type="text" id="inp-bonus-motivo" placeholder="Ex: Ajudou sem precisar pedir!" />
-      `;
-
-      openSheet(
-        isPenalty ? '⚠️ Aplicar Penalidade Transparente' : '✨ Atribuir Estrelas Bônus',
-        bodyHTML,
-        () => {
-          const saldoAtual = appState.estrelasTotal || 0;
-          if (isPenalty) {
-            const qtd = Math.max(1, Number(document.getElementById('inp-pen-qtd').value) || 1);
-            const motivo = document.getElementById('inp-pen-motivo').value.trim();
-            if (!motivo) {
-              alert('Escreva o motivo da penalidade para ficar transparente para a Duda.');
-              return false;
-            }
-            const descontoReal = Math.min(saldoAtual, qtd);
-            appState.estrelasTotal = Math.max(0, saldoAtual - qtd);
-            registrarMovimentacaoEstrelas({
-              tipo: 'penalidade',
-              delta: -descontoReal,
-              motivo,
-              autor: quem
-            });
-          } else {
-            const qtd = Math.max(1, Number(document.getElementById('inp-bonus-qtd').value) || 1);
-            const motivo = document.getElementById('inp-bonus-motivo').value.trim() || 'Estrelas extras atribuídas';
-            appState.estrelasTotal = saldoAtual + qtd;
-            registrarMovimentacaoEstrelas({
-              tipo: 'bonus',
-              delta: qtd,
-              motivo,
-              autor: quem
-            });
-          }
-          saveState();
-        },
-        isPenalty
-      );
-    }
-
-    // --- COMPROMISSO INDIVIDUAL / FAMÍLIA NA ABA HOJE ---
-    function openModalCasal() {
-      const user = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      openSheet(`Novo Compromisso · ${formatDateBR(hojeSelectedDateISO)}`, `
-        <label>Integrante</label>
-        <input type="hidden" id="inp-casal-quem" value="${user}" />
-        <div class="chip-group">
-          ${buildMemberChipsHTML('inp-casal-quem', user)}
-        </div>
-        <label>Data</label>
-        <input type="date" id="inp-casal-data" value="${hojeSelectedDateISO}" />
-        <label>Descrição / Horário</label>
-        <input type="text" id="inp-casal-txt" placeholder="Ex: Turno até 18h ou Dentista 15h" />
-      `, () => {
-        const quem = document.getElementById('inp-casal-quem').value || 'Família';
-        const data = document.getElementById('inp-casal-data').value || hojeSelectedDateISO;
-        const txt = document.getElementById('inp-casal-txt').value.trim();
-        if (txt) {
-          const textoFinal = txt.toLowerCase().startsWith(quem.toLowerCase() + ':') ? txt : `${quem}: ${txt}`;
-          appState.casalHoje.push({ id: Date.now(), data, membro: quem, texto: textoFinal });
-          appState.agenda.push({ id: Date.now() + 1, categoria: quem, data, hora: '', texto: txt });
-          hojeSelectedDateISO = data;
-          selectedDateISO = data;
-          saveState();
-        }
-      });
-    }
-
-    function openModalEditarCasal(idx) {
-      const item = appState.casalHoje[idx];
-      if (!item) return;
-      const membroAtual = item.membro || String(item.texto || '').split(':')[0].trim() || 'Família';
-      openSheet('Editar Compromisso', `
-        <label>Integrante</label>
-        <input type="hidden" id="inp-edit-casal-quem" value="${membroAtual}" />
-        <div class="chip-group">
-          ${buildMemberChipsHTML('inp-edit-casal-quem', membroAtual)}
-        </div>
-        <label>Data</label>
-        <input type="date" id="inp-edit-casal-data" value="${item.data || hojeSelectedDateISO}" />
-        <label>Descrição</label>
-        <input type="text" id="inp-edit-casal-txt" value="${item.texto}" />
-      `, () => {
-        const membro = document.getElementById('inp-edit-casal-quem').value || membroAtual;
-        const data = document.getElementById('inp-edit-casal-data').value || item.data || hojeSelectedDateISO;
-        const txt = document.getElementById('inp-edit-casal-txt').value.trim();
-        if (txt) {
-          item.membro = membro;
-          item.data = data;
-          item.texto = txt;
-          saveState();
-        }
-      });
-    }
-
-    // --- PENDÊNCIAS DA CASA (ADICIONAR E EDITAR) ---
     function openModalPendencia() {
       openSheet('Nova Pendência da Casa', `
-        <label>Tarefa</label>
-        <input type="text" id="inp-pend-txt" placeholder="Ex: Pagar boleto da escola" />
-        <label>Valor R$ (Opcional)</label>
-        <input type="text" id="inp-pend-val" inputmode="decimal" placeholder="Ex: 120,00" />
+        <label>Descrição da Tarefa / Conta</label>
+        <input type="text" id="inp-pend-texto" placeholder="Ex: Pagar conta de luz, Agendar revisão..." />
+        <label>Valor (Opcional · R$)</label>
+        <input type="text" id="inp-pend-valor" placeholder="Ex: 150,00" />
       `, () => {
-        const texto = document.getElementById('inp-pend-txt').value.trim();
-        const valor = document.getElementById('inp-pend-val').value.trim();
-        if (texto) {
-          appState.pendencias.push({ id: Date.now(), texto, valor, done: false });
-          saveState();
-        }
+        const texto = document.getElementById('inp-pend-texto').value.trim();
+        const valor = document.getElementById('inp-pend-valor').value.trim();
+        if (!texto) return false;
+        appState.pendencias.unshift({ id: Date.now(), texto, valor, done: false });
+        saveState();
       });
     }
 
     function openModalEditarPendencia(idx) {
       const item = appState.pendencias[idx];
       if (!item) return;
-      openSheet('Editar Pendência da Casa', `
-        <label>Tarefa</label>
-        <input type="text" id="inp-edit-pend-txt" value="${item.texto}" />
-        <label>Valor R$ (Opcional)</label>
-        <input type="text" id="inp-edit-pend-val" inputmode="decimal" value="${item.valor || ''}" />
+      openSheet('Editar Pendência', `
+        <label>Descrição</label>
+        <input type="text" id="inp-pend-texto" value="${escapeHTML(item.texto)}" />
+        <label>Valor (Opcional · R$)</label>
+        <input type="text" id="inp-pend-valor" value="${escapeHTML(item.valor || '')}" />
       `, () => {
-        const texto = document.getElementById('inp-edit-pend-txt').value.trim();
-        const valor = document.getElementById('inp-edit-pend-val').value.trim();
-        if (texto) {
-          item.texto = texto;
-          item.valor = valor;
-          saveState();
-        }
+        const texto = document.getElementById('inp-pend-texto').value.trim();
+        const valor = document.getElementById('inp-pend-valor').value.trim();
+        if (!texto) return false;
+        item.texto = texto;
+        item.valor = valor;
+        saveState();
       });
     }
 
-    // --- MURAL RÁPIDO POR DIA (ADICIONAR E EDITAR) ---
-    function openModalMural() {
-      const autor = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
-      openSheet(`Fixar Recado · ${formatDateBR(hojeSelectedDateISO)}`, `
-        <label>Data do Recado</label>
-        <input type="date" id="inp-mural-data" value="${hojeSelectedDateISO}" />
-        <label>Mensagem rápida (${autor})</label>
-        <input type="text" id="inp-mural-txt" placeholder="Ex: Deixei a autorização na mochila" />
-      `, () => {
-        const data = document.getElementById('inp-mural-data').value || hojeSelectedDateISO;
-        const texto = document.getElementById('inp-mural-txt').value.trim();
-        if (texto) {
-          appState.mural.unshift({ id: Date.now(), data, autor, texto });
-          hojeSelectedDateISO = data;
-          saveState();
-        }
-      });
-    }
-
-    function openModalEditarMural(idx) {
-      const item = appState.mural[idx];
-      if (!item) return;
-      openSheet('Editar Recado do Mural', `
-        <label>Data do Recado</label>
-        <input type="date" id="inp-edit-mural-data" value="${item.data || hojeSelectedDateISO}" />
-        <label>Autor</label>
-        <input type="text" id="inp-edit-mural-autor" value="${item.autor}" />
-        <label>Mensagem</label>
-        <input type="text" id="inp-edit-mural-txt" value="${item.texto}" />
-      `, () => {
-        const data = document.getElementById('inp-edit-mural-data').value || item.data || hojeSelectedDateISO;
-        const autor = document.getElementById('inp-edit-mural-autor').value.trim() || item.autor;
-        const texto = document.getElementById('inp-edit-mural-txt').value.trim();
-        if (texto) {
-          item.data = data;
-          item.autor = autor;
-          item.texto = texto;
-          saveState();
-        }
-      });
-    }
-
-    // --- LOGÍSTICA ESCOLAR POR DIA ---
+    // --- LOGÍSTICA ---
     function openModalLogistica() {
-      const currentLog = getDayLogistica(hojeSelectedDateISO);
-      openSheet(`Logística Escolar · ${formatDateBR(hojeSelectedDateISO)}`, `
-        <label>Quem Leva</label>
-        <input type="text" id="inp-log-leva" value="${currentLog.leva}" />
-        <label>Quem Busca</label>
-        <input type="text" id="inp-log-busca" value="${currentLog.busca}" />
+      const logAtual = getDayLogistica(hojeSelectedDateISO);
+      openSheet(`Logística · ${formatDateBR(hojeSelectedDateISO)}`, `
+        <label>Quem leva a Duda?</label>
+        <input type="text" id="inp-log-leva" value="${escapeHTML(logAtual.leva)}" placeholder="Ex: Paulo (07:30)" />
+        <label>Quem busca a Duda?</label>
+        <input type="text" id="inp-log-busca" value="${escapeHTML(logAtual.busca)}" placeholder="Ex: Isabela (12:00)" />
+        <div class="row-buttons" style="margin-top:12px;">
+          <button type="button" class="btn-secondary" style="font-size:12px;" onclick="const a=document.getElementById('inp-log-leva').value; document.getElementById('inp-log-leva').value=document.getElementById('inp-log-busca').value; document.getElementById('inp-log-busca').value=a;">⇄ Inverter Leva/Busca</button>
+        </div>
       `, () => {
-        const leva = document.getElementById('inp-log-leva').value.trim() || currentLog.leva;
-        const busca = document.getElementById('inp-log-busca').value.trim() || currentLog.busca;
+        const leva = document.getElementById('inp-log-leva').value.trim() || '-';
+        const busca = document.getElementById('inp-log-busca').value.trim() || '-';
         if (!appState.logisticaPorDia) appState.logisticaPorDia = {};
         appState.logisticaPorDia[hojeSelectedDateISO] = { leva, busca };
         if (hojeSelectedDateISO === getTodayISO()) {
@@ -3048,77 +2735,176 @@
       });
     }
 
-    // --- AGENDA / CALENDÁRIO (ADICIONAR E EDITAR COM INTEGRANTES) ---
-    function openModalAgenda() {
-      const defaultOwner = currentFilter !== 'Todos' ? currentFilter : 'Família';
-      openSheet('Novo Evento no Calendário', `
-        <label>Integrante / Responsável</label>
-        <input type="hidden" id="inp-ag-cat" value="${defaultOwner}" />
+    // --- MURAL ---
+    function deleteMural(idx) {
+      if (!confirm('Remover este recado do mural?')) return;
+      appState.mural.splice(idx, 1);
+      saveState();
+    }
+
+    function openModalMural() {
+      const current = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
+      openSheet('Novo Recado no Mural', `
+        <label>Autor</label>
+        <input type="hidden" id="inp-mural-autor" value="${escapeHTML(current)}" />
         <div class="chip-group">
-          ${buildMemberChipsHTML('inp-ag-cat', defaultOwner)}
+          <button type="button" class="chip-opt ${current==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-mural-autor')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${current==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-mural-autor')">👩 Isabela</button>
         </div>
+        <label>Recado</label>
+        <input type="text" id="inp-mural-texto" placeholder="Ex: Lancheira já está na geladeira" />
+      `, () => {
+        const autor = document.getElementById('inp-mural-autor').value || current;
+        const texto = document.getElementById('inp-mural-texto').value.trim();
+        if (!texto) return false;
+        appState.mural.unshift({ id: Date.now(), data: hojeSelectedDateISO, autor, texto });
+        saveState();
+      });
+    }
+
+    function openModalEditarMural(idx) {
+      const item = appState.mural[idx];
+      if (!item) return;
+      openSheet('Editar Recado', `
+        <label>Autor</label>
+        <input type="text" id="inp-mural-autor" value="${escapeHTML(item.autor)}" />
+        <label>Recado</label>
+        <input type="text" id="inp-mural-texto" value="${escapeHTML(item.texto)}" />
+      `, () => {
+        const autor = document.getElementById('inp-mural-autor').value.trim() || 'Família';
+        const texto = document.getElementById('inp-mural-texto').value.trim();
+        if (!texto) return false;
+        item.autor = autor;
+        item.texto = texto;
+        saveState();
+      });
+    }
+
+    // --- COMPROMISSOS DO DIA (casalHoje) ---
+    function deleteCasal(idx) {
+      if (!confirm('Excluir este compromisso do dia?')) return;
+      appState.casalHoje.splice(idx, 1);
+      saveState();
+    }
+
+    function openModalCasal() {
+      const current = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
+      openSheet('Novo Compromisso do Dia', `
+        <label>Integrante</label>
+        <input type="hidden" id="inp-casal-membro" value="${escapeHTML(current)}" />
+        <div class="chip-group">${buildMemberChipsHTML('inp-casal-membro', current)}</div>
+        <label>Descrição (inclua horário se desejar, ex: 18:00)</label>
+        <input type="text" id="inp-casal-texto" placeholder="Ex: Reunião até 18:30" />
+      `, () => {
+        const membro = document.getElementById('inp-casal-membro').value || current;
+        const raw = document.getElementById('inp-casal-texto').value.trim();
+        if (!raw) return false;
+        const texto = raw.toLowerCase().startsWith(membro.toLowerCase()) ? raw : `${membro}: ${raw}`;
+        appState.casalHoje.push({ id: Date.now(), data: hojeSelectedDateISO, membro, texto });
+        saveState();
+      });
+    }
+
+    function openModalEditarCasal(idx) {
+      const item = appState.casalHoje[idx];
+      if (!item) return;
+      openSheet('Editar Compromisso', `
+        <label>Integrante</label>
+        <input type="hidden" id="inp-casal-membro" value="${escapeHTML(item.membro || 'Paulo')}" />
+        <div class="chip-group">${buildMemberChipsHTML('inp-casal-membro', item.membro || 'Paulo')}</div>
+        <label>Descrição</label>
+        <input type="text" id="inp-casal-texto" value="${escapeHTML(item.texto)}" />
+      `, () => {
+        const membro = document.getElementById('inp-casal-membro').value || 'Família';
+        const texto = document.getElementById('inp-casal-texto').value.trim();
+        if (!texto) return false;
+        item.membro = membro;
+        item.texto = texto;
+        saveState();
+      });
+    }
+
+    // --- AGENDA / CALENDÁRIO ---
+    function deleteAgenda(idx) {
+      if (!confirm('Excluir este evento da agenda?')) return;
+      appState.agenda.splice(idx, 1);
+      saveState();
+    }
+
+    function openModalAgenda() {
+      const activeTabHoje = document.getElementById('tab-hoje').classList.contains('active');
+      const defaultDate = activeTabHoje ? hojeSelectedDateISO : selectedDateISO;
+      const defaultCat = currentFilter !== 'Todos' ? currentFilter : 'Família';
+      openSheet('Novo Evento na Agenda', `
+        <label>Integrante / Categoria</label>
+        <input type="hidden" id="inp-ag-cat" value="${escapeHTML(defaultCat)}" />
+        <div class="chip-group">${buildMemberChipsHTML('inp-ag-cat', defaultCat)}</div>
         <label>Data</label>
-        <input type="date" id="inp-ag-data" value="${selectedDateISO}" />
+        <input type="date" id="inp-ag-data" value="${escapeHTML(defaultDate)}" />
         <label>Horário (Opcional)</label>
         <input type="time" id="inp-ag-hora" />
-        <label>Descrição</label>
-        <input type="text" id="inp-ag-txt" placeholder="Ex: Dentista, Passeio escolar, Reunião..." />
+        <label>Descrição do Evento</label>
+        <input type="text" id="inp-ag-texto" placeholder="Ex: Consulta pediatra, Festa na escola..." />
       `, () => {
         const categoria = document.getElementById('inp-ag-cat').value || 'Família';
-        const data = document.getElementById('inp-ag-data').value || selectedDateISO;
-        const hora = document.getElementById('inp-ag-hora').value;
-        const texto = document.getElementById('inp-ag-txt').value.trim();
-        if (texto) {
-          appState.agenda.push({ id: Date.now(), categoria, data, hora, texto });
-          selectedDateISO = data;
-          saveState();
-        }
+        const data = document.getElementById('inp-ag-data').value || defaultDate;
+        const hora = document.getElementById('inp-ag-hora').value.trim();
+        const texto = document.getElementById('inp-ag-texto').value.trim();
+        if (!texto) return false;
+        appState.agenda.push({ id: Date.now(), categoria, data, hora, texto });
+        selectedDateISO = data;
+        saveState();
       });
     }
 
     function openModalEditarAgenda(idx) {
-      const item = appState.agenda[idx];
-      if (!item) return;
-      const catNorm = normalizeCategoriaName(item.categoria);
-      openSheet('Editar Evento do Calendário', `
-        <label>Integrante / Responsável</label>
-        <input type="hidden" id="inp-edit-ag-cat" value="${catNorm}" />
-        <div class="chip-group">
-          ${buildMemberChipsHTML('inp-edit-ag-cat', catNorm)}
-        </div>
+      const ev = appState.agenda[idx];
+      if (!ev) return;
+      openSheet('Editar Evento', `
+        <label>Integrante / Categoria</label>
+        <input type="hidden" id="inp-ag-cat" value="${escapeHTML(ev.categoria || 'Família')}" />
+        <div class="chip-group">${buildMemberChipsHTML('inp-ag-cat', ev.categoria || 'Família')}</div>
         <label>Data</label>
-        <input type="date" id="inp-edit-ag-data" value="${item.data}" />
+        <input type="date" id="inp-ag-data" value="${escapeHTML(ev.data)}" />
         <label>Horário (Opcional)</label>
-        <input type="time" id="inp-edit-ag-hora" value="${item.hora || ''}" />
+        <input type="time" id="inp-ag-hora" value="${escapeHTML(ev.hora || '')}" />
         <label>Descrição</label>
-        <input type="text" id="inp-edit-ag-txt" value="${item.texto}" />
+        <input type="text" id="inp-ag-texto" value="${escapeHTML(ev.texto)}" />
       `, () => {
-        const categoria = document.getElementById('inp-edit-ag-cat').value || catNorm;
-        const data = document.getElementById('inp-edit-ag-data').value || item.data;
-        const hora = document.getElementById('inp-edit-ag-hora').value;
-        const texto = document.getElementById('inp-edit-ag-txt').value.trim();
-        if (texto) {
-          item.categoria = categoria;
-          item.data = data;
-          item.hora = hora;
-          item.texto = texto;
-          selectedDateISO = data;
-          saveState();
-        }
+        const categoria = document.getElementById('inp-ag-cat').value || 'Família';
+        const data = document.getElementById('inp-ag-data').value || ev.data;
+        const hora = document.getElementById('inp-ag-hora').value.trim();
+        const texto = document.getElementById('inp-ag-texto').value.trim();
+        if (!texto) return false;
+        ev.categoria = categoria;
+        ev.data = data;
+        ev.hora = hora;
+        ev.texto = texto;
+        saveState();
       });
     }
 
-    // --- LISTA COMPARTILHADA / MERCADO (ADICIONAR E EDITAR) ---
+    // --- MERCADO / LISTA COMPARTILHADA ---
+    function toggleMercado(idx) {
+      if (!appState.mercado[idx]) return;
+      appState.mercado[idx].done = !appState.mercado[idx].done;
+      saveState();
+    }
+
+    function deleteMercado(idx) {
+      appState.mercado.splice(idx, 1);
+      saveState();
+    }
+
     function openModalMercado() {
-      openSheet('Adicionar à Lista Compartilhada', `
+      openSheet('Adicionar Item à Lista', `
         <label>Item</label>
-        <input type="text" id="inp-merc-txt" placeholder="Ex: Iogurte e frutas" />
+        <input type="text" id="inp-merc-texto" placeholder="Ex: Pão integral, Papel toalha..." />
       `, () => {
-        const texto = document.getElementById('inp-merc-txt').value.trim();
-        if (texto) {
-          appState.mercado.push({ id: Date.now(), texto, done: false });
-          saveState();
-        }
+        const texto = document.getElementById('inp-merc-texto').value.trim();
+        if (!texto) return false;
+        appState.mercado.push({ id: Date.now(), texto, done: false });
+        saveState();
       });
     }
 
@@ -3127,46 +2913,47 @@
       if (!item) return;
       openSheet('Editar Item da Lista', `
         <label>Item</label>
-        <input type="text" id="inp-edit-merc-txt" value="${item.texto}" />
+        <input type="text" id="inp-merc-texto" value="${escapeHTML(item.texto)}" />
       `, () => {
-        const texto = document.getElementById('inp-edit-merc-txt').value.trim();
-        if (texto) {
-          item.texto = texto;
-          saveState();
-        }
+        const texto = document.getElementById('inp-merc-texto').value.trim();
+        if (!texto) return false;
+        item.texto = texto;
+        saveState();
       });
     }
 
     // --- DESPESAS COMPARTILHADAS ---
     function openModalDespesa() {
-      const quemPadrao = (sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo') || 'Paulo';
+      const current = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
       openSheet('Nova Despesa Compartilhada', `
-        <label>Descrição do Gasto</label>
-        <input type="text" id="inp-desp-txt" placeholder="Ex: Uniforme escolar ou consulta" />
+        <label>Descrição</label>
+        <input type="text" id="inp-desp-titulo" placeholder="Ex: Farmácia, Uniforme escolar..." />
         <label>Valor (R$)</label>
-        <input type="number" id="inp-desp-val" step="0.01" min="0" placeholder="Ex: 120.00" />
-        <label>Pago por</label>
-        <input type="hidden" id="inp-desp-quem" value="${quemPadrao}" />
+        <input type="number" id="inp-desp-valor" step="0.01" min="0" placeholder="0.00" />
+        <label>Quem pagou?</label>
+        <input type="hidden" id="inp-desp-pago" value="${escapeHTML(current)}" />
         <div class="chip-group">
-          <button type="button" class="chip-opt ${quemPadrao==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-desp-quem')">Paulo</button>
-          <button type="button" class="chip-opt ${quemPadrao==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-desp-quem')">Isabela</button>
+          <button type="button" class="chip-opt ${current==='Paulo'?'selected':''}" data-val="Paulo" onclick="selectChip(this, 'inp-desp-pago')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${current==='Isabela'?'selected':''}" data-val="Isabela" onclick="selectChip(this, 'inp-desp-pago')">👩 Isabela</button>
         </div>
       `, () => {
-        const titulo = document.getElementById('inp-desp-txt').value.trim();
-        const valor = parseFloat(document.getElementById('inp-desp-val').value);
-        const pagoPor = document.getElementById('inp-desp-quem').value || quemPadrao;
-        if (titulo && !isNaN(valor) && valor > 0) {
-          if (!Array.isArray(appState.despesas)) appState.despesas = [];
-          appState.despesas.unshift({
-            id: Date.now(),
-            titulo,
-            valor,
-            pagoPor,
-            split: '50/50',
-            status: 'pendente'
-          });
-          saveState();
+        const titulo = document.getElementById('inp-desp-titulo').value.trim();
+        const valor = parseFloat(String(document.getElementById('inp-desp-valor').value).replace(',', '.'));
+        const pagoPor = document.getElementById('inp-desp-pago').value || current;
+        if (!titulo || isNaN(valor) || valor <= 0) {
+          alert('Informe descrição e valor válido.');
+          return false;
         }
+        if (!Array.isArray(appState.despesas)) appState.despesas = [];
+        appState.despesas.unshift({
+          id: Date.now(),
+          titulo,
+          valor,
+          pagoPor,
+          split: '50/50',
+          status: 'pendente'
+        });
+        saveState();
       });
     }
 
@@ -3177,32 +2964,201 @@
     }
 
     function deleteDespesa(idx) {
+      if (!confirm('Excluir esta despesa?')) return;
       appState.despesas.splice(idx, 1);
       saveState();
     }
 
-    // --- VACINAS ---
+    // --- SAÚDE: REMÉDIOS, DOSES, FICHA E VACINAS ---
+    function buildRemedioFormHTML(rem) {
+      const r = rem || { nome: '', intervaloHoras: 6, horarioFixo: '' };
+      const intVal = r.intervaloHoras || 6;
+      return `
+        <label>Nome do Medicamento e Dose</label>
+        <input type="text" id="inp-rem-nome" value="${escapeHTML(r.nome)}" placeholder="Ex: Dipirona 20 gotas ou Amoxicilina" />
+        <label>Intervalo entre Doses (em horas)</label>
+        <input type="hidden" id="inp-rem-int" value="${intVal}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${intVal==4?'selected':''}" data-val="4" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=4;">4/4h</button>
+          <button type="button" class="chip-opt ${intVal==6?'selected':''}" data-val="6" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=6;">6/6h</button>
+          <button type="button" class="chip-opt ${intVal==8?'selected':''}" data-val="8" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=8;">8/8h</button>
+          <button type="button" class="chip-opt ${intVal==12?'selected':''}" data-val="12" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=12;">12/12h</button>
+          <button type="button" class="chip-opt ${intVal==24?'selected':''}" data-val="24" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=24;">24/24h</button>
+          <button type="button" class="chip-opt ${intVal==0?'selected':''}" data-val="0" onclick="selectChip(this, 'inp-rem-int'); document.getElementById('inp-rem-int-custom').value=0;">Sem intervalo</button>
+        </div>
+        <label>Ou digite outro intervalo em horas</label>
+        <input type="number" id="inp-rem-int-custom" min="0" step="0.5" value="${intVal}" oninput="document.getElementById('inp-rem-int').value = this.value;" />
+        <label>Horário Base / Fixo (Opcional)</label>
+        <input type="time" id="inp-rem-hora" value="${escapeHTML(r.horarioFixo || '')}" />
+      `;
+    }
+
+    function openModalNovoRemedio() {
+      openSheet('Adicionar Novo Remédio', buildRemedioFormHTML(null), () => {
+        const nome = document.getElementById('inp-rem-nome').value.trim();
+        const intervaloHoras = Number(document.getElementById('inp-rem-int').value) || 0;
+        const horarioFixo = document.getElementById('inp-rem-hora').value.trim();
+        if (!nome) return false;
+        appState.saude.remedios.push({
+          id: Date.now(),
+          nome,
+          intervaloHoras,
+          horarioFixo,
+          ultimaDoseTimestamp: null,
+          ultimaDoseResponsavel: ''
+        });
+        saveState();
+      });
+    }
+
+    function openModalEditarRemedio(idx) {
+      const rem = appState.saude.remedios[idx];
+      if (!rem) return;
+      openSheet('Editar Remédio', buildRemedioFormHTML(rem), () => {
+        const nome = document.getElementById('inp-rem-nome').value.trim();
+        const intervaloHoras = Number(document.getElementById('inp-rem-int').value) || 0;
+        const horarioFixo = document.getElementById('inp-rem-hora').value.trim();
+        if (!nome) return false;
+        rem.nome = nome;
+        rem.intervaloHoras = intervaloHoras;
+        rem.horarioFixo = horarioFixo;
+        saveState();
+      });
+    }
+
+    function deleteRemedio(idx) {
+      if (!confirm('Remover este remédio ativo?')) return;
+      appState.saude.remedios.splice(idx, 1);
+      saveState();
+    }
+
+    function registrarDoseRemedio(idx) {
+      const rem = appState.saude.remedios[idx];
+      if (!rem) return;
+      const now = Date.now();
+      const resp = sessionStorage.getItem('familia_alves_session_profile') || 'Responsável';
+      rem.ultimaDoseTimestamp = now;
+      rem.ultimaDoseResponsavel = resp;
+      appState.saude.historicoDoses.unshift({
+        id: now,
+        remedioId: rem.id,
+        remedioNome: rem.nome,
+        timestamp: now,
+        responsavel: resp,
+        obs: ''
+      });
+      saveState();
+    }
+
+    function openModalLancarDoseAvulsa() {
+      const remedios = appState.saude.remedios || [];
+      const respDefault = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
+      const selectOpts = remedios.length > 0
+        ? remedios.map(r => `<option value="${escapeHTML(r.nome)}">${escapeHTML(r.nome)}</option>`).join('')
+        : `<option value="Medicamento avulso">Medicamento avulso</option>`;
+
+      openSheet('Lançar Dose no Histórico', `
+        <label>Remédio</label>
+        <select id="inp-dose-rem">${selectOpts}</select>
+        <label>Data e Horário da Dose</label>
+        <input type="datetime-local" id="inp-dose-dt" value="${formatDateTimeLocalInput(Date.now())}" />
+        <label>Quem aplicou?</label>
+        <input type="text" id="inp-dose-resp" value="${escapeHTML(respDefault)}" />
+        <label>Observação (Opcional)</label>
+        <input type="text" id="inp-dose-obs" placeholder="Ex: Tomou após almoço" />
+      `, () => {
+        const remedioNome = document.getElementById('inp-dose-rem').value;
+        const dtStr = document.getElementById('inp-dose-dt').value;
+        const responsavel = document.getElementById('inp-dose-resp').value.trim() || respDefault;
+        const obs = document.getElementById('inp-dose-obs').value.trim();
+        const ts = dtStr ? new Date(dtStr).getTime() : Date.now();
+
+        appState.saude.historicoDoses.unshift({
+          id: Date.now(),
+          remedioNome,
+          timestamp: ts,
+          responsavel,
+          obs
+        });
+
+        const matchingRem = (appState.saude.remedios || []).find(r => r.nome === remedioNome);
+        if (matchingRem && (!matchingRem.ultimaDoseTimestamp || ts >= matchingRem.ultimaDoseTimestamp)) {
+          matchingRem.ultimaDoseTimestamp = ts;
+          matchingRem.ultimaDoseResponsavel = responsavel;
+        }
+        saveState();
+      });
+    }
+
+    function openModalEditarDose(idx) {
+      const dose = appState.saude.historicoDoses[idx];
+      if (!dose) return;
+      openSheet('Corrigir Registro de Dose', `
+        <label>Remédio</label>
+        <input type="text" id="inp-ed-dose-rem" value="${escapeHTML(dose.remedioNome)}" />
+        <label>Data e Horário</label>
+        <input type="datetime-local" id="inp-ed-dose-dt" value="${formatDateTimeLocalInput(dose.timestamp)}" />
+        <label>Responsável</label>
+        <input type="text" id="inp-ed-dose-resp" value="${escapeHTML(dose.responsavel || '')}" />
+        <label>Observação</label>
+        <input type="text" id="inp-ed-dose-obs" value="${escapeHTML(dose.obs || '')}" />
+      `, () => {
+        const remedioNome = document.getElementById('inp-ed-dose-rem').value.trim();
+        const dtStr = document.getElementById('inp-ed-dose-dt').value;
+        const responsavel = document.getElementById('inp-ed-dose-resp').value.trim();
+        const obs = document.getElementById('inp-ed-dose-obs').value.trim();
+        if (!remedioNome) return false;
+        dose.remedioNome = remedioNome;
+        if (dtStr) dose.timestamp = new Date(dtStr).getTime();
+        dose.responsavel = responsavel;
+        dose.obs = obs;
+        saveState();
+      });
+    }
+
+    function deleteDoseHistorico(idx) {
+      if (!confirm('Excluir este registro do histórico de doses?')) return;
+      appState.saude.historicoDoses.splice(idx, 1);
+      saveState();
+    }
+
+    function openModalFicha() {
+      const s = appState.saude;
+      openSheet('Editar Ficha Rápida · Duda', `
+        <label>Alergias</label>
+        <input type="text" id="inp-ficha-alergias" value="${escapeHTML(s.alergias)}" />
+        <label>Tipo Sanguíneo</label>
+        <input type="text" id="inp-ficha-sangue" value="${escapeHTML(s.tipoSanguineo)}" />
+        <label>Status Geral das Vacinas</label>
+        <input type="text" id="inp-ficha-vacinas" value="${escapeHTML(s.vacinas)}" />
+      `, () => {
+        appState.saude.alergias = document.getElementById('inp-ficha-alergias').value.trim() || 'Nenhuma registrada';
+        appState.saude.tipoSanguineo = document.getElementById('inp-ficha-sangue').value.trim() || '-';
+        appState.saude.vacinas = document.getElementById('inp-ficha-vacinas').value.trim() || 'Em dia';
+        saveState();
+      });
+    }
+
     function openModalVacina() {
-      openSheet('Registrar Vacina / Acompanhamento', `
-        <label>Nome da Vacina ou Dose</label>
-        <input type="text" id="inp-vac-nome" placeholder="Ex: Reforço HPV ou Influenza" />
+      openSheet('Adicionar Vacina na Carteirinha', `
+        <label>Nome da Vacina</label>
+        <input type="text" id="inp-vac-nome" placeholder="Ex: Gripe (Influenza), Reforço HPV..." />
         <label>Status</label>
         <input type="hidden" id="inp-vac-status" value="Em dia" />
         <div class="chip-group">
-          <button type="button" class="chip-opt selected" data-val="Em dia" onclick="selectChip(this, 'inp-vac-status')">Em dia</button>
-          <button type="button" class="chip-opt" data-val="Em breve" onclick="selectChip(this, 'inp-vac-status')">Em breve</button>
+          <button type="button" class="chip-opt selected" data-val="Em dia" onclick="selectChip(this, 'inp-vac-status')">✅ Em dia</button>
+          <button type="button" class="chip-opt" data-val="Em breve" onclick="selectChip(this, 'inp-vac-status')">📅 Em breve</button>
         </div>
-        <label>Observação (Opcional)</label>
-        <input type="text" id="inp-vac-det" placeholder="Ex: Tomada em 12/05 ou agendar para o mês que vem" />
+        <label>Detalhe / Data (Opcional)</label>
+        <input type="text" id="inp-vac-detalhe" placeholder="Ex: Aplicada em 10/05 · Lote conferido" />
       `, () => {
         const nome = document.getElementById('inp-vac-nome').value.trim();
         const status = document.getElementById('inp-vac-status').value || 'Em dia';
-        const detalhe = document.getElementById('inp-vac-det').value.trim();
-        if (nome) {
-          if (!Array.isArray(appState.saude.vacinasLista)) appState.saude.vacinasLista = [];
-          appState.saude.vacinasLista.push({ id: Date.now(), nome, status, detalhe });
-          saveState();
-        }
+        const detalhe = document.getElementById('inp-vac-detalhe').value.trim();
+        if (!nome) return false;
+        if (!Array.isArray(appState.saude.vacinasLista)) appState.saude.vacinasLista = [];
+        appState.saude.vacinasLista.push({ id: Date.now(), nome, status, detalhe });
+        saveState();
       });
     }
 
@@ -3211,53 +3167,45 @@
       saveState();
     }
 
-    // --- FICHA & MISSÕES (ADICIONAR E EDITAR) ---
-    function openModalFicha() {
-      const s = appState.saude;
-      openSheet('Editar Ficha Rápida', `
-        <label>Alergias</label>
-        <input type="text" id="inp-ficha-alerg" value="${s.alergias}" />
-        <label>Tipo Sanguíneo</label>
-        <input type="text" id="inp-ficha-sangue" value="${s.tipoSanguineo}" />
-        <label>Vacinas</label>
-        <input type="text" id="inp-ficha-vac" value="${s.vacinas}" />
-      `, () => {
-        appState.saude.alergias = document.getElementById('inp-ficha-alerg').value.trim() || 'Nenhuma registrada';
-        appState.saude.tipoSanguineo = document.getElementById('inp-ficha-sangue').value.trim() || 'O+';
-        appState.saude.vacinas = document.getElementById('inp-ficha-vac').value.trim() || 'Em dia';
-        saveState();
-      });
+    // --- MISSÕES, ESTRELAS & DESEJOS ---
+    function toggleMissao(idx) {
+      const m = appState.missoes[idx];
+      if (!m) return;
+      m.done = !m.done;
+      if (m.done) {
+        appState.estrelasTotal = (Number(appState.estrelasTotal) || 0) + 1;
+      } else {
+        appState.estrelasTotal = Math.max(0, (Number(appState.estrelasTotal) || 0) - 1);
+      }
+      syncTodayMissionHistory();
+      saveState();
     }
 
     function openModalMissao() {
-      openSheet('Nova Missão para a Duda', `
-        <label>Turno do Dia</label>
-        <input type="hidden" id="inp-mis-turno" value="Tarde" />
+      const emojis = ['🦷', '🎒', '✏️', '🧸', '👕', '🛏️', '📚', '🥗', '🚿', '⭐'];
+      openSheet('Nova Missão Diária da Duda', `
+        <label>Turno</label>
+        <input type="hidden" id="inp-mis-turno" value="Manhã" />
         <div class="chip-group">
-          <button type="button" class="chip-opt" data-val="Manhã" onclick="selectChip(this, 'inp-mis-turno')">☀️ Manhã</button>
-          <button type="button" class="chip-opt selected" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
+          <button type="button" class="chip-opt selected" data-val="Manhã" onclick="selectChip(this, 'inp-mis-turno')">☀️ Manhã</button>
+          <button type="button" class="chip-opt" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
           <button type="button" class="chip-opt" data-val="Noite" onclick="selectChip(this, 'inp-mis-turno')">🌙 Noite</button>
         </div>
-        <label>Ícone da Missão</label>
+        <label>Ícone</label>
         <input type="hidden" id="inp-mis-emoji" value="⭐" />
         <div class="chip-group">
-          <button type="button" class="chip-opt" data-val="🦷" onclick="selectChip(this, 'inp-mis-emoji')">🦷</button>
-          <button type="button" class="chip-opt" data-val="🎒" onclick="selectChip(this, 'inp-mis-emoji')">🎒</button>
-          <button type="button" class="chip-opt" data-val="✏️" onclick="selectChip(this, 'inp-mis-emoji')">✏️</button>
-          <button type="button" class="chip-opt" data-val="🧸" onclick="selectChip(this, 'inp-mis-emoji')">🧸</button>
-          <button type="button" class="chip-opt selected" data-val="⭐" onclick="selectChip(this, 'inp-mis-emoji')">⭐</button>
+          ${emojis.map((em, i) => `<button type="button" class="chip-opt ${i===9?'selected':''}" data-val="${em}" onclick="selectChip(this, 'inp-mis-emoji')">${em}</button>`).join('')}
         </div>
-        <label>Descrição da Missão</label>
-        <input type="text" id="inp-mis-txt" placeholder="Ex: Guardar os tênis" />
+        <label>Título da Missão</label>
+        <input type="text" id="inp-mis-titulo" placeholder="Ex: Ler 15 minutos antes de dormir" />
       `, () => {
-        const turno = document.getElementById('inp-mis-turno').value;
+        const turno = document.getElementById('inp-mis-turno').value || 'Manhã';
         const emoji = document.getElementById('inp-mis-emoji').value || '⭐';
-        const titulo = document.getElementById('inp-mis-txt').value.trim();
-        if (titulo) {
-          appState.missoes.push({ id: Date.now(), turno, emoji, titulo, done: false });
-          syncTodayMissionHistory();
-          saveState();
-        }
+        const titulo = document.getElementById('inp-mis-titulo').value.trim();
+        if (!titulo) return false;
+        appState.missoes.push({ id: Date.now(), turno, emoji, titulo, done: false });
+        syncTodayMissionHistory();
+        saveState();
       });
     }
 
@@ -3265,122 +3213,151 @@
       const m = appState.missoes[idx];
       if (!m) return;
       openSheet('Editar Missão', `
-        <label>Turno do Dia</label>
-        <input type="hidden" id="inp-edit-mis-turno" value="${m.turno}" />
+        <label>Turno</label>
+        <input type="hidden" id="inp-mis-turno" value="${escapeHTML(m.turno)}" />
         <div class="chip-group">
-          <button type="button" class="chip-opt ${m.turno==='Manhã'?'selected':''}" data-val="Manhã" onclick="selectChip(this, 'inp-edit-mis-turno')">☀️ Manhã</button>
-          <button type="button" class="chip-opt ${m.turno==='Tarde'?'selected':''}" data-val="Tarde" onclick="selectChip(this, 'inp-edit-mis-turno')">🌤️ Tarde</button>
-          <button type="button" class="chip-opt ${m.turno==='Noite'?'selected':''}" data-val="Noite" onclick="selectChip(this, 'inp-edit-mis-turno')">🌙 Noite</button>
+          <button type="button" class="chip-opt ${m.turno==='Manhã'?'selected':''}" data-val="Manhã" onclick="selectChip(this, 'inp-mis-turno')">☀️ Manhã</button>
+          <button type="button" class="chip-opt ${m.turno==='Tarde'?'selected':''}" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
+          <button type="button" class="chip-opt ${m.turno==='Noite'?'selected':''}" data-val="Noite" onclick="selectChip(this, 'inp-mis-turno')">🌙 Noite</button>
         </div>
-        <label>Descrição da Missão</label>
-        <input type="text" id="inp-edit-mis-txt" value="${m.titulo}" />
+        <label>Emoji</label>
+        <input type="text" id="inp-mis-emoji" value="${escapeHTML(m.emoji || '⭐')}" />
+        <label>Título da Missão</label>
+        <input type="text" id="inp-mis-titulo" value="${escapeHTML(m.titulo)}" />
       `, () => {
-        const turno = document.getElementById('inp-edit-mis-turno').value;
-        const titulo = document.getElementById('inp-edit-mis-txt').value.trim();
-        if (titulo) {
-          m.turno = turno;
-          m.titulo = titulo;
-          saveState();
-        }
+        const turno = document.getElementById('inp-mis-turno').value || m.turno;
+        const emoji = document.getElementById('inp-mis-emoji').value.trim() || '⭐';
+        const titulo = document.getElementById('inp-mis-titulo').value.trim();
+        if (!titulo) return false;
+        m.turno = turno;
+        m.emoji = emoji;
+        m.titulo = titulo;
+        saveState();
       });
     }
 
-    // ============================================================================
-    // 9. AÇÕES DIRETAS (MISSÕES +1 ⭐, DESEJOS & APROVAÇÃO)
-    // ============================================================================
-    function deleteCasal(idx) { appState.casalHoje.splice(idx, 1); saveState(); }
-    function togglePendencia(idx) { appState.pendencias[idx].done = !appState.pendencias[idx].done; saveState(); }
-    function deletePendencia(idx) { appState.pendencias.splice(idx, 1); saveState(); }
-    function deleteMural(idx) { appState.mural.splice(idx, 1); saveState(); }
-    function deleteAgenda(idx) { appState.agenda.splice(idx, 1); saveState(); }
-    function toggleMercado(idx) { appState.mercado[idx].done = !appState.mercado[idx].done; saveState(); }
-    function deleteMercado(idx) { appState.mercado.splice(idx, 1); saveState(); }
     function deleteMissao(idx) {
+      if (!confirm('Excluir esta missão recorrente?')) return;
       appState.missoes.splice(idx, 1);
       syncTodayMissionHistory();
       saveState();
     }
-    function resetEstrelas() {
-      const saldoAnterior = appState.estrelasTotal || 0;
-      if (saldoAnterior <= 0) return;
-      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
-      openSheet('⚠️ Zerar Saldo de Estrelas', `
-        <p class="hint">Você está zerando <strong>⭐ ${saldoAnterior}</strong> da Duda. Informe o motivo para ficar registrado com transparência:</p>
-        <label>Motivo</label>
-        <input type="text" id="inp-zerar-motivo" placeholder="Ex: Fechamento de ciclo ou combinado reiniciado" />
-      `, () => {
-        const motivo = document.getElementById('inp-zerar-motivo').value.trim();
-        if (!motivo) {
-          alert('Informe o motivo para manter a transparência.');
-          return false;
-        }
-        appState.estrelasTotal = 0;
-        registrarMovimentacaoEstrelas({
-          tipo: 'penalidade',
-          delta: -saldoAnterior,
-          motivo,
-          autor: quem
-        });
-        saveState();
-      }, true);
+
+    function openModalEstrelasManual(mode) {
+      const isPenalty = mode === 'penalty';
+      const autor = sessionStorage.getItem('familia_alves_session_profile') || 'Paulo';
+      openSheet(
+        isPenalty ? '⚠️ Aplicar Penalidade de Estrelas' : '✨ Dar Bônus de Estrelas',
+        `
+          <label>Quantidade de Estrelas</label>
+          <input type="number" id="inp-est-qtd" min="1" max="50" value="1" />
+          <label>Motivo claro (será mostrado para a Duda)</label>
+          <input type="text" id="inp-est-motivo" placeholder="${isPenalty ? 'Ex: Não guardou os brinquedos após pedir 3x' : 'Ex: Ajudou a arrumar a mesa sem pedir'}" />
+        `,
+        () => {
+          const qtd = Math.max(1, parseInt(document.getElementById('inp-est-qtd').value, 10) || 1);
+          const motivo = document.getElementById('inp-est-motivo').value.trim();
+          if (!motivo) {
+            alert('Escreva um motivo claro para a Duda entender o ajuste.');
+            return false;
+          }
+          const delta = isPenalty ? -qtd : qtd;
+          appState.estrelasTotal = Math.max(0, (Number(appState.estrelasTotal) || 0) + delta);
+          registrarMovimentacaoEstrelas({
+            tipo: isPenalty ? 'penalidade' : 'bonus',
+            delta,
+            motivo,
+            autor
+          });
+          saveState();
+        },
+        isPenalty ? 'Aplicar Desconto' : 'Adicionar Bônus',
+        isPenalty
+      );
     }
 
-    function toggleMissao(idx) {
-      if (dudaSelectedDateISO !== getTodayISO()) return;
-      const missao = appState.missoes[idx];
-      if (!missao) return;
-      missao.done = !missao.done;
-      if (missao.done) {
-        appState.estrelasTotal = (appState.estrelasTotal || 0) + 1;
-      } else {
-        appState.estrelasTotal = Math.max(0, (appState.estrelasTotal || 0) - 1);
+    function resetEstrelas() {
+      if (!confirm('Zerar o saldo de estrelas acumuladas da Duda?')) return;
+      const atual = Number(appState.estrelasTotal) || 0;
+      const autor = sessionStorage.getItem('familia_alves_session_profile') || 'Responsável';
+      if (atual > 0) {
+        registrarMovimentacaoEstrelas({
+          tipo: 'resgate',
+          delta: -atual,
+          motivo: 'Ciclo de estrelas zerado pelos responsáveis',
+          autor
+        });
       }
-      syncTodayMissionHistory();
+      appState.estrelasTotal = 0;
       saveState();
     }
 
+    function openModalDesejoDuda() {
+      const sugestoes = [
+        { texto: 'Escolher o filme de sexta', custo: 5 },
+        { texto: 'Passeio na sorveteria', custo: 10 },
+        { texto: '30 min extras de desenho/jogo', custo: 6 }
+      ];
+      openSheet('🎁 Pedir um Desejo', `
+        <p class="hint">Você tem <strong>${appState.estrelasTotal || 0} ⭐</strong> guardadas!</p>
+        <label>Ideias rápidas (toque para preencher)</label>
+        <div class="chip-group">
+          ${sugestoes.map(s => `
+            <button type="button" class="chip-opt" onclick="document.getElementById('inp-wish-txt').value='${escapeAttrJS(s.texto)}'; document.getElementById('inp-wish-custo').value=${s.custo};">
+              ${escapeHTML(s.texto)} (${s.custo}⭐)
+            </button>
+          `).join('')}
+        </div>
+        <label>Qual é o seu desejo?</label>
+        <input type="text" id="inp-wish-txt" placeholder="Escreva seu desejo aqui..." />
+        <label>Quantas estrelas vale?</label>
+        <input type="number" id="inp-wish-custo" min="1" max="100" value="5" />
+      `, () => {
+        const texto = document.getElementById('inp-wish-txt').value.trim();
+        const custo = Math.max(1, parseInt(document.getElementById('inp-wish-custo').value, 10) || 5);
+        if (!texto) return false;
+        if (!Array.isArray(appState.desejos)) appState.desejos = [];
+        appState.desejos.unshift({ id: Date.now(), texto, custo, status: 'pendente' });
+        saveState();
+      }, 'Enviar Pedido ✨');
+    }
+
     function aprovarDesejo(idx) {
-      const desejo = appState.desejos[idx];
-      if (!desejo) return;
-      const saldo = appState.estrelasTotal || 0;
-      const custo = Number(desejo.custo) || 0;
-      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
+      const d = appState.desejos[idx];
+      if (!d) return;
+      const saldo = Number(appState.estrelasTotal) || 0;
+      const custo = Number(d.custo) || 0;
       if (saldo < custo) {
-        alert(`A Duda tem ${saldo} estrelas e o pedido pede ${custo} estrelas. Você pode atribuir estrelas bônus se quiser aprovar mesmo assim.`);
+        alert(`A Duda tem ${saldo} ⭐, mas este desejo custa ${custo} ⭐.`);
         return;
       }
+      const autor = sessionStorage.getItem('familia_alves_session_profile') || 'Responsável';
       appState.estrelasTotal = saldo - custo;
-      desejo.status = 'aprovado';
+      d.status = 'aprovado';
       registrarMovimentacaoEstrelas({
         tipo: 'resgate',
         delta: -custo,
-        motivo: `Desejo aprovado: ${desejo.texto}`,
-        autor: quem
+        motivo: `Desejo aprovado: ${d.texto}`,
+        autor
       });
       saveState();
     }
 
     function recusarDesejo(idx) {
-      const desejo = appState.desejos[idx];
-      if (!desejo) return;
-      const quem = sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
-
-      openSheet('Explicar Motivo para a Duda 💬', `
-        <p class="hint">Pedido: <strong>"${desejo.texto}"</strong> (${desejo.custo} ⭐).<br>Escolha uma sugestão rápida ou escreva um recado carinhoso que aparecerá para ela:</p>
-        <div class="chip-group" style="margin-bottom:10px;">
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-recusa-motivo').value='Junte mais algumas estrelinhas primeiro! ⭐'">⭐ Juntar mais estrelas</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-recusa-motivo').value='Hoje não dá, mas podemos combinar para o fim de semana! 📅'">📅 Fica p/ fim de semana</button>
-          <button type="button" class="chip-opt" onclick="document.getElementById('inp-recusa-motivo').value='Vamos escolher outro desejo juntos? 💡'">💡 Escolher outro desejo</button>
-        </div>
-        <label>Motivo / Recado para a Duda</label>
-        <input type="text" id="inp-recusa-motivo" placeholder="Ex: Hoje está tarde para filme, combinamos sexta!" />
+      const d = appState.desejos[idx];
+      if (!d) return;
+      const autor = sessionStorage.getItem('familia_alves_session_profile') || 'Responsável';
+      openSheet('Recusar / Conversar sobre Desejo', `
+        <p class="hint">Explique com carinho por que este desejo não pode agora (aparecerá para a Duda):</p>
+        <label>Mensagem para a Duda</label>
+        <input type="text" id="inp-wish-recusa" placeholder="Ex: Vamos deixar para o fim de semana que vem!" />
       `, () => {
-        const motivo = document.getElementById('inp-recusa-motivo').value.trim();
-        desejo.status = 'recusado';
-        desejo.motivoRecusa = motivo || 'Vamos conversar e combinar um outro momento!';
-        desejo.recusadoPor = quem;
+        const motivo = document.getElementById('inp-wish-recusa').value.trim() || 'Combinamos outro momento em família.';
+        d.status = 'recusado';
+        d.motivoRecusa = motivo;
+        d.recusadoPor = autor;
         saveState();
-      });
+      }, 'Enviar Recado', true);
     }
 
     function deleteDesejo(idx) {
@@ -3388,9 +3365,7 @@
       saveState();
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
+    // Inicializa a aplicação
     initProfile();
   </script>
 </body>
