@@ -378,6 +378,10 @@
     }
     .wish-status-pill.approved { background: var(--primary-soft); color: var(--primary-dark); }
     .wish-status-pill.rejected { background: var(--accent-soft); color: #8A452B; }
+    .wish-reason-box {
+      margin-top: 8px; background: var(--accent-soft); border: 1px solid #F0CFC2; color: #8A452B;
+      border-radius: 12px; padding: 8px 10px; font-size: 12px; font-weight: 700;
+    }
     .wish-actions { display: flex; gap: 8px; margin-top: 11px; }
     .btn-approve {
       flex: 1; background: var(--primary); color: #fff; border: none; padding: 10px 12px;
@@ -512,11 +516,15 @@
     .duda-wish-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .duda-wish-item {
       background: var(--note-bg); border: 1.5px solid var(--note-border); border-radius: 16px;
-      padding: 11px 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 11px 13px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
       font-size: 14px; font-weight: 700; color: var(--text-main);
     }
     .duda-wish-item.approved { background: var(--primary-soft); border-color: #C7DFD0; color: var(--primary-dark); }
     .duda-wish-item.rejected { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
+    .duda-wish-reason {
+      margin-top: 6px; font-size: 12px; font-weight: 800; color: #8A452B;
+      background: rgba(255, 255, 255, 0.85); border: 1px solid #F0CFC2; border-radius: 10px; padding: 6px 9px;
+    }
     .wish-tag-mini {
       font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
       background: #F4E9C4; color: #854D0E; white-space: nowrap;
@@ -1104,7 +1112,7 @@
         estrelasTotal: 4,
         historicoEstrelas: [],
         desejos: [
-          { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente" }
+          { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente", justificativa: "" }
         ],
         casalHoje: [
           { id: 1, data: hoje, membro: "Paulo", texto: "Paulo: Turno até 18h" },
@@ -1243,7 +1251,10 @@
       }
 
       st.historicoEstrelas = toCleanArray(st.historicoEstrelas);
-      st.desejos = toCleanArray(st.desejos);
+      st.desejos = toCleanArray(st.desejos).map(w => ({
+        ...w,
+        justificativa: w.justificativa || w.motivoRecusa || ""
+      }));
       st.despesas = toCleanArray(st.despesas);
       st.casalHoje = toCleanArray(st.casalHoje);
       st.pendencias = toCleanArray(st.pendencias);
@@ -2634,12 +2645,16 @@
         } else {
           dudaList.innerHTML = wishes.map(w => {
             const statusClass = w.status === 'aprovado' ? 'approved' : (w.status === 'recusado' ? 'rejected' : '');
-            const statusLabel = w.status === 'aprovado' ? '✅ Aprovado' : (w.status === 'recusado' ? '💬 Conversar' : '⏳ Aguardando');
+            const statusLabel = w.status === 'aprovado' ? '✅ Aprovado' : (w.status === 'recusado' ? '💬 Recusado' : '⏳ Aguardando');
+            const justificativaHTML = (w.status === 'recusado' && w.justificativa)
+              ? `<div class="duda-wish-reason">💬 Motivo: ${w.justificativa}</div>`
+              : '';
             return `
               <div class="duda-wish-item ${statusClass}">
-                <div>
+                <div style="flex:1; min-width:0;">
                   <div>${w.texto}</div>
                   <small style="opacity:0.8; font-weight:800;">Custo: ${w.custo} ⭐</small>
+                  ${justificativaHTML}
                 </div>
                 <span class="wish-tag-mini">${statusLabel}</span>
               </div>
@@ -2657,6 +2672,9 @@
             const isPending = w.status === 'pendente';
             const pillClass = w.status === 'aprovado' ? 'approved' : (w.status === 'recusado' ? 'rejected' : '');
             const pillText = w.status === 'aprovado' ? 'Aprovado' : (w.status === 'recusado' ? 'Recusado' : 'Pendente');
+            const justificativaAdminHTML = (w.status === 'recusado' && w.justificativa)
+              ? `<div class="wish-reason-box">Justificativa enviada à Duda: "${w.justificativa}"</div>`
+              : '';
             return `
               <div class="wish-admin-card">
                 <div class="wish-admin-top">
@@ -2669,10 +2687,11 @@
                     <span class="act-icon" title="Excluir desejo" onclick="deleteDesejo(${idx})">🗑️</span>
                   </div>
                 </div>
+                ${justificativaAdminHTML}
                 ${isPending ? `
                   <div class="wish-actions">
                     <button type="button" class="btn-approve" onclick="aprovarDesejo(${idx})">✓ Aprovar (-${w.custo} ⭐)</button>
-                    <button type="button" class="btn-reject" onclick="recusarDesejo(${idx})">✕ Recusar</button>
+                    <button type="button" class="btn-reject" onclick="openModalRecusarDesejo(${idx})">✕ Recusar</button>
                   </div>
                 ` : ''}
               </div>
@@ -2693,7 +2712,7 @@
         const custo = Math.max(1, parseInt(document.getElementById('inp-wish-custo').value, 10) || 1);
         if (!texto) return;
         if (!Array.isArray(appState.desejos)) appState.desejos = [];
-        appState.desejos.unshift({ id: Date.now(), texto, custo, status: 'pendente' });
+        appState.desejos.unshift({ id: Date.now(), texto, custo, status: 'pendente', justificativa: '' });
         saveState();
       });
     }
@@ -2709,6 +2728,7 @@
       }
       appState.estrelasTotal = atual - custo;
       w.status = 'aprovado';
+      w.justificativa = '';
       const hoje = getTodayISO();
       if (!Array.isArray(appState.historicoEstrelas)) appState.historicoEstrelas = [];
       appState.historicoEstrelas.unshift({
@@ -2724,11 +2744,32 @@
       saveState();
     }
 
-    function recusarDesejo(idx) {
+    function openModalRecusarDesejo(idx) {
       const w = appState.desejos[idx];
       if (!w) return;
-      w.status = 'recusado';
-      saveState();
+      const suggestions = [
+        'Hoje temos compromisso cedo e não dá tempo',
+        'Vamos guardar estrelinhas para o fim de semana',
+        'Podemos combinar para outro dia com calma'
+      ];
+
+      openSheet(`Justificar Recusa · "${w.texto}"`, `
+        <p class="hint">Explique com carinho o motivo para a Duda entender a recusa (${w.custo} ⭐):</p>
+        <label>Motivo da Recusa (Obrigatório)</label>
+        <input type="text" id="inp-wish-justificativa" value="${w.justificativa || ''}" placeholder="Ex: Hoje já temos compromisso à noite, mas podemos fazer no sábado..." />
+        <div class="chip-group" style="margin-top:10px;">
+          ${suggestions.map(s => `<button type="button" class="chip-opt" onclick="document.getElementById('inp-wish-justificativa').value='${s.replace(/'/g, "\\'")}'">${s}</button>`).join('')}
+        </div>
+      `, () => {
+        const justificativa = document.getElementById('inp-wish-justificativa').value.trim();
+        if (!justificativa) {
+          alert('Escreva uma justificativa para recusar o desejo.');
+          return false;
+        }
+        w.status = 'recusado';
+        w.justificativa = justificativa;
+        saveState();
+      }, { saveLabel: 'Confirmar Recusa', saveClass: 'btn-primary penalty' });
     }
 
     function deleteDesejo(idx) {
