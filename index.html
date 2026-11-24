@@ -22,17 +22,56 @@
       --primary: #4A7C59;
       --primary-dark: #365E42;
       --primary-soft: #EBF3EE;
+      --primary-border: #C7DFD0;
       --accent: #C96A48;
+      --accent-dark: #8A452B;
       --accent-soft: #FDF3EF;
+      --accent-border: #F0CFC2;
       --text-main: #1F2933;
       --text-muted: #616E7C;
       --border: #EAE5DC;
+      --border-subtle: #F3F0EA;
+      --pill-bg: #F2EFE9;
+      --pill-text: #52606D;
       --note-bg: #FDFBF5;
       --note-border: #E8DFC2;
+      --note-text: #854D0E;
+      --header-bg: rgba(250, 248, 245, 0.96);
+      --nav-bg: rgba(255, 255, 255, 0.96);
+      --glance-bg: linear-gradient(160deg, #FFFFFF 0%, #F5F9F6 100%);
+      --glance-border: #D5E5DB;
+      --duda-bg: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%);
+    }
+
+    body.dark-mode {
+      --bg-adult: #121614;
+      --card-bg: #1B211E;
+      --primary: #5D9C70;
+      --primary-dark: #88C59B;
+      --primary-soft: #1E3126;
+      --primary-border: #2E4D3B;
+      --accent: #D97B59;
+      --accent-dark: #F3B39B;
+      --accent-soft: #31201B;
+      --accent-border: #59352B;
+      --text-main: #F1F5F3;
+      --text-muted: #9AA5B1;
+      --border: #2B3530;
+      --border-subtle: #242D28;
+      --pill-bg: #26302B;
+      --pill-text: #CBD2D9;
+      --note-bg: #252219;
+      --note-border: #4A422B;
+      --note-text: #FCD34D;
+      --header-bg: rgba(18, 22, 20, 0.94);
+      --nav-bg: rgba(27, 33, 30, 0.96);
+      --glance-bg: linear-gradient(160deg, #1B211E 0%, #17231C 100%);
+      --glance-border: #2B4234;
+      --duda-bg: linear-gradient(180deg, #151A17 0%, #19241E 100%);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-adult); color: var(--text-main); -webkit-tap-highlight-color: transparent; line-height: 1.45; }
+    body { background: var(--bg-adult); color: var(--text-main); -webkit-tap-highlight-color: transparent; line-height: 1.45; transition: background-color 0.22s ease, color 0.22s ease; }
     .hidden { display: none !important; }
 
     /* GATEKEEPER & PIN MODAL */
@@ -54,25 +93,25 @@
     }
     .btn-profile:active { transform: scale(0.98); }
     .btn-profile:hover { border-color: var(--primary); background: var(--primary-soft); }
-    .btn-profile.duda { background: var(--primary-soft); border-color: #B8D8C2; color: var(--primary-dark); font-family: 'Nunito', sans-serif; font-weight: 900; }
-    .btn-profile.apoio { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
+    .btn-profile.duda { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-dark); font-family: 'Nunito', sans-serif; font-weight: 900; }
+    .btn-profile.apoio { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-dark); }
     .btn-install-gate {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 11px 14px; margin-top: 14px; border-radius: 16px;
-      border: 1.5px dashed #B8D8C2; background: var(--note-bg); color: var(--primary-dark);
+      border: 1.5px dashed var(--primary-border); background: var(--note-bg); color: var(--primary-dark);
       font-size: 13px; font-weight: 800; cursor: pointer; transition: background 0.15s ease;
     }
     .btn-install-gate:hover { background: var(--primary-soft); }
-    .install-steps-box {
-      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 16px;
-      padding: 13px 14px; margin-top: 10px; text-align: left; font-size: 13px;
+    .gate-top-bar {
+      display: flex; justify-content: flex-end; margin-bottom: 6px;
     }
-    .install-steps-box strong { color: var(--primary-dark); display: block; margin-bottom: 6px; font-size: 14px; }
-    .install-steps-box ol { padding-left: 18px; color: var(--text-main); }
-    .install-steps-box li { margin-bottom: 5px; }
-
-    .modal-box input {
-      width: 164px; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 11px;
+    .btn-theme-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--card-bg); border: 1.5px solid var(--border); color: var(--text-main);
+      padding: 6px 11px; border-radius: 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-theme-pill:hover { border-color: var(--primary); background: var(--primary-soft); }
       margin: 16px 0; border: 2px solid var(--border); border-radius: 16px; font-weight: 800;
       background: var(--card-bg); color: var(--text-main);
     }
@@ -90,7 +129,7 @@
       box-shadow: 0 -12px 32px rgba(31, 41, 51, 0.16); border-top: 1px solid var(--border);
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .sheet-handle { width: 42px; height: 4px; background: #D6CFC2; border-radius: 99px; margin: 0 auto 14px; }
+    .sheet-handle { width: 42px; height: 4px; background: var(--border); border-radius: 99px; margin: 0 auto 14px; }
     .sheet-box h3 { font-size: 18px; margin-bottom: 12px; color: var(--text-main); font-weight: 800; }
     .sheet-body label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 0.45px; }
     .sheet-body input, .sheet-body select {
@@ -107,10 +146,38 @@
     .sheet-actions { display: flex; gap: 10px; margin-top: 22px; }
     .sheet-actions button { flex: 1; padding: 13px; font-size: 15px; }
 
+    /* TOAST DE FEEDBACK NÃO-INTRUSIVO */
+    .app-toast {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1F2933;
+      color: #FFFFFF;
+      padding: 11px 18px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(31, 41, 51, 0.25);
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .app-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .app-toast.error {
+      background: #8A452B;
+    }
+
     /* HEADER ADULTO & INDICADOR DE SYNC */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 18px 14px; background: rgba(250, 248, 245, 0.96);
+      padding: 16px 18px 14px; background: var(--header-bg);
       backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 10; gap: 10px;
     }
@@ -127,7 +194,7 @@
       padding: 8px 11px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer;
     }
     .btn-duda-switch {
-      background: var(--accent-soft); border: 1.5px solid #F0CFC2; color: #8A452B;
+      background: var(--accent-soft); border: 1.5px solid var(--accent-border); color: var(--accent-dark);
       padding: 8px 13px; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer;
       transition: transform 0.12s ease;
     }
@@ -169,11 +236,11 @@
       border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; transition: opacity 0.12s ease;
     }
     .btn-mini.penalty {
-      background: var(--accent-soft); color: #8A452B; border: 1px solid #F0CFC2;
+      background: var(--accent-soft); color: var(--accent-dark); border: 1px solid var(--accent-border);
     }
     .btn-mini:active { opacity: 0.8; }
 
-    .divider { border: none; border-top: 1px solid #EFECE5; margin: 12px 0; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .sub-title { font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.45px; }
     .item-actions-inline { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .act-icon { cursor: pointer; font-size: 13px; opacity: 0.82; padding: 3px 5px; border-radius: 8px; }
@@ -182,20 +249,26 @@
     /* CHECKLISTS & LOGÍSTICA */
     .check-item {
       display: flex; align-items: center; justify-content: space-between; padding: 9px 0;
-      border-bottom: 1px solid #F3F0EA; font-size: 14px; cursor: pointer; gap: 8px;
+      border-bottom: 1px solid var(--border-subtle); font-size: 14px; cursor: pointer; gap: 8px;
     }
     .check-item:last-child { border-bottom: none; }
     .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
     .valor-pill {
-      font-size: 11px; font-weight: 700; background: #F2EFE9; color: #52606D;
+      font-size: 11px; font-weight: 700; background: var(--pill-bg); color: var(--pill-text);
       padding: 2px 8px; border-radius: 8px; margin-left: 6px;
     }
 
     /* RELANCE DA ABA HOJE */
     .hoje-glance-card {
-      background: linear-gradient(160deg, #FFFFFF 0%, #F5F9F6 100%);
+      background: var(--glance-bg);
       border-radius: 24px; padding: 16px; margin-bottom: 14px;
-      border: 1.5px solid #D5E5DB; box-shadow: 0 4px 14px rgba(54, 94, 66, 0.05);
+      border: 1.5px solid var(--glance-border); box-shadow: 0 4px 14px rgba(31, 41, 51, 0.06);
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
+    .valor-pill {
+      font-size: 11px; font-weight: 700; background: var(--pill-bg); color: var(--pill-text);
+      padding: 2px 8px; border-radius: 8px; margin-left: 6px;
     }
     .hoje-glance-top {
       display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
@@ -214,7 +287,7 @@
       font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px;
     }
     .hoje-mini-pendencias {
-      background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border);
+      background: var(--card-bg); border: 1px solid var(--border);
       border-radius: 16px; padding: 10px 12px; margin-top: 10px;
     }
     .hoje-mini-pendencias-head {
@@ -224,14 +297,15 @@
 
     .timeline-feed { position: relative; margin-top: 6px; }
     .timeline-row {
-      display: flex; gap: 11px; padding: 10px 0; border-bottom: 1px solid #F3F0EA;
+      display: flex; gap: 11px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle);
       align-items: flex-start;
     }
     .timeline-row:last-child { border-bottom: none; padding-bottom: 2px; }
     .timeline-time-col {
-      width: 60px; flex-shrink: 0; font-size: 11px; font-weight: 800;
+      width: 68px; flex-shrink: 0; font-size: 11px; font-weight: 800;
       color: var(--primary-dark); background: var(--primary-soft);
-      padding: 4px 6px; border-radius: 10px; text-align: center; margin-top: 1px;
+      padding: 4px 5px; border-radius: 10px; text-align: center; margin-top: 1px;
+      line-height: 1.25;
     }
     .timeline-main-col { flex: 1; min-width: 0; }
     .timeline-title-line {
@@ -243,13 +317,13 @@
 
     .logistica-box {
       display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--primary-soft);
-      padding: 12px; border-radius: 16px; font-size: 14px; margin-bottom: 12px; border: 1px solid #CFE3D6;
+      padding: 12px; border-radius: 16px; font-size: 14px; margin-bottom: 12px; border: 1px solid var(--primary-border);
     }
-    .logistica-box span { color: var(--primary-dark); opacity: 0.85; display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+    .logistica-box span { color: var(--primary-dark); opacity: 0.9; display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
     .logistica-box strong { font-size: 14px; color: var(--text-main); }
 
     .progress-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 7px; }
-    .progress-bar { height: 10px; background: #EFECE5; border-radius: 99px; overflow: hidden; }
+    .progress-bar { height: 10px; background: var(--pill-bg); border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; border-radius: 99px; }
 
     /* FILTROS & CALENDÁRIO MENSAL */
@@ -262,7 +336,7 @@
     }
     .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .pill.add-member {
-      border-style: dashed; border-color: #CBD5E1; color: var(--primary-dark); background: var(--primary-soft);
+      border-style: dashed; border-color: var(--primary-border); color: var(--primary-dark); background: var(--primary-soft);
     }
 
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -290,7 +364,7 @@
 
     .agenda-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid #F3F0EA; font-size: 14px; gap: 8px;
+      padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: 14px; gap: 8px;
     }
     .agenda-item:last-child { border-bottom: none; }
     .agenda-tag {
@@ -300,16 +374,16 @@
 
     /* SAÚDE */
     .remedio-card {
-      background: var(--primary-soft); padding: 14px; border-radius: 16px; border: 1.5px solid #C7DFD0;
+      background: var(--primary-soft); padding: 14px; border-radius: 16px; border: 1.5px solid var(--primary-border);
       margin-bottom: 10px;
     }
     .remedio-card:last-child { margin-bottom: 0; }
-    .remedio-card.overdue { background: var(--accent-soft); border-color: #F0CFC2; }
+    .remedio-card.overdue { background: var(--accent-soft); border-color: var(--accent-border); }
     .remedio-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .remedio-actions-top { display: flex; gap: 6px; align-items: center; }
     .icon-btn-tiny {
-      background: rgba(255,255,255,0.92); border: 1px solid var(--border); border-radius: 9px;
-      padding: 4px 8px; font-size: 12px; cursor: pointer;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 9px;
+      padding: 4px 8px; font-size: 12px; cursor: pointer; color: var(--text-main);
     }
     .btn-dose {
       width: 100%; margin-top: 11px; padding: 11px; background: var(--primary); color: #fff;
@@ -327,7 +401,7 @@
     .dose-log-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .dose-log-btns { display: flex; gap: 6px; flex-shrink: 0; }
 
-    .ficha-grid p { font-size: 14px; padding: 8px 0; border-bottom: 1px solid #F3F0EA; }
+    .ficha-grid p { font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); }
     .ficha-grid p:last-child { border-bottom: none; }
 
     /* DESPESAS */
@@ -345,32 +419,32 @@
       display: block; font-size: 14px; font-weight: 800; color: var(--text-main); margin-top: 3px;
     }
     .finance-balance-banner {
-      background: var(--primary-soft); border: 1px solid #C7DFD0; color: var(--primary-dark);
+      background: var(--primary-soft); border: 1px solid var(--primary-border); color: var(--primary-dark);
       border-radius: 14px; padding: 10px 12px; font-size: 12px; font-weight: 800;
       display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px;
     }
     .despesa-row {
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      padding: 10px 0; border-bottom: 1px solid #F3F0EA; font-size: 13px;
+      padding: 10px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px;
     }
     .despesa-row:last-child { border-bottom: none; }
     .despesa-status-badge {
       font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px;
-      background: #F4E9C4; color: #854D0E; margin-left: 6px;
+      background: var(--note-bg); color: var(--note-text); border: 1px solid var(--note-border); margin-left: 6px;
     }
-    .despesa-status-badge.aprovada { background: var(--primary-soft); color: var(--primary-dark); }
+    .despesa-status-badge.aprovada { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary-border); }
 
     /* VACINAS */
     .vaccine-row {
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      padding: 9px 0; border-bottom: 1px solid #F3F0EA; font-size: 13px;
+      padding: 9px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px;
     }
     .vaccine-row:last-child { border-bottom: none; }
     .vaccine-pill {
       font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
       background: var(--primary-soft); color: var(--primary-dark); white-space: nowrap;
     }
-    .vaccine-pill.upcoming { background: var(--note-bg); color: #854D0E; border: 1px solid var(--note-border); }
+    .vaccine-pill.upcoming { background: var(--note-bg); color: var(--note-text); border: 1px solid var(--note-border); }
 
     /* ESTRELAS, DESEJOS & BOTÕES */
     .meta-admin-box { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -380,12 +454,12 @@
       background: var(--bg-adult); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px;
       font-size: 13px;
     }
-    .star-log-row.penalty { background: var(--accent-soft); border-color: #F0CFC2; }
+    .star-log-row.penalty { background: var(--accent-soft); border-color: var(--accent-border); }
     .star-log-delta {
       font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
       background: var(--primary-soft); color: var(--primary-dark); white-space: nowrap;
     }
-    .star-log-row.penalty .star-log-delta { background: #F9DDD2; color: #8A452B; }
+    .star-log-row.penalty .star-log-delta { background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-dark); }
 
     .wish-admin-card {
       background: var(--note-bg); border: 1.5px solid var(--note-border); border-radius: 16px; padding: 13px;
@@ -395,17 +469,21 @@
     .wish-admin-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .wish-status-pill {
       font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
-      background: #F4E9C4; color: #854D0E; white-space: nowrap;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text); white-space: nowrap;
     }
-    .wish-status-pill.approved { background: var(--primary-soft); color: var(--primary-dark); }
-    .wish-status-pill.rejected { background: var(--accent-soft); color: #8A452B; }
+    .wish-status-pill.approved { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-dark); }
+    .wish-status-pill.rejected { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-dark); }
     .wish-reason-box {
-      margin-top: 8px; background: var(--accent-soft); border: 1px solid #F0CFC2; color: #8A452B;
+      margin-top: 8px; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-dark);
       border-radius: 12px; padding: 8px 10px; font-size: 12px; font-weight: 700;
     }
     .wish-actions { display: flex; gap: 8px; margin-top: 11px; }
     .btn-approve {
       flex: 1; background: var(--primary); color: #fff; border: none; padding: 10px 12px;
+      border-radius: 11px; font-weight: 800; font-size: 13px; cursor: pointer;
+    }
+    .btn-reject {
+      flex: 1; background: var(--accent-soft); color: var(--accent-dark); border: 1px solid var(--accent-border); padding: 10px 12px;
       border-radius: 11px; font-weight: 800; font-size: 13px; cursor: pointer;
     }
     .btn-reject {
@@ -420,13 +498,14 @@
     .week-day-pill {
       background: var(--bg-adult); border: 1.5px solid var(--border); border-radius: 13px; padding: 8px 2px;
       text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--text-main);
     }
-    .week-day-pill.today { border-color: var(--primary); background: var(--primary-soft); }
+    .week-day-pill.today { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); }
     .week-day-pill.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
     .week-day-pill.future { opacity: 0.45; cursor: default; }
-    .week-day-pill small { font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .week-day-pill strong { font-size: 13px; }
-    .week-day-pill span { font-size: 11px; font-weight: 800; }
+    .week-day-pill small { font-size: 10px; font-weight: 800; text-transform: uppercase; color: inherit; }
+    .week-day-pill strong { font-size: 13px; color: inherit; }
+    .week-day-pill span { font-size: 11px; font-weight: 800; color: inherit; }
 
     .week-history-row {
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
@@ -435,13 +514,13 @@
     }
     .week-history-row:last-child { margin-bottom: 0; }
     .week-badge-stars {
-      background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E; font-weight: 800; font-size: 12px;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text); font-weight: 800; font-size: 12px;
       padding: 4px 10px; border-radius: 99px; white-space: nowrap;
     }
 
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 11px 18px; border-radius: 14px; font-weight: 800; cursor: pointer; }
     .btn-primary.penalty { background: var(--accent); }
-    .btn-secondary { background: #EFECE5; color: var(--text-main); border: none; padding: 11px 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
+    .btn-secondary { background: var(--pill-bg); color: var(--text-main); border: 1px solid var(--border); padding: 11px 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
     .row-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
     .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
 
@@ -451,7 +530,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.96);
+      background: var(--nav-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
@@ -459,7 +538,7 @@
       justify-content: center;
       padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
       z-index: 20;
-      box-shadow: 0 -4px 20px rgba(31, 41, 51, 0.04);
+      box-shadow: 0 -4px 20px rgba(31, 41, 51, 0.06);
     }
     .bottom-nav-inner {
       display: grid;
@@ -503,18 +582,19 @@
     .nav-item.active {
       color: var(--primary-dark);
       background: var(--primary-soft);
-      border-color: #C7DFD0;
+      border-color: var(--primary-border);
     }
     .nav-item.active small {
       font-weight: 800;
     }
 
     /* TEMA INFANTIL (MODO DUDA) */
-    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%); padding: 18px 16px 64px; font-family: 'Nunito', sans-serif; }
+    .duda-theme { min-height: 100vh; background: var(--duda-bg); padding: 18px 16px 64px; font-family: 'Nunito', sans-serif; }
     .duda-theme * { font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif; }
     .duda-content { max-width: 520px; margin: 0 auto; }
     .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; max-width: 520px; margin-left: auto; margin-right: auto; gap: 10px; }
     .duda-header h1 { font-size: 25px; color: var(--text-main); font-weight: 900; }
+    .duda-header-actions { display: flex; align-items: center; gap: 8px; }
     .btn-lock {
       background: var(--card-bg); border: 1.5px solid var(--border); padding: 9px 14px;
       border-radius: 16px; font-weight: 800; color: var(--text-muted); cursor: pointer; box-shadow: 0 2px 8px rgba(31, 41, 51, 0.05);
@@ -530,7 +610,7 @@
       display: inline-block; background: rgba(255,255,255,0.22); padding: 6px 14px;
       border-radius: 99px; font-size: 14px; font-weight: 900;
     }
-    .duda-stars-badge.wallet { background: #FACC15; color: var(--text-main); cursor: pointer; }
+    .duda-stars-badge.wallet { background: #FACC15; color: #1F2933; cursor: pointer; }
     .duda-hero-card h2 { font-size: 20px; margin-bottom: 10px; font-weight: 800; }
     .duda-progress-bar { height: 15px; background: rgba(255,255,255,0.3); border-radius: 99px; overflow: hidden; }
     .duda-progress-fill { height: 100%; background: #FACC15; transition: width 0.35s ease; border-radius: 99px; }
@@ -540,23 +620,24 @@
     }
 
     .duda-transparency-card {
-      background: var(--accent-soft); border: 2px solid #F0CFC2; border-radius: 24px;
+      background: var(--accent-soft); border: 2px solid var(--accent-border); border-radius: 24px;
       padding: 15px; margin: 0 auto 14px; max-width: 520px;
       box-shadow: 0 4px 14px rgba(201, 106, 72, 0.08);
     }
     .duda-transparency-head {
       display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;
     }
-    .duda-transparency-head h3 { font-size: 16px; font-weight: 900; color: #8A452B; }
+    .duda-transparency-head h3 { font-size: 16px; font-weight: 900; color: var(--accent-dark); }
+    .duda-transparency-sub { font-size: 12px; color: var(--accent-dark); font-weight: 700; }
     .duda-penalty-item {
-      background: rgba(255, 255, 255, 0.88); border: 1px solid #F0CFC2; border-radius: 16px;
+      background: var(--card-bg); border: 1px solid var(--accent-border); border-radius: 16px;
       padding: 11px 13px; margin-top: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
     }
-    .duda-penalty-item strong { color: #8A452B; font-size: 14px; display: block; }
+    .duda-penalty-item strong { color: var(--accent-dark); font-size: 14px; display: block; }
     .duda-penalty-item p { font-size: 13px; color: var(--text-main); font-weight: 700; margin-top: 2px; }
     .duda-penalty-item small { font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-top: 3px; }
     .btn-duda-ack {
-      background: #8A452B; color: #fff; border: none; padding: 7px 11px; border-radius: 12px;
+      background: var(--accent); color: #fff; border: none; padding: 7px 11px; border-radius: 12px;
       font-size: 12px; font-weight: 900; cursor: pointer; white-space: nowrap; flex-shrink: 0;
     }
 
@@ -571,18 +652,18 @@
       border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer;
     }
     .readonly-banner {
-      background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E; font-size: 12px; font-weight: 800;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text); font-size: 12px; font-weight: 800;
       padding: 8px 12px; border-radius: 12px; text-align: center; margin-top: 8px;
     }
 
     .duda-wish-box {
       background: var(--card-bg); border: 2px solid var(--note-border); border-radius: 24px;
-      padding: 16px; margin: 0 auto 18px; max-width: 520px; box-shadow: 0 4px 14px rgba(232, 223, 194, 0.35);
+      padding: 16px; margin: 0 auto 18px; max-width: 520px; box-shadow: 0 4px 14px rgba(31, 41, 51, 0.08);
     }
     .duda-wish-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .duda-wish-top h3 { font-size: 17px; color: #854D0E; font-weight: 900; }
+    .duda-wish-top h3 { font-size: 17px; color: var(--note-text); font-weight: 900; }
     .btn-wish-open {
-      background: linear-gradient(135deg, #EAB308, #FACC15); color: var(--text-main); border: none;
+      background: linear-gradient(135deg, #EAB308, #FACC15); color: #1F2933; border: none;
       padding: 10px 14px; border-radius: 16px; font-weight: 900; font-size: 13px; cursor: pointer;
       box-shadow: 0 3px 8px rgba(234, 179, 8, 0.25);
     }
@@ -592,18 +673,18 @@
       padding: 11px 13px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
       font-size: 14px; font-weight: 700; color: var(--text-main);
     }
-    .duda-wish-item.approved { background: var(--primary-soft); border-color: #C7DFD0; color: var(--primary-dark); }
-    .duda-wish-item.rejected { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
+    .duda-wish-item.approved { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-dark); }
+    .duda-wish-item.rejected { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-dark); }
     .duda-wish-reason {
-      margin-top: 6px; font-size: 12px; font-weight: 800; color: #8A452B;
-      background: rgba(255, 255, 255, 0.85); border: 1px solid #F0CFC2; border-radius: 10px; padding: 6px 9px;
+      margin-top: 6px; font-size: 12px; font-weight: 800; color: var(--accent-dark);
+      background: var(--card-bg); border: 1px solid var(--accent-border); border-radius: 10px; padding: 6px 9px;
     }
     .wish-tag-mini {
       font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
-      background: #F4E9C4; color: #854D0E; white-space: nowrap;
+      background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text); white-space: nowrap;
     }
-    .duda-wish-item.approved .wish-tag-mini { background: #CFE3D6; color: var(--primary-dark); }
-    .duda-wish-item.rejected .wish-tag-mini { background: #F9DDD2; color: #8A452B; }
+    .duda-wish-item.approved .wish-tag-mini { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-dark); }
+    .duda-wish-item.rejected .wish-tag-mini { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-dark); }
 
     .duda-turno-title { font-size: 18px; font-weight: 900; color: var(--text-main); margin: 16px 0 10px; }
     .duda-mission-card {
@@ -621,12 +702,12 @@
     .mission-left { display: flex; align-items: center; gap: 12px; }
     .mission-emoji { font-size: 24px; }
     .mission-star-tag {
-      font-size: 12px; font-weight: 900; background: var(--note-bg); border: 1px solid var(--note-border); color: #854D0E;
+      font-size: 12px; font-weight: 900; background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text);
       padding: 4px 9px; border-radius: 99px; margin-right: 4px;
     }
-    .duda-mission-card.completed .mission-star-tag { background: #CFE3D6; border-color: transparent; color: var(--primary-dark); }
+    .duda-mission-card.completed .mission-star-tag { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-dark); }
     .mission-circle {
-      width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid #CBD5E1; flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid var(--border); flex-shrink: 0;
       background: var(--card-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
     }
     .duda-mission-card.completed .mission-circle {
@@ -639,6 +720,9 @@
   <!-- TELA 0: SELEÇÃO INICIAL DE PERFIL -->
   <div id="profile-gate" class="gate-screen hidden">
     <div class="gate-card">
+      <div class="gate-top-bar">
+        <button type="button" class="btn-theme-pill" data-theme-btn onclick="toggleThemeMode()" title="Alternar tema claro/escuro">🌙 Escuro</button>
+      </div>
       <h1>Família Alves</h1>
       <p>Quem está usando este aparelho?</p>
       <button type="button" class="btn-profile" onclick="requestAdultProfile('Paulo')">🧔🏾 Paulo</button>
@@ -666,7 +750,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL GENÉRICO -->
+  <!-- BOTTOM SHEET MODAL GENÉRICO (PARA INSERIR E EDITAR ITENS) -->
   <div id="sheet-modal" class="sheet-backdrop hidden" onclick="closeSheetModal(event)">
     <div class="sheet-box" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
@@ -679,6 +763,9 @@
     </div>
   </div>
 
+  <!-- TOAST DE FEEDBACK -->
+  <div id="app-toast" class="app-toast" role="status" aria-live="polite"></div>
+
   <!-- VISÃO REDE DE APOIO -->
   <div id="apoio-app" class="hidden">
     <header class="app-header">
@@ -689,6 +776,7 @@
         <h1>Resumo da Duda</h1>
       </div>
       <div class="header-actions">
+        <button type="button" class="btn-icon-lock" data-theme-icon onclick="toggleThemeMode()" title="Alternar tema claro/escuro">🌙</button>
         <button type="button" class="btn-duda-switch" onclick="openPinModal()">🔒 Responsáveis</button>
       </div>
     </header>
@@ -722,6 +810,7 @@
         <h1 id="header-title">Família Alves · Dia</h1>
       </div>
       <div class="header-actions">
+        <button type="button" class="btn-icon-lock" data-theme-icon onclick="toggleThemeMode()" title="Alternar tema claro/escuro">🌙</button>
         <button type="button" class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
         <button type="button" class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
       </div>
@@ -939,6 +1028,7 @@
           <div class="card-header">
             <h2>⚙️ Configurações & Segurança</h2>
             <div class="btn-group-mini">
+              <button type="button" class="btn-mini" data-theme-btn onclick="toggleThemeMode()">🌙 Modo Escuro</button>
               <button type="button" class="btn-mini" onclick="triggerInstallApp()">📲 Instalar App</button>
               <button type="button" class="btn-mini" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
             </div>
@@ -980,7 +1070,10 @@
   <div id="duda-app" class="duda-theme hidden">
     <header class="duda-header">
       <h1>Olá, Duda! 🌟</h1>
-      <button type="button" class="btn-lock" onclick="openPinModal()">🔒 Sair</button>
+      <div class="duda-header-actions">
+        <button type="button" class="btn-lock" data-theme-icon onclick="toggleThemeMode()" title="Alternar tema claro/escuro">🌙</button>
+        <button type="button" class="btn-lock" onclick="openPinModal()">🔒 Sair</button>
+      </div>
     </header>
 
     <div class="duda-hero-card">
@@ -994,13 +1087,13 @@
       </div>
       <div id="duda-celebration-msg" class="duda-celebration hidden">🎉 Parabéns, Duda! Você completou todas as missões de hoje!</div>
     </div>
-
+    <!-- CARD DE TRANSPARÊNCIA DE PENALIDADES -->
     <div id="duda-transparency-box" class="duda-transparency-card hidden">
       <div class="duda-transparency-head">
         <h3>⚖️ Por que perdi estrelinhas?</h3>
-        <button type="button" class="btn-past-weeks" style="background:#fff; color:#8A452B;" onclick="openModalExtratoEstrelasDuda()">Ver Tudo</button>
+        <button type="button" class="btn-past-weeks" onclick="openModalExtratoEstrelasDuda()">Ver Tudo</button>
       </div>
-      <p style="font-size:12px; color:#8A452B; font-weight:700;">Aqui está explicado direitinho o motivo de cada desconto nas suas estrelas:</p>
+      <p class="duda-transparency-sub">Aqui está explicado direitinho o motivo de cada desconto nas suas estrelas:</p>
       <div id="duda-penalties-list"></div>
     </div>
 
@@ -1030,6 +1123,61 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
+    // =========================================================================
+    // GERENCIAMENTO DE TEMA (CLARO / ESCURO)
+    // =========================================================================
+    const THEME_STORAGE_KEY = 'familia_alves_theme_mode';
+
+    function applyThemeMode(mode, persist = false) {
+      const isDark = mode === 'dark';
+      document.body.classList.toggle('dark-mode', isDark);
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', isDark ? '#121614' : '#4A7C59');
+      }
+
+      document.querySelectorAll('[data-theme-icon]').forEach(btn => {
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro';
+      });
+
+      document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+        btn.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Escuro';
+      });
+
+      if (persist) {
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, mode);
+        } catch (e) {}
+      }
+    }
+
+    function initThemeMode() {
+      let saved = null;
+      try {
+        saved = localStorage.getItem(THEME_STORAGE_KEY);
+      } catch (e) {}
+
+      if (saved === 'dark' || saved === 'light') {
+        applyThemeMode(saved, false);
+      } else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyThemeMode(prefersDark ? 'dark' : 'light', false);
+      }
+    }
+
+    function toggleThemeMode() {
+      const isCurrentlyDark = document.body.classList.contains('dark-mode');
+      const nextMode = isCurrentlyDark ? 'light' : 'dark';
+      applyThemeMode(nextMode, true);
+      if (typeof showToast === 'function') {
+        showToast(nextMode === 'dark' ? '🌙 Tema escuro ativado' : '☀️ Tema claro ativado');
+      }
+    }
+
+    initThemeMode();
+
     // =========================================================================
     // SUPORTE PWA NATIVO (MANIFEST FÍSICO & SERVICE WORKER REAL)
     // =========================================================================
@@ -1275,8 +1423,8 @@
           { id: 1, texto: "Escolher o filme de sexta", custo: 5, status: "pendente", justificativa: "" }
         ],
         casalHoje: [
-          { id: 1, data: hoje, membro: "Paulo", texto: "Paulo: Turno até 18h" },
-          { id: 2, data: hoje, membro: "Isabela", texto: "Isabela: Compromisso às 15h" }
+          { id: 1, data: hoje, membro: "Paulo", horaInicio: "08:00", horaFim: "18:00", recorrencia: "semanal", diasSemana: [1, 2, 3, 4, 5], texto: "Paulo: Turno" },
+          { id: 2, data: hoje, membro: "Isabela", horaInicio: "15:00", horaFim: "16:30", recorrencia: "nenhuma", diasSemana: [], texto: "Isabela: Compromisso" }
         ],
         pendencias: [
           { id: 1, texto: "Pagar boleto da escola", valor: "450,00", done: true },
@@ -1292,8 +1440,8 @@
           }
         },
         agenda: [
-          { id: 1, categoria: "Duda", data: hoje, hora: "07:30", texto: "Escola · Paulo leva / Isabela busca" },
-          { id: 2, categoria: "Família", data: hoje, hora: "19:30", texto: "Alinhar programação do fim de semana" }
+          { id: 1, categoria: "Duda", data: hoje, hora: "07:30", horaFim: "12:00", recorrencia: "semanal", diasSemana: [1, 2, 3, 4, 5], texto: "Escola · Paulo leva / Isabela busca" },
+          { id: 2, categoria: "Família", data: hoje, hora: "19:30", horaFim: "20:30", recorrencia: "nenhuma", diasSemana: [], texto: "Alinhar programação do fim de semana" }
         ],
         despesas: [
           { id: 1, titulo: "Material escolar & cadernos", valor: 180.00, pagoPor: "Paulo", split: "50/50", status: "aprovada" },
@@ -1388,8 +1536,35 @@
 
     function normalizeStateData(rawSt) {
       const hoje = getTodayISO();
-      const baseDef = createDefaultState();
-      const st = (rawSt && typeof rawSt === 'object') ? { ...baseDef, ...rawSt } : baseDef;
+      const hasExistingData = Boolean(rawSt && typeof rawSt === 'object' && Object.keys(rawSt).length > 0);
+      const baseDef = hasExistingData
+        ? {
+            pins: { Paulo: "1234", Isabela: "1234" },
+            integrantes: DEFAULT_INTEGRANTES.map(m => ({ ...m })),
+            lastResetDate: hoje,
+            estrelasTotal: 0,
+            historicoEstrelas: [],
+            desejos: [],
+            casalHoje: [],
+            pendencias: [],
+            mural: [],
+            logisticaPorDia: {},
+            agenda: [],
+            despesas: [],
+            mercado: [],
+            saude: {
+              remedios: [],
+              historicoDoses: [],
+              vacinasLista: [],
+              alergias: "Nenhuma registrada",
+              tipoSanguineo: "O+",
+              vacinas: "Em dia"
+            },
+            missoes: [],
+            historicoMissoes: {}
+          }
+        : createDefaultState();
+      const st = hasExistingData ? { ...baseDef, ...rawSt } : baseDef;
 
       st.pins = normalizePins(st);
       st.saude = normalizeSaudeState(st.saude);
@@ -1429,9 +1604,15 @@
           const prefix = String(item.texto || '').split(':')[0].trim();
           item.membro = prefix || 'Paulo';
         }
+        if (!item.recorrencia) item.recorrencia = 'nenhuma';
+        if (!Array.isArray(item.diasSemana)) item.diasSemana = [];
       });
       st.mural.forEach(item => { if (!item.data) item.data = st.lastResetDate || hoje; });
-      st.agenda.forEach(item => { item.categoria = normalizeCategoriaName(item.categoria); });
+      st.agenda.forEach(item => {
+        item.categoria = normalizeCategoriaName(item.categoria);
+        if (!item.recorrencia) item.recorrencia = 'nenhuma';
+        if (!Array.isArray(item.diasSemana)) item.diasSemana = [];
+      });
 
       if (!st.logisticaPorDia || typeof st.logisticaPorDia !== 'object') {
         st.logisticaPorDia = {};
@@ -1484,6 +1665,49 @@
     let selectedDateISO = todayStr;
     let activeAdultTab = 'hoje';
     let lastSyncedSignature = '';
+
+    // =========================================================================
+    // UTILITÁRIOS DE SEGURANÇA (ESCAPE HTML) & FEEDBACK VISUAL (TOAST/CONFIRM)
+    // =========================================================================
+    function escapeHTML(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJSArg(str) {
+      return String(str ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
+    }
+
+    let toastTimer = null;
+    function showToast(message, isError = false) {
+      const el = document.getElementById('app-toast');
+      if (!el) return;
+      el.textContent = message;
+      el.classList.toggle('error', Boolean(isError));
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.remove('show');
+      }, 3000);
+    }
+
+    function openConfirmSheet(title, message, onConfirm, confirmLabel = 'Confirmar', isDanger = true) {
+      openSheet(title, `
+        <p style="font-size:14px; color:var(--text-main); line-height:1.5; margin-top:4px;">${escapeHTML(message)}</p>
+      `, () => {
+        if (onConfirm) onConfirm();
+      }, {
+        saveLabel: confirmLabel,
+        saveClass: isDanger ? 'btn-primary penalty' : 'btn-primary'
+      });
+    }
 
     function getActiveProfileMode() {
       if (!document.getElementById('duda-app').classList.contains('hidden')) return 'Duda';
@@ -1566,6 +1790,12 @@
     }
 
     function saveState() {
+      if (Array.isArray(appState.saude?.historicoDoses) && appState.saude.historicoDoses.length > 100) {
+        appState.saude.historicoDoses = appState.saude.historicoDoses.slice(0, 100);
+      }
+      if (Array.isArray(appState.historicoEstrelas) && appState.historicoEstrelas.length > 100) {
+        appState.historicoEstrelas = appState.historicoEstrelas.slice(0, 100);
+      }
       const serialized = JSON.stringify(appState);
       lastSyncedSignature = serialized;
       try {
@@ -1733,7 +1963,7 @@
         applyProfileView(targetProfile);
         renderActiveView();
       } else {
-        alert(`Senha de ${targetProfile} incorreta!`);
+        showToast(`Senha de ${targetProfile} incorreta!`, true);
         document.getElementById('pin-input').value = '';
       }
     }
@@ -1756,11 +1986,11 @@
         const p1 = document.getElementById('inp-new-pin').value.trim();
         const p2 = document.getElementById('inp-confirm-pin').value.trim();
         if (!/^\d{4}$/.test(p1)) {
-          alert('A senha deve ter exatamente 4 números.');
+          showToast('A senha deve ter exatamente 4 números.', true);
           return false;
         }
         if (p1 !== p2) {
-          alert('As duas senhas não conferem.');
+          showToast('As duas senhas não conferem.', true);
           return false;
         }
         if (!appState.pins || typeof appState.pins !== 'object') {
@@ -1768,7 +1998,7 @@
         }
         appState.pins[who] = p1;
         saveState();
-        alert(`Senha de ${who} atualizada com sucesso!`);
+        showToast(`Senha de ${who} atualizada com sucesso!`);
       });
     }
 
@@ -1831,9 +2061,9 @@
         const pal = MEMBER_PALETTES[(Number(m.colorIdx) || 0) % MEMBER_PALETTES.length] || MEMBER_PALETTES[0];
         const activeStyle = isActive ? `background:${pal.dot}; border-color:${pal.dot}; color:#fff;` : '';
         return `
-          <button type="button" class="pill ${isActive ? 'active' : ''}" style="${activeStyle}" onclick="setAgendaFilter('${m.nome.replace(/'/g, "\\'")}')">
-            <span>${m.emoji || '👤'}</span>
-            <span>${m.nome}</span>
+          <button type="button" class="pill ${isActive ? 'active' : ''}" style="${activeStyle}" onclick="setAgendaFilter('${escapeJSArg(m.nome)}')">
+            <span>${escapeHTML(m.emoji || '👤')}</span>
+            <span>${escapeHTML(m.nome)}</span>
           </button>
         `;
       }).join('');
@@ -1851,9 +2081,9 @@
         return `
           <div class="check-item" style="cursor:default;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:${pal.bg}; color:${pal.text}; font-size:15px;">${m.emoji || '👤'}</span>
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:${pal.bg}; color:${pal.text}; font-size:15px;">${escapeHTML(m.emoji || '👤')}</span>
               <div>
-                <strong>${m.nome}</strong>
+                <strong>${escapeHTML(m.nome)}</strong>
                 <div style="font-size:11px; color:var(--text-muted);">${m.isSystem ? 'Integrante principal' : 'Integrante adicional'}</div>
               </div>
             </div>
@@ -1888,13 +2118,16 @@
         const nome = document.getElementById('inp-mem-nome').value.trim();
         const emoji = document.getElementById('inp-mem-emoji').value || '👤';
         const colorIdx = Number(document.getElementById('inp-mem-color').value) || 0;
-        if (!nome) return;
+        if (!nome) {
+          showToast('Digite o nome do integrante.', true);
+          return false;
+        }
         if (!Array.isArray(appState.integrantes)) {
           appState.integrantes = DEFAULT_INTEGRANTES.map(m => ({ ...m }));
         }
         const exists = appState.integrantes.some(m => m.nome.toLowerCase() === nome.toLowerCase());
         if (exists) {
-          alert('Já existe um integrante com esse nome.');
+          showToast('Já existe um integrante com esse nome.', true);
           return false;
         }
         appState.integrantes.push({
@@ -1906,16 +2139,19 @@
         });
         currentFilter = nome;
         saveState();
+        showToast(`${nome} adicionado à família!`);
       });
     }
 
     function deleteIntegrante(idx) {
       const m = appState.integrantes[idx];
       if (!m || m.isSystem) return;
-      if (!confirm(`Remover "${m.nome}" da lista de integrantes?`)) return;
-      if (currentFilter === m.nome) currentFilter = 'Todos';
-      appState.integrantes.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Remover Integrante', `Deseja remover "${m.nome}" da lista de integrantes?`, () => {
+        if (currentFilter === m.nome) currentFilter = 'Todos';
+        appState.integrantes.splice(idx, 1);
+        saveState();
+        showToast('Integrante removido.');
+      }, 'Remover');
     }
 
     function changeMonth(delta) {
@@ -1937,6 +2173,55 @@
       return { leva: "Paulo (07:30)", busca: "Isabela (12:00)" };
     }
 
+    function matchesRecurrenceOnDate(item, targetISO) {
+      if (!item || !item.data) return false;
+      const rec = item.recorrencia || 'nenhuma';
+      if (rec === 'nenhuma') return item.data === targetISO;
+      if (targetISO < item.data) return false;
+      if (item.dataFimRecorrencia && targetISO > item.dataFimRecorrencia) return false;
+
+      if (rec === 'diaria') return true;
+      if (rec === 'semanal') {
+        const targetDow = parseISODate(targetISO).getDay();
+        const dias = Array.isArray(item.diasSemana) && item.diasSemana.length > 0
+          ? item.diasSemana.map(Number)
+          : [parseISODate(item.data).getDay()];
+        return dias.includes(targetDow);
+      }
+      if (rec === 'mensal') {
+        const startDay = parseISODate(item.data).getDate();
+        const targetDay = parseISODate(targetISO).getDate();
+        return startDay === targetDay;
+      }
+      return item.data === targetISO;
+    }
+
+    function formatTimeRange(inicio, fim, fallback = '') {
+      if (inicio && fim) return `${inicio} – ${fim}`;
+      if (inicio) return inicio;
+      if (fim) return `até ${fim}`;
+      return fallback;
+    }
+
+    function formatRecurrenceLabel(item) {
+      const rec = item.recorrencia || 'nenhuma';
+      if (rec === 'nenhuma') return '';
+      const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      let base = '';
+      if (rec === 'diaria') base = '🔁 Todo dia';
+      else if (rec === 'mensal') base = '🔁 Todo mês';
+      else if (rec === 'semanal') {
+        const dias = Array.isArray(item.diasSemana) && item.diasSemana.length > 0
+          ? item.diasSemana.map(d => diasNomes[Number(d)]).filter(Boolean).join(', ')
+          : diasNomes[parseISODate(item.data).getDay()];
+        base = `🔁 ${dias}`;
+      }
+      if (item.dataFimRecorrencia) {
+        base += ` (até ${formatDateBR(item.dataFimRecorrencia)})`;
+      }
+      return base;
+    }
+
     function renderCalendar() {
       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       document.getElementById('cal-month-label').textContent = `${monthNames[calMonth]} ${calYear}`;
@@ -1946,13 +2231,9 @@
       const grid = document.getElementById('cal-days-grid');
       const hoje = getTodayISO();
 
-      const eventsByDate = {};
-      (appState.agenda || []).forEach(e => {
+      const filteredAgenda = (appState.agenda || []).filter(e => {
         const catNorm = normalizeCategoriaName(e.categoria);
-        if (currentFilter === 'Todos' || catNorm === currentFilter) {
-          if (!eventsByDate[e.data]) eventsByDate[e.data] = [];
-          eventsByDate[e.data].push(e);
-        }
+        return currentFilter === 'Todos' || catNorm === currentFilter;
       });
 
       const muralDates = new Set((appState.mural || []).map(m => m.data));
@@ -1965,7 +2246,7 @@
 
       for (let day = 1; day <= daysInMonth; day++) {
         const iso = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const eventsOnDay = eventsByDate[iso] || [];
+        const eventsOnDay = filteredAgenda.filter(e => matchesRecurrenceOnDate(e, iso));
         const hasMuralOrLog = muralDates.has(iso) || logDates.has(iso);
         const isToday = iso === hoje ? 'today' : '';
         const isSelected = iso === selectedDateISO ? 'selected' : '';
@@ -2034,7 +2315,7 @@
       } else {
         pendEl.innerHTML = (appState.pendencias || []).map((item, idx) => `
           <div class="check-item ${item.done ? 'done' : ''}" onclick="togglePendencia(${idx})">
-            <span>${item.done ? '✅' : '⬜'} ${item.texto} ${item.valor ? `<span class="valor-pill">R$ ${item.valor}</span>` : ''}</span>
+            <span>${item.done ? '✅' : '⬜'} ${escapeHTML(item.texto)} ${item.valor ? `<span class="valor-pill">R$ ${escapeHTML(item.valor)}</span>` : ''}</span>
             <div class="item-actions-inline" onclick="event.stopPropagation()">
               <span class="act-icon" title="Editar" onclick="openModalEditarPendencia(${idx})">✏️</span>
               <span class="act-icon" title="Excluir" onclick="deletePendencia(${idx})">🗑️</span>
@@ -2057,7 +2338,7 @@
       } else {
         muralEl.innerHTML = muralDoDia.map(({ m, idx }) => `
           <div class="check-item" style="border:none; padding:5px 0; cursor:default;">
-            <span><strong>${m.autor}:</strong> ${m.texto}</span>
+            <span><strong>${escapeHTML(m.autor)}:</strong> ${escapeHTML(m.texto)}</span>
             <div class="item-actions-inline">
               <span class="act-icon" title="Editar" onclick="openModalEditarMural(${idx})">✏️</span>
               <span class="act-icon" title="Excluir" onclick="deleteMural(${idx})">🗑️</span>
@@ -2069,18 +2350,21 @@
       const timelineEntries = [];
 
       (appState.casalHoje || []).forEach((item, idx) => {
-        if ((item.data || hoje) === hojeSelectedDateISO) {
+        if (matchesRecurrenceOnDate(item, hojeSelectedDateISO)) {
           const horaMatch = String(item.texto || '').match(/\b(\d{1,2}:\d{2})\b/);
+          const hIni = item.horaInicio || (horaMatch ? horaMatch[1] : '');
+          const hFim = item.horaFim || '';
           const membroNome = item.membro || String(item.texto || '').split(':')[0].trim() || 'Família';
           const meta = getMemberMeta(membroNome);
+          const recTxt = formatRecurrenceLabel(item);
           timelineEntries.push({
-            sortKey: horaMatch ? horaMatch[1] : '09:00',
-            timeLabel: horaMatch ? horaMatch[1] : membroNome,
+            sortKey: hIni || '09:00',
+            timeLabel: formatTimeRange(hIni, hFim, membroNome),
             badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tag: `${meta.emoji} ${meta.nome}`,
             title: item.texto,
-            meta: `Compromisso · ${meta.nome}`,
+            meta: [`Compromisso · ${meta.nome}`, recTxt].filter(Boolean).join(' · '),
             done: false,
             actionsHTML: `
               <span class="act-icon" title="Editar" onclick="openModalEditarCasal(${idx})">✏️</span>
@@ -2091,16 +2375,17 @@
       });
 
       (appState.agenda || []).forEach((ev, originalIdx) => {
-        if (ev.data === hojeSelectedDateISO) {
+        if (matchesRecurrenceOnDate(ev, hojeSelectedDateISO)) {
           const meta = getMemberMeta(ev.categoria);
+          const recTxt = formatRecurrenceLabel(ev);
           timelineEntries.push({
             sortKey: ev.hora || '12:00',
-            timeLabel: ev.hora || meta.nome,
+            timeLabel: formatTimeRange(ev.hora, ev.horaFim, meta.nome),
             badgeStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tagStyle: `background:${meta.palette.bg}; color:${meta.palette.text};`,
             tag: `${meta.emoji} ${meta.nome}`,
             title: ev.texto,
-            meta: 'Evento no calendário',
+            meta: ['Evento no calendário', recTxt].filter(Boolean).join(' · '),
             done: false,
             actionsHTML: `
               <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${originalIdx})">✏️</span>
@@ -2137,16 +2422,16 @@
       } else {
         timelineEl.innerHTML = timelineEntries.map(entry => `
           <div class="timeline-row">
-            <div class="timeline-time-col" style="${entry.badgeStyle}">${entry.timeLabel}</div>
+            <div class="timeline-time-col" style="${entry.badgeStyle}">${escapeHTML(entry.timeLabel)}</div>
             <div class="timeline-main-col">
               <div class="timeline-title-line ${entry.done ? 'done' : ''}"
                    style="${entry.onToggle ? 'cursor:pointer;' : ''}"
                    ${entry.onToggle ? `onclick="${entry.onToggle}"` : ''}>
                 ${entry.onToggle ? `<span>${entry.done ? '✅' : '⬜'}</span>` : ''}
-                <span class="agenda-tag" style="${entry.tagStyle}">${entry.tag}</span>
-                <span>${entry.title}</span>
+                <span class="agenda-tag" style="${entry.tagStyle}">${escapeHTML(entry.tag)}</span>
+                <span>${escapeHTML(entry.title)}</span>
               </div>
-              <div class="timeline-meta">${entry.meta}</div>
+              <div class="timeline-meta">${escapeHTML(entry.meta)}</div>
             </div>
             ${entry.actionsHTML ? `<div class="item-actions-inline">${entry.actionsHTML}</div>` : ''}
           </div>
@@ -2162,21 +2447,25 @@
         .map((item, originalIdx) => ({ ...item, originalIdx }))
         .filter(a => {
           const catNorm = normalizeCategoriaName(a.categoria);
-          return a.data === selectedDateISO && (currentFilter === 'Todos' || catNorm === currentFilter);
-        });
+          return matchesRecurrenceOnDate(a, selectedDateISO) && (currentFilter === 'Todos' || catNorm === currentFilter);
+        })
+        .sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'));
 
       if (filtered.length === 0) {
-        agendaEl.innerHTML = `<p class="hint" style="margin:6px 0;">Nenhum compromisso${currentFilter !== 'Todos' ? ` de ${currentFilter}` : ''} neste dia.</p>`;
+        agendaEl.innerHTML = `<p class="hint" style="margin:6px 0;">Nenhum compromisso${currentFilter !== 'Todos' ? ` de ${escapeHTML(currentFilter)}` : ''} neste dia.</p>`;
         return;
       }
 
       agendaEl.innerHTML = filtered.map(item => {
         const meta = getMemberMeta(item.categoria);
+        const timeRange = formatTimeRange(item.hora, item.horaFim);
+        const recTxt = formatRecurrenceLabel(item);
         return `
           <div class="agenda-item">
             <div>
-              <span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${meta.emoji} ${meta.nome}</span>
-              ${item.hora ? `<strong>${item.hora} · </strong>` : ''}${item.texto}
+              <span class="agenda-tag" style="background:${meta.palette.bg}; color:${meta.palette.text};">${escapeHTML(meta.emoji)} ${escapeHTML(meta.nome)}</span>
+              ${timeRange ? `<strong>${escapeHTML(timeRange)} · </strong>` : ''}${escapeHTML(item.texto)}
+              ${recTxt ? `<div class="hint" style="margin:3px 0 0;">${escapeHTML(recTxt)}</div>` : ''}
             </div>
             <div class="item-actions-inline">
               <span class="act-icon" title="Editar" onclick="openModalEditarAgenda(${item.originalIdx})">✏️</span>
@@ -2191,7 +2480,7 @@
       const mercEl = document.getElementById('mercado-list');
       mercEl.innerHTML = (appState.mercado || []).map((item, idx) => `
         <div class="check-item ${item.done ? 'done' : ''}" onclick="toggleMercado(${idx})">
-          <span>${item.done ? '✅' : '⬜'} ${item.texto}</span>
+          <span>${item.done ? '✅' : '⬜'} ${escapeHTML(item.texto)}</span>
           <div class="item-actions-inline" onclick="event.stopPropagation()">
             <span class="act-icon" title="Editar" onclick="openModalEditarMercado(${idx})">✏️</span>
             <span class="act-icon" title="Excluir" onclick="deleteMercado(${idx})">🗑️</span>
@@ -2251,10 +2540,10 @@
           <div class="despesa-row">
             <div>
               <div>
-                <strong>${d.titulo}</strong>
+                <strong>${escapeHTML(d.titulo)}</strong>
                 <span class="despesa-status-badge ${isAprovada ? 'aprovada' : ''}">${isAprovada ? 'Aprovada' : 'Pendente'}</span>
               </div>
-              <div class="hint" style="margin:2px 0 0;">${formatBRL(d.valor)} · Pago por ${d.pagoPor || 'Paulo'} · ${d.split || '50/50'}</div>
+              <div class="hint" style="margin:2px 0 0;">${formatBRL(d.valor)} · Pago por ${escapeHTML(d.pagoPor || 'Paulo')} · ${escapeHTML(d.split || '50/50')}</div>
             </div>
             <div class="item-actions-inline">
               ${!isAprovada ? `<button type="button" class="btn-mini" onclick="aprovarDespesa(${idx})">✓ Aprovar</button>` : ''}
@@ -2318,8 +2607,8 @@
             <div class="remedio-card ${overdue ? 'overdue' : ''}">
               <div class="remedio-top">
                 <div>
-                  <strong>${rem.nome}</strong>
-                  <span class="valor-pill">${regraTag}</span>
+                  <strong>${escapeHTML(rem.nome)}</strong>
+                  <span class="valor-pill">${escapeHTML(regraTag)}</span>
                 </div>
                 <div class="remedio-actions-top">
                   <button type="button" class="icon-btn-tiny" title="Editar remédio" onclick="openModalEditarRemedio(${idx})">✏️</button>
@@ -2327,7 +2616,7 @@
                 </div>
               </div>
               <p style="font-size:13px; margin-top:6px;">
-                Última dose: <strong>${rem.ultimaDoseTimestamp ? `${formatDoseDisplay(rem.ultimaDoseTimestamp)}${rem.ultimaDoseResponsavel ? ` (${rem.ultimaDoseResponsavel})` : ''}` : '-'}</strong>
+                Última dose: <strong>${rem.ultimaDoseTimestamp ? `${formatDoseDisplay(rem.ultimaDoseTimestamp)}${rem.ultimaDoseResponsavel ? ` (${escapeHTML(rem.ultimaDoseResponsavel)})` : ''}` : '-'}</strong>
               </p>
               <p style="font-size:13px; margin-top:2px;">
                 Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong> ${overdue ? '· Horário atingido' : ''}
@@ -2346,8 +2635,8 @@
         histBox.innerHTML = hist.map((item, idx) => `
           <div class="dose-log-row">
             <div class="dose-log-main">
-              <strong>💊 ${item.remedioNome}</strong>
-              <div class="dose-log-meta">${formatDoseDisplay(item.timestamp)} · Por ${item.responsavel || 'Responsável'}${item.obs ? ` · ${item.obs}` : ''}</div>
+              <strong>💊 ${escapeHTML(item.remedioNome)}</strong>
+              <div class="dose-log-meta">${formatDoseDisplay(item.timestamp)} · Por ${escapeHTML(item.responsavel || 'Responsável')}${item.obs ? ` · ${escapeHTML(item.obs)}` : ''}</div>
             </div>
             <div class="dose-log-btns">
               <button type="button" class="icon-btn-tiny" title="Corrigir dose" onclick="openModalEditarDose(${idx})">✏️</button>
@@ -2358,9 +2647,9 @@
       }
 
       document.getElementById('ficha-saude-box').innerHTML = `
-        <p><strong>Alergias:</strong> ${s.alergias}</p>
-        <p><strong>Tipo sanguíneo:</strong> ${s.tipoSanguineo}</p>
-        <p><strong>Resumo vacinas:</strong> ${s.vacinas}</p>
+        <p><strong>Alergias:</strong> ${escapeHTML(s.alergias)}</p>
+        <p><strong>Tipo sanguíneo:</strong> ${escapeHTML(s.tipoSanguineo)}</p>
+        <p><strong>Resumo vacinas:</strong> ${escapeHTML(s.vacinas)}</p>
       `;
 
       const vacListEl = document.getElementById('vacinas-list-box');
@@ -2373,11 +2662,11 @@
           return `
             <div class="vaccine-row">
               <div>
-                <strong>${v.nome}</strong>
-                ${v.detalhe ? `<div class="hint" style="margin:2px 0 0;">${v.detalhe}</div>` : ''}
+                <strong>${escapeHTML(v.nome)}</strong>
+                ${v.detalhe ? `<div class="hint" style="margin:2px 0 0;">${escapeHTML(v.detalhe)}</div>` : ''}
               </div>
               <div class="item-actions-inline">
-                <span class="vaccine-pill ${isUpcoming ? 'upcoming' : ''}">${v.status || 'Em dia'}</span>
+                <span class="vaccine-pill ${isUpcoming ? 'upcoming' : ''}">${escapeHTML(v.status || 'Em dia')}</span>
                 <span class="act-icon" title="Remover" onclick="deleteVacina(${idx})">🗑️</span>
               </div>
             </div>
@@ -2400,7 +2689,7 @@
       } else {
         remEl.innerHTML = remedios.map(rem => `
           <div class="remedio-card ${isRemedioOverdue(rem) ? 'overdue' : ''}" style="margin-bottom:8px;">
-            <strong>${rem.nome}</strong> <span class="valor-pill">${rem.horarioFixo ? `Fixo ${rem.horarioFixo}` : `A cada ${rem.intervaloHoras || 6}h`}</span>
+            <strong>${escapeHTML(rem.nome)}</strong> <span class="valor-pill">${rem.horarioFixo ? `Fixo ${escapeHTML(rem.horarioFixo)}` : `A cada ${rem.intervaloHoras || 6}h`}</span>
             <p style="font-size:13px; margin-top:5px;">Última dose: <strong>${rem.ultimaDoseTimestamp ? formatDoseDisplay(rem.ultimaDoseTimestamp) : '-'}</strong></p>
             <p style="font-size:13px; margin-top:2px;">Próxima dose: <strong>${getRemedioNextDoseText(rem)}</strong></p>
           </div>
@@ -2408,9 +2697,9 @@
       }
 
       document.getElementById('apoio-ficha-box').innerHTML = `
-        <p><strong>Alergias:</strong> ${s.alergias}</p>
-        <p><strong>Tipo sanguíneo:</strong> ${s.tipoSanguineo}</p>
-        <p><strong>Vacinas:</strong> ${s.vacinas}</p>
+        <p><strong>Alergias:</strong> ${escapeHTML(s.alergias)}</p>
+        <p><strong>Tipo sanguíneo:</strong> ${escapeHTML(s.tipoSanguineo)}</p>
+        <p><strong>Vacinas:</strong> ${escapeHTML(s.vacinas)}</p>
       `;
     }
 
@@ -2496,9 +2785,9 @@
       list.innerHTML = activePenalties.map(({ entry, idx }) => `
         <div class="duda-penalty-item">
           <div>
-            <strong>${entry.delta} ⭐ · Ajustado por ${entry.autor || 'Responsável'}</strong>
-            <p>Motivo: ${entry.motivo}</p>
-            <small>${entry.dataLabel || formatDateBR(entry.data || getTodayISO())}</small>
+            <strong>${entry.delta} ⭐ · Ajustado por ${escapeHTML(entry.autor || 'Responsável')}</strong>
+            <p>Motivo: ${escapeHTML(entry.motivo)}</p>
+            <small>${escapeHTML(entry.dataLabel || formatDateBR(entry.data || getTodayISO()))}</small>
           </div>
           <button type="button" class="btn-duda-ack" onclick="acknowledgePenalty(${idx})">Entendi 👍</button>
         </div>
@@ -2529,8 +2818,8 @@
         return `
           <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
             <div>
-              <strong>${entry.motivo || 'Ajuste de estrelas'}</strong>
-              <div class="hint" style="margin:2px 0 0;">Por ${entry.autor || 'Responsável'} · ${entry.dataLabel || formatDateBR(entry.data || getTodayISO())} ${statusTxt}</div>
+              <strong>${escapeHTML(entry.motivo || 'Ajuste de estrelas')}</strong>
+              <div class="hint" style="margin:2px 0 0;">Por ${escapeHTML(entry.autor || 'Responsável')} · ${escapeHTML(entry.dataLabel || formatDateBR(entry.data || getTodayISO()))} ${statusTxt}</div>
             </div>
             <span class="star-log-delta">${sign} ⭐</span>
           </div>
@@ -2598,8 +2887,8 @@
             html += `
               <div class="${cardClass}" ${clickHandler}>
                 <div class="mission-left">
-                  <span class="mission-emoji">${m.emoji || '⭐'}</span>
-                  <span>${m.titulo}</span>
+                  <span class="mission-emoji">${escapeHTML(m.emoji || '⭐')}</span>
+                  <span>${escapeHTML(m.titulo)}</span>
                 </div>
                 <div style="display:flex; align-items:center;">
                   <span class="mission-star-tag">${isDone ? '+1 ⭐' : '1 ⭐'}</span>
@@ -2644,7 +2933,7 @@
       const adminList = document.getElementById('admin-missoes-list');
       adminList.innerHTML = (appState.missoes || []).map((m, idx) => `
         <div class="check-item" style="cursor:default;">
-          <span>${m.emoji || '⭐'} <strong>[${m.turno}]</strong> ${m.titulo} ${m.done ? '✅' : ''}</span>
+          <span>${escapeHTML(m.emoji || '⭐')} <strong>[${escapeHTML(m.turno)}]</strong> ${escapeHTML(m.titulo)} ${m.done ? '✅' : ''}</span>
           <div class="item-actions-inline">
             <span class="act-icon" title="Editar" onclick="openModalEditarMissao(${idx})">✏️</span>
             <span class="act-icon" title="Excluir" onclick="deleteMissao(${idx})">🗑️</span>
@@ -2687,8 +2976,8 @@
             return `
               <div class="star-log-row ${isPenalty ? 'penalty' : ''}">
                 <div>
-                  <strong>${entry.motivo}</strong>
-                  <div class="hint" style="margin:2px 0 0;">${entry.autor || 'Família'} · ${entry.dataLabel || formatDateBR(entry.data || getTodayISO())}</div>
+                  <strong>${escapeHTML(entry.motivo)}</strong>
+                  <div class="hint" style="margin:2px 0 0;">${escapeHTML(entry.autor || 'Família')} · ${escapeHTML(entry.dataLabel || formatDateBR(entry.data || getTodayISO()))}</div>
                 </div>
                 <span class="star-log-delta">${sign} ⭐</span>
               </div>
@@ -2733,9 +3022,9 @@
         const motivo = document.getElementById('inp-star-motivo').value.trim();
 
         if (!motivo) {
-          alert(chosenMode === 'penalty'
+          showToast(chosenMode === 'penalty'
             ? 'Por transparência com a Duda, escreva o motivo da penalidade.'
-            : 'Escreva o motivo do bônus de estrelas.');
+            : 'Escreva o motivo do bônus de estrelas.', true);
           return false;
         }
 
@@ -2775,13 +3064,16 @@
         }
 
         saveState();
+        showToast(chosenMode === 'penalty' ? 'Penalidade registrada.' : 'Bônus de estrelas adicionado!');
       }, { saveClass: isPenalty ? 'btn-primary penalty' : 'btn-primary' });
     }
 
     function resetEstrelas() {
-      if (!confirm("Zerar o saldo de estrelas da Duda?")) return;
-      appState.estrelasTotal = 0;
-      saveState();
+      openConfirmSheet('Zerar Estrelas', 'Tem certeza que deseja zerar o saldo de estrelas da Duda?', () => {
+        appState.estrelasTotal = 0;
+        saveState();
+        showToast('Saldo de estrelas zerado.');
+      }, 'Zerar');
     }
 
     function renderDesejos() {
@@ -2795,12 +3087,12 @@
             const statusClass = w.status === 'aprovado' ? 'approved' : (w.status === 'recusado' ? 'rejected' : '');
             const statusLabel = w.status === 'aprovado' ? '✅ Aprovado' : (w.status === 'recusado' ? '💬 Recusado' : '⏳ Aguardando');
             const justificativaHTML = (w.status === 'recusado' && w.justificativa)
-              ? `<div class="duda-wish-reason">💬 Motivo: ${w.justificativa}</div>`
+              ? `<div class="duda-wish-reason">💬 Motivo: ${escapeHTML(w.justificativa)}</div>`
               : '';
             return `
               <div class="duda-wish-item ${statusClass}">
                 <div style="flex:1; min-width:0;">
-                  <div>${w.texto}</div>
+                  <div>${escapeHTML(w.texto)}</div>
                   <small style="opacity:0.8; font-weight:800;">Custo: ${w.custo} ⭐</small>
                   ${justificativaHTML}
                 </div>
@@ -2821,13 +3113,13 @@
             const pillClass = w.status === 'aprovado' ? 'approved' : (w.status === 'recusado' ? 'rejected' : '');
             const pillText = w.status === 'aprovado' ? 'Aprovado' : (w.status === 'recusado' ? 'Recusado' : 'Pendente');
             const justificativaAdminHTML = (w.status === 'recusado' && w.justificativa)
-              ? `<div class="wish-reason-box">Justificativa enviada à Duda: "${w.justificativa}"</div>`
+              ? `<div class="wish-reason-box">Justificativa enviada à Duda: "${escapeHTML(w.justificativa)}"</div>`
               : '';
             return `
               <div class="wish-admin-card">
                 <div class="wish-admin-top">
                   <div>
-                    <strong>${w.texto}</strong>
+                    <strong>${escapeHTML(w.texto)}</strong>
                     <div class="hint" style="margin:3px 0 0;">Valor pedido: <strong>${w.custo} ⭐</strong> · Saldo atual da Duda: <strong>${appState.estrelasTotal || 0} ⭐</strong></div>
                   </div>
                   <div style="display:flex; align-items:center; gap:6px;">
@@ -2858,10 +3150,14 @@
       `, () => {
         const texto = document.getElementById('inp-wish-texto').value.trim();
         const custo = Math.max(1, parseInt(document.getElementById('inp-wish-custo').value, 10) || 1);
-        if (!texto) return;
+        if (!texto) {
+          showToast('Escreva qual é o seu desejo primeiro!', true);
+          return false;
+        }
         if (!Array.isArray(appState.desejos)) appState.desejos = [];
         appState.desejos.unshift({ id: Date.now(), texto, custo, status: 'pendente', justificativa: '' });
         saveState();
+        showToast('Desejo enviado para aprovação! ✨');
       });
     }
 
@@ -2871,7 +3167,7 @@
       const custo = Number(w.custo) || 0;
       const atual = Number(appState.estrelasTotal) || 0;
       if (atual < custo) {
-        alert(`A Duda tem ${atual} ⭐ e o desejo custa ${custo} ⭐. Você pode adicionar estrelas antes de aprovar ou recusar o pedido.`);
+        showToast(`Saldo insuficiente (${atual} ⭐ de ${custo} ⭐ necessárias).`, true);
         return;
       }
       appState.estrelasTotal = atual - custo;
@@ -2890,6 +3186,7 @@
         cienteDuda: true
       });
       saveState();
+      showToast('Desejo aprovado com sucesso!');
     }
 
     function openModalRecusarDesejo(idx) {
@@ -2904,26 +3201,29 @@
       openSheet(`Justificar Recusa · "${w.texto}"`, `
         <p class="hint">Explique com carinho o motivo para a Duda entender a recusa (${w.custo} ⭐):</p>
         <label>Motivo da Recusa (Obrigatório)</label>
-        <input type="text" id="inp-wish-justificativa" value="${w.justificativa || ''}" placeholder="Ex: Hoje já temos compromisso à noite, mas podemos fazer no sábado..." />
+        <input type="text" id="inp-wish-justificativa" value="${escapeHTML(w.justificativa || '')}" placeholder="Ex: Hoje já temos compromisso à noite, mas podemos fazer no sábado..." />
         <div class="chip-group" style="margin-top:10px;">
-          ${suggestions.map(s => `<button type="button" class="chip-opt" onclick="document.getElementById('inp-wish-justificativa').value='${s.replace(/'/g, "\\'")}'">${s}</button>`).join('')}
+          ${suggestions.map(s => `<button type="button" class="chip-opt" onclick="document.getElementById('inp-wish-justificativa').value='${escapeJSArg(s)}'">${escapeHTML(s)}</button>`).join('')}
         </div>
       `, () => {
         const justificativa = document.getElementById('inp-wish-justificativa').value.trim();
         if (!justificativa) {
-          alert('Escreva uma justificativa para recusar o desejo.');
+          showToast('Escreva uma justificativa para recusar o desejo.', true);
           return false;
         }
         w.status = 'recusado';
         w.justificativa = justificativa;
         saveState();
+        showToast('Justificativa enviada para a Duda.');
       }, { saveLabel: 'Confirmar Recusa', saveClass: 'btn-primary penalty' });
     }
 
     function deleteDesejo(idx) {
-      if (!confirm('Remover este desejo?')) return;
-      appState.desejos.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Remover Desejo', 'Deseja excluir este desejo da lista?', () => {
+        appState.desejos.splice(idx, 1);
+        saveState();
+        showToast('Desejo removido.');
+      }, 'Excluir');
     }
 
     let currentSheetSaveHandler = null;
@@ -3025,31 +3325,143 @@
       buscaEl.value = temp;
     }
 
+    function buildRecurrenceFieldsHTML(prefix, recAtual = 'nenhuma', diasAtuais = [], dataBaseISO = getTodayISO(), dataFimAtual = '') {
+      const diasOptions = [
+        { val: 1, label: 'Seg' },
+        { val: 2, label: 'Ter' },
+        { val: 3, label: 'Qua' },
+        { val: 4, label: 'Qui' },
+        { val: 5, label: 'Sex' },
+        { val: 6, label: 'Sáb' },
+        { val: 0, label: 'Dom' }
+      ];
+      const defaultDow = parseISODate(dataBaseISO).getDay();
+      const selectedDays = Array.isArray(diasAtuais) && diasAtuais.length > 0
+        ? diasAtuais.map(Number)
+        : [defaultDow];
+
+      return `
+        <label>Repetição / Recorrência</label>
+        <input type="hidden" id="${prefix}-rec" value="${recAtual}" />
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${recAtual==='nenhuma'?'selected':''}" data-val="nenhuma" onclick="selectRecurrenceChip(this, '${prefix}')">Não repete</button>
+          <button type="button" class="chip-opt ${recAtual==='diaria'?'selected':''}" data-val="diaria" onclick="selectRecurrenceChip(this, '${prefix}')">Diário</button>
+          <button type="button" class="chip-opt ${recAtual==='semanal'?'selected':''}" data-val="semanal" onclick="selectRecurrenceChip(this, '${prefix}')">Semanal</button>
+          <button type="button" class="chip-opt ${recAtual==='mensal'?'selected':''}" data-val="mensal" onclick="selectRecurrenceChip(this, '${prefix}')">Mensal</button>
+        </div>
+        <div id="${prefix}-weekdays-wrap" class="${recAtual === 'semanal' ? '' : 'hidden'}" style="margin-top:8px;">
+          <label style="margin-top:4px;">Dias da Semana</label>
+          <div class="chip-group" id="${prefix}-weekdays-group">
+            ${diasOptions.map(d => `
+              <button type="button" class="chip-opt ${selectedDays.includes(d.val) ? 'selected' : ''}"
+                data-dow="${d.val}" onclick="this.classList.toggle('selected')">${d.label}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div id="${prefix}-enddate-wrap" class="${recAtual !== 'nenhuma' ? '' : 'hidden'}" style="margin-top:8px;">
+          <label style="margin-top:4px;">Repetir até (opcional)</label>
+          <input type="date" id="${prefix}-rec-fim" value="${dataFimAtual || ''}" />
+        </div>
+      `;
+    }
+
+    function selectRecurrenceChip(el, prefix) {
+      selectChip(el, `${prefix}-rec`);
+      const val = el.getAttribute('data-val');
+      const weekWrap = document.getElementById(`${prefix}-weekdays-wrap`);
+      const endWrap = document.getElementById(`${prefix}-enddate-wrap`);
+      if (weekWrap) weekWrap.classList.toggle('hidden', val !== 'semanal');
+      if (endWrap) endWrap.classList.toggle('hidden', val === 'nenhuma');
+    }
+
+    function readRecurrenceValues(prefix, fallbackISO) {
+      const recorrencia = document.getElementById(`${prefix}-rec`)?.value || 'nenhuma';
+      let diasSemana = [];
+      if (recorrencia === 'semanal') {
+        const selectedBtns = document.querySelectorAll(`#${prefix}-weekdays-group .chip-opt.selected`);
+        diasSemana = Array.from(selectedBtns).map(b => Number(b.getAttribute('data-dow')));
+        if (diasSemana.length === 0 && fallbackISO) {
+          diasSemana = [parseISODate(fallbackISO).getDay()];
+        }
+      }
+      const dataFimRecorrencia = recorrencia !== 'nenhuma'
+        ? (document.getElementById(`${prefix}-rec-fim`)?.value || '')
+        : '';
+      return { recorrencia, diasSemana, dataFimRecorrencia };
+    }
+
     function openModalCasal(editIdx = null) {
       const isEdit = editIdx !== null && appState.casalHoje[editIdx];
       const existing = isEdit ? appState.casalHoje[editIdx] : null;
       const defaultMember = existing ? (existing.membro || 'Paulo') : 'Paulo';
+      const defaultData = existing ? (existing.data || hojeSelectedDateISO) : hojeSelectedDateISO;
+      const defaultIni = existing ? (existing.horaInicio || '') : '';
+      const defaultFim = existing ? (existing.horaFim || '') : '';
+      const defaultRec = existing ? (existing.recorrencia || 'nenhuma') : 'nenhuma';
+      const defaultDias = existing ? (existing.diasSemana || []) : [];
+      const defaultFimRec = existing ? (existing.dataFimRecorrencia || '') : '';
       const defaultTexto = existing ? existing.texto : '';
 
       openSheet(isEdit ? 'Editar Compromisso do Dia' : `Compromisso · ${formatDateBR(hojeSelectedDateISO)}`, `
         <label>Integrante</label>
         ${buildMemberChipsHTML('inp-casal-membro', defaultMember)}
-        <label>Compromisso / Horário</label>
-        <input type="text" id="inp-casal-texto" value="${defaultTexto}" placeholder="Ex: Turno até 18h, Consulta às 15h..." />
+        <label>Data de Início</label>
+        <input type="date" id="inp-casal-data" value="${defaultData}" />
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label>Horário Início</label>
+            <input type="time" id="inp-casal-ini" value="${defaultIni}" />
+          </div>
+          <div>
+            <label>Horário Fim</label>
+            <input type="time" id="inp-casal-fim" value="${defaultFim}" />
+          </div>
+        </div>
+        ${buildRecurrenceFieldsHTML('inp-casal', defaultRec, defaultDias, defaultData, defaultFimRec)}
+        <label>Compromisso / Descrição</label>
+        <input type="text" id="inp-casal-texto" value="${escapeHTML(defaultTexto)}" placeholder="Ex: Turno de trabalho, Aula de inglês, Consulta..." />
       `, () => {
         const membro = document.getElementById('inp-casal-membro').value || 'Paulo';
+        const data = document.getElementById('inp-casal-data').value || hojeSelectedDateISO;
+        const horaInicio = document.getElementById('inp-casal-ini').value;
+        const horaFim = document.getElementById('inp-casal-fim').value;
+        const { recorrencia, diasSemana, dataFimRecorrencia } = readRecurrenceValues('inp-casal', data);
         let texto = document.getElementById('inp-casal-texto').value.trim();
-        if (!texto) return;
+        if (!texto) {
+          showToast('Digite a descrição do compromisso.', true);
+          return false;
+        }
+        if (horaInicio && horaFim && horaFim < horaInicio) {
+          showToast('O horário de fim não pode ser anterior ao de início.', true);
+          return false;
+        }
         if (!texto.toLowerCase().startsWith(membro.toLowerCase())) {
           texto = `${membro}: ${texto}`;
         }
         if (isEdit) {
           existing.membro = membro;
+          existing.data = data;
+          existing.horaInicio = horaInicio;
+          existing.horaFim = horaFim;
+          existing.recorrencia = recorrencia;
+          existing.diasSemana = diasSemana;
+          existing.dataFimRecorrencia = dataFimRecorrencia;
           existing.texto = texto;
         } else {
-          appState.casalHoje.push({ id: Date.now(), data: hojeSelectedDateISO, membro, texto });
+          appState.casalHoje.push({
+            id: Date.now(),
+            data,
+            membro,
+            horaInicio,
+            horaFim,
+            recorrencia,
+            diasSemana,
+            dataFimRecorrencia,
+            texto
+          });
         }
         saveState();
+        showToast(recorrencia !== 'nenhuma' ? 'Compromisso recorrente salvo!' : 'Compromisso salvo!');
       });
     }
 
@@ -3058,9 +3470,11 @@
     }
 
     function deleteCasal(idx) {
-      if (!confirm('Excluir este compromisso do dia?')) return;
-      appState.casalHoje.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Compromisso', 'Deseja excluir este compromisso (e suas repetições, se houver)?', () => {
+        appState.casalHoje.splice(idx, 1);
+        saveState();
+        showToast('Compromisso excluído.');
+      }, 'Excluir');
     }
 
     function openModalPendencia(editIdx = null) {
@@ -3096,9 +3510,11 @@
     }
 
     function deletePendencia(idx) {
-      if (!confirm('Excluir esta pendência?')) return;
-      appState.pendencias.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Pendência', 'Deseja excluir esta pendência da casa?', () => {
+        appState.pendencias.splice(idx, 1);
+        saveState();
+        showToast('Pendência excluída.');
+      }, 'Excluir');
     }
 
     function openModalMural(editIdx = null) {
@@ -3135,9 +3551,11 @@
     }
 
     function deleteMural(idx) {
-      if (!confirm('Excluir este recado do mural?')) return;
-      appState.mural.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Recado', 'Deseja excluir este recado do mural?', () => {
+        appState.mural.splice(idx, 1);
+        saveState();
+        showToast('Recado excluído.');
+      }, 'Excluir');
     }
 
     function openModalAgenda(editIdx = null) {
@@ -3146,36 +3564,73 @@
       const defaultCat = existing ? normalizeCategoriaName(existing.categoria) : (currentFilter !== 'Todos' ? currentFilter : 'Família');
       const defaultData = existing ? existing.data : selectedDateISO;
       const defaultHora = existing ? (existing.hora || '') : '';
+      const defaultHoraFim = existing ? (existing.horaFim || '') : '';
+      const defaultRec = existing ? (existing.recorrencia || 'nenhuma') : 'nenhuma';
+      const defaultDias = existing ? (existing.diasSemana || []) : [];
+      const defaultFimRec = existing ? (existing.dataFimRecorrencia || '') : '';
       const defaultTexto = existing ? existing.texto : '';
 
-      openSheet(isEdit ? 'Editar Compromisso' : 'Novo Compromisso', `
+      openSheet(isEdit ? 'Editar Evento / Compromisso' : 'Novo Evento / Compromisso', `
         <label>Integrante / Categoria</label>
         ${buildMemberChipsHTML('inp-ag-cat', defaultCat)}
-        <label>Data</label>
+        <label>Data de Início</label>
         <input type="date" id="inp-ag-data" value="${defaultData}" />
-        <label>Horário (opcional)</label>
-        <input type="time" id="inp-ag-hora" value="${defaultHora}" />
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label>Horário Início</label>
+            <input type="time" id="inp-ag-hora" value="${defaultHora}" />
+          </div>
+          <div>
+            <label>Horário Fim</label>
+            <input type="time" id="inp-ag-hora-fim" value="${defaultHoraFim}" />
+          </div>
+        </div>
+        ${buildRecurrenceFieldsHTML('inp-ag', defaultRec, defaultDias, defaultData, defaultFimRec)}
         <label>Descrição</label>
-        <input type="text" id="inp-ag-texto" value="${defaultTexto}" placeholder="Ex: Reunião escolar, consulta..." />
+        <input type="text" id="inp-ag-texto" value="${escapeHTML(defaultTexto)}" placeholder="Ex: Natação, Reunião escolar, Consulta..." />
       `, () => {
         const categoria = normalizeCategoriaName(document.getElementById('inp-ag-cat').value);
         const data = document.getElementById('inp-ag-data').value;
         const hora = document.getElementById('inp-ag-hora').value;
+        const horaFim = document.getElementById('inp-ag-hora-fim').value;
+        const { recorrencia, diasSemana, dataFimRecorrencia } = readRecurrenceValues('inp-ag', data);
         const texto = document.getElementById('inp-ag-texto').value.trim();
-        if (!data || !texto) return;
+        if (!data || !texto) {
+          showToast('Preencha a data e a descrição.', true);
+          return false;
+        }
+        if (hora && horaFim && horaFim < hora) {
+          showToast('O horário de fim não pode ser anterior ao de início.', true);
+          return false;
+        }
         if (isEdit) {
           existing.categoria = categoria;
           existing.data = data;
           existing.hora = hora;
+          existing.horaFim = horaFim;
+          existing.recorrencia = recorrencia;
+          existing.diasSemana = diasSemana;
+          existing.dataFimRecorrencia = dataFimRecorrencia;
           existing.texto = texto;
         } else {
-          appState.agenda.push({ id: Date.now(), categoria, data, hora, texto });
+          appState.agenda.push({
+            id: Date.now(),
+            categoria,
+            data,
+            hora,
+            horaFim,
+            recorrencia,
+            diasSemana,
+            dataFimRecorrencia,
+            texto
+          });
         }
         selectedDateISO = data;
         const dt = parseISODate(data);
         calYear = dt.getFullYear();
         calMonth = dt.getMonth();
         saveState();
+        showToast(recorrencia !== 'nenhuma' ? 'Evento recorrente salvo!' : 'Evento salvo!');
       });
     }
 
@@ -3184,9 +3639,11 @@
     }
 
     function deleteAgenda(idx) {
-      if (!confirm('Excluir este compromisso da agenda?')) return;
-      appState.agenda.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Evento', 'Deseja excluir este evento (e suas repetições, se houver)?', () => {
+        appState.agenda.splice(idx, 1);
+        saveState();
+        showToast('Evento excluído.');
+      }, 'Excluir');
     }
 
     function openModalMercado(editIdx = null) {
@@ -3218,9 +3675,11 @@
     }
 
     function deleteMercado(idx) {
-      if (!confirm('Excluir este item da lista?')) return;
-      appState.mercado.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Item', 'Deseja remover este item da lista compartilhada?', () => {
+        appState.mercado.splice(idx, 1);
+        saveState();
+        showToast('Item removido.');
+      }, 'Excluir');
     }
 
     function openModalDespesa() {
@@ -3249,7 +3708,7 @@
         const pagoPor = document.getElementById('inp-desp-pago').value || 'Paulo';
         const status = document.getElementById('inp-desp-status').value || 'pendente';
         if (!titulo || isNaN(valor) || valor <= 0) {
-          alert('Preencha a descrição e um valor válido.');
+          showToast('Preencha a descrição e um valor válido.', true);
           return false;
         }
         if (!Array.isArray(appState.despesas)) appState.despesas = [];
@@ -3262,6 +3721,7 @@
           status
         });
         saveState();
+        showToast('Despesa registrada!');
       });
     }
 
@@ -3270,12 +3730,15 @@
       if (!d) return;
       d.status = 'aprovada';
       saveState();
+      showToast('Despesa aprovada!');
     }
 
     function deleteDespesa(idx) {
-      if (!confirm('Excluir esta despesa?')) return;
-      appState.despesas.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Excluir Despesa', 'Deseja excluir esta despesa compartilhada?', () => {
+        appState.despesas.splice(idx, 1);
+        saveState();
+        showToast('Despesa excluída.');
+      }, 'Excluir');
     }
 
     function buildRemedioFormHTML(rem = null) {
@@ -3343,9 +3806,11 @@
     function deleteRemedio(idx) {
       const rem = appState.saude.remedios[idx];
       if (!rem) return;
-      if (!confirm(`Remover "${rem.nome}" da lista de remédios ativos?`)) return;
-      appState.saude.remedios.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Remover Remédio', `Deseja remover "${rem.nome}" da lista de remédios ativos?`, () => {
+        appState.saude.remedios.splice(idx, 1);
+        saveState();
+        showToast('Remédio removido.');
+      }, 'Remover');
     }
 
     function registrarDoseRemedio(idx) {
@@ -3366,6 +3831,7 @@
         obs: ''
       });
       saveState();
+      showToast(`Dose de ${rem.nome} registrada!`);
     }
 
     function openModalLancarDoseAvulsa() {
@@ -3375,10 +3841,10 @@
 
       openSheet('Lançar Dose no Histórico', `
         <label>Remédio / Medicamento</label>
-        <input type="text" id="inp-dose-rem" value="${defaultNome}" placeholder="Ex: Dipirona 20 gotas" />
+        <input type="text" id="inp-dose-rem" value="${escapeHTML(defaultNome)}" placeholder="Ex: Dipirona 20 gotas" />
         ${remedios.length > 0 ? `
           <div class="chip-group">
-            ${remedios.map(r => `<button type="button" class="chip-opt" onclick="document.getElementById('inp-dose-rem').value='${r.nome.replace(/'/g, "\\'")}'">${r.nome}</button>`).join('')}
+            ${remedios.map(r => `<button type="button" class="chip-opt" onclick="document.getElementById('inp-dose-rem').value='${escapeJSArg(r.nome)}'">${escapeHTML(r.nome)}</button>`).join('')}
           </div>
         ` : ''}
         <label>Data e Hora da Dose</label>
@@ -3478,11 +3944,13 @@
     function deleteDoseHistorico(idx) {
       const item = appState.saude.historicoDoses[idx];
       if (!item) return;
-      if (!confirm(`Excluir o registro de "${item.remedioNome}" (${formatDoseDisplay(item.timestamp)})?`)) return;
-      const nomeRem = item.remedioNome;
-      appState.saude.historicoDoses.splice(idx, 1);
-      recalculateRemedioLastDoseFromHistory(nomeRem);
-      saveState();
+      openConfirmSheet('Excluir Registro de Dose', `Deseja excluir o registro de "${item.remedioNome}" (${formatDoseDisplay(item.timestamp)})?`, () => {
+        const nomeRem = item.remedioNome;
+        appState.saude.historicoDoses.splice(idx, 1);
+        recalculateRemedioLastDoseFromHistory(nomeRem);
+        saveState();
+        showToast('Registro de dose excluído.');
+      }, 'Excluir');
     }
 
     function openModalFicha() {
@@ -3526,9 +3994,11 @@
     }
 
     function deleteVacina(idx) {
-      if (!confirm('Remover este item da carteirinha?')) return;
-      appState.saude.vacinasLista.splice(idx, 1);
-      saveState();
+      openConfirmSheet('Remover Vacina', 'Deseja remover este item da carteirinha de vacinas?', () => {
+        appState.saude.vacinasLista.splice(idx, 1);
+        saveState();
+        showToast('Item removido da carteirinha.');
+      }, 'Remover');
     }
 
     function openModalMissao(editIdx = null) {
@@ -3585,11 +4055,22 @@
     function deleteMissao(idx) {
       const m = appState.missoes[idx];
       if (!m) return;
-      if (!confirm(`Excluir a missão "${m.titulo}"?`)) return;
-      appState.missoes.splice(idx, 1);
-      syncTodayMissionHistory();
-      saveState();
+      openConfirmSheet('Excluir Missão', `Deseja excluir a missão "${m.titulo}"?`, () => {
+        appState.missoes.splice(idx, 1);
+        syncTodayMissionHistory();
+        saveState();
+        showToast('Missão excluída.');
+      }, 'Excluir');
     }
+
+    // Atualiza alertas de horários de remédios automaticamente a cada minuto
+    setInterval(() => {
+      if (getActiveProfileMode() === 'Adult' && activeAdultTab === 'saude') {
+        renderSaude();
+      } else if (getActiveProfileMode() === 'Apoio') {
+        renderApoio();
+      }
+    }, 60000);
 
     initProfile();
   </script>
