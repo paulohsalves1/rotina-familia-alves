@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Família Alves · Rotina & Missões</title>
   <meta name="theme-color" content="#4A7C59" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Família Alves" />
+  <link id="pwa-manifest-link" rel="manifest" />
+  <link id="apple-touch-icon-link" rel="apple-touch-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -49,6 +55,20 @@
     .btn-profile:hover { border-color: var(--primary); background: var(--primary-soft); }
     .btn-profile.duda { background: var(--primary-soft); border-color: #B8D8C2; color: var(--primary-dark); font-family: 'Nunito', sans-serif; font-weight: 900; }
     .btn-profile.apoio { background: var(--accent-soft); border-color: #F0CFC2; color: #8A452B; }
+    .btn-install-gate {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 11px 14px; margin-top: 14px; border-radius: 16px;
+      border: 1.5px dashed #B8D8C2; background: var(--note-bg); color: var(--primary-dark);
+      font-size: 13px; font-weight: 800; cursor: pointer; transition: background 0.15s ease;
+    }
+    .btn-install-gate:hover { background: var(--primary-soft); }
+    .install-steps-box {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 16px;
+      padding: 13px 14px; margin-top: 10px; text-align: left; font-size: 13px;
+    }
+    .install-steps-box strong { color: var(--primary-dark); display: block; margin-bottom: 6px; font-size: 14px; }
+    .install-steps-box ol { padding-left: 18px; color: var(--text-main); }
+    .install-steps-box li { margin-bottom: 5px; }
 
     .modal-box input {
       width: 164px; font-size: 24px; text-align: center; letter-spacing: 8px; padding: 11px;
@@ -89,18 +109,18 @@
     /* HEADER ADULTO & INDICADOR DE SYNC */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 16px 12px; background: rgba(250, 248, 245, 0.95);
+      padding: 16px 18px 14px; background: rgba(250, 248, 245, 0.96);
       backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 10;
+      position: sticky; top: 0; z-index: 10; gap: 10px;
     }
-    .user-sync-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    .user-sync-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
     .badge-user { font-size: 11px; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 0.5px; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
     .sync-dot.online { background: var(--primary); box-shadow: 0 0 6px rgba(74, 124, 89, 0.55); }
     .sync-dot.offline { background: var(--accent); }
 
-    .app-header h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
-    .header-actions { display: flex; gap: 7px; align-items: center; }
+    .app-header h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.25; }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
     .btn-icon-lock {
       background: var(--card-bg); border: 1.5px solid var(--border); color: var(--text-muted);
       padding: 8px 11px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer;
@@ -113,14 +133,14 @@
     .btn-duda-switch:active { transform: scale(0.97); }
 
     /* CONTEÚDO E CARDS */
-    .app-content { padding: 12px 16px 96px; max-width: 520px; margin: 0 auto; }
+    .app-content { padding: 18px 16px 104px; max-width: 520px; margin: 0 auto; }
     .tab-view { display: none; }
     .tab-view.active { display: block; }
 
     /* SELETOR DE DIA NA ABA HOJE */
     .day-switcher-bar {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      background: var(--card-bg); border-radius: 18px; padding: 10px 12px; margin-bottom: 14px;
+      background: var(--card-bg); border-radius: 18px; padding: 10px 12px; margin-bottom: 16px;
       border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(31, 41, 51, 0.03);
     }
     .day-nav-btn {
@@ -427,20 +447,20 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(10px); border-top: 1px solid var(--border);
-      display: flex; justify-content: space-around; padding: 8px 0 12px; z-index: 20;
+      display: flex; justify-content: space-around; padding: 10px 6px 14px; z-index: 20;
     }
     .nav-item {
-      background: none; border: none; display: flex; flex-direction: column; align-items: center;
-      color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 2px 12px; border-radius: 12px;
+      background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 5px 14px; border-radius: 14px; gap: 3px;
     }
-    .nav-item small { font-size: 11px; font-weight: 700; margin-top: 2px; }
+    .nav-item small { font-size: 11px; font-weight: 700; margin-top: 1px; }
     .nav-item.active { color: var(--primary-dark); background: var(--primary-soft); }
 
     /* TEMA INFANTIL (MODO DUDA) */
-    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%); padding: 16px 16px 60px; font-family: 'Nunito', sans-serif; }
+    .duda-theme { min-height: 100vh; background: linear-gradient(180deg, #FBF8F1 0%, #EEF5F0 100%); padding: 18px 16px 64px; font-family: 'Nunito', sans-serif; }
     .duda-theme * { font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif; }
     .duda-content { max-width: 520px; margin: 0 auto; }
-    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .duda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; max-width: 520px; margin-left: auto; margin-right: auto; gap: 10px; }
     .duda-header h1 { font-size: 25px; color: var(--text-main); font-weight: 900; }
     .btn-lock {
       background: var(--card-bg); border: 1.5px solid var(--border); padding: 9px 14px;
@@ -572,6 +592,7 @@
       <button type="button" class="btn-profile" onclick="requestAdultProfile('Isabela')">👩 Isabela</button>
       <button type="button" class="btn-profile apoio" onclick="selectPublicProfile('Apoio')">👵 Rede de Apoio (Consulta)</button>
       <button type="button" class="btn-profile duda" onclick="selectPublicProfile('Duda')">🌟 Duda (Modo Missões)</button>
+      <button type="button" id="gate-install-btn" class="btn-install-gate" onclick="triggerInstallApp()">📲 Instalar App no Celular</button>
     </div>
   </div>
 
@@ -864,9 +885,12 @@
         <div class="card">
           <div class="card-header">
             <h2>⚙️ Configurações & Segurança</h2>
-            <button type="button" class="btn-mini" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
+            <div class="btn-group-mini">
+              <button type="button" class="btn-mini" onclick="triggerInstallApp()">📲 Instalar App</button>
+              <button type="button" class="btn-mini" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
+            </div>
           </div>
-          <p class="hint">Cada responsável tem sua própria senha de 4 dígitos (padrão inicial: 1234). Ao fechar o app ou abrir por link, a senha será exigida.</p>
+          <p class="hint">Instale na tela inicial do celular para abrir em tela cheia como aplicativo. Cada responsável tem sua própria senha de 4 dígitos (padrão: 1234).</p>
           <div class="row-buttons">
             <button type="button" class="btn-secondary" onclick="switchAdultProfile('Paulo')">🧔🏾 Paulo</button>
             <button type="button" class="btn-secondary" onclick="switchAdultProfile('Isabela')">👩 Isabela</button>
@@ -947,9 +971,136 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
-    // ============================================================================
-    // 1. CONFIGURAÇÃO DO FIREBASE
-    // ============================================================================
+    // =========================================================================
+    // SUPORTE PWA (MANIFEST DINÂMICO, ÍCONE SVG & INSTALAÇÃO NO CELULAR)
+    // =========================================================================
+    let deferredInstallPrompt = null;
+
+    function initPWA() {
+      const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <rect width="512" height="512" rx="112" fill="#4A7C59"/>
+        <path d="M256 112L108 236h44v156h84v-96h40v96h84V236h44L256 112z" fill="#FAF8F5"/>
+        <circle cx="372" cy="144" r="32" fill="#FACC15"/>
+      </svg>`;
+      const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(iconSvg);
+
+      const appleIconEl = document.getElementById('apple-touch-icon-link');
+      if (appleIconEl) appleIconEl.href = iconUrl;
+
+      const manifestData = {
+        name: "Família Alves · Rotina & Missões",
+        short_name: "Família Alves",
+        description: "Rotina compartilhada, saúde e missões da Família Alves",
+        start_url: window.location.href.split('#')[0],
+        display: "standalone",
+        orientation: "portrait",
+        background_color: "#FAF8F5",
+        theme_color: "#4A7C59",
+        icons: [
+          {
+            src: iconUrl,
+            sizes: "512x512",
+            type: "image/svg+xml",
+            purpose: "any maskable"
+          }
+        ]
+      };
+
+      const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/manifest+json' });
+      const manifestLink = document.getElementById('pwa-manifest-link');
+      if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+
+      if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+        const swCode = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', (e) => {});
+        `;
+        try {
+          const swBlob = new Blob([swCode], { type: 'application/javascript' });
+          navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        } catch (err) {}
+      }
+
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone) {
+        const gateBtn = document.getElementById('gate-install-btn');
+        if (gateBtn) gateBtn.classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const gateBtn = document.getElementById('gate-install-btn');
+      if (gateBtn) gateBtn.textContent = '📲 Instalar App Agora (1 Toque)';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      const gateBtn = document.getElementById('gate-install-btn');
+      if (gateBtn) gateBtn.classList.add('hidden');
+    });
+
+    async function triggerInstallApp() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          deferredInstallPrompt = null;
+        }
+        return;
+      }
+
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isAndroid = /android/i.test(navigator.userAgent);
+
+      let guideHTML = '';
+      if (isIOS) {
+        guideHTML = `
+          <div class="install-steps-box">
+            <strong>🍎 Como instalar no iPhone / iPad:</strong>
+            <ol>
+              <li>Abra este link no navegador <strong>Safari</strong>.</li>
+              <li>Toque no botão <strong>Compartilhar</strong> (quadrado com seta para cima, na barra inferior).</li>
+              <li>Role para baixo e toque em <strong>"Adicionar à Tela de Início"</strong>.</li>
+              <li>Toque em <strong>Adicionar</strong> no canto superior direito.</li>
+            </ol>
+          </div>
+        `;
+      } else if (isAndroid) {
+        guideHTML = `
+          <div class="install-steps-box">
+            <strong>🤖 Como instalar no Android:</strong>
+            <ol>
+              <li>Abra este link no <strong>Google Chrome</strong>.</li>
+              <li>Toque no menu <strong>⋮</strong> (três pontinhos no canto superior direito).</li>
+              <li>Toque em <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+              <li>Confirme tocando em <strong>Instalar</strong>.</li>
+            </ol>
+          </div>
+        `;
+      } else {
+        guideHTML = `
+          <div class="install-steps-box">
+            <strong>📱 Como instalar no celular ou computador:</strong>
+            <ol>
+              <li><strong>Android (Chrome):</strong> toque em <strong>⋮</strong> → <strong>Instalar aplicativo</strong>.</li>
+              <li><strong>iPhone (Safari):</strong> toque em <strong>Compartilhar</strong> → <strong>Adicionar à Tela de Início</strong>.</li>
+              <li><strong>Computador (Chrome/Edge):</strong> clique no ícone de instalação na barra de endereço.</li>
+            </ol>
+          </div>
+        `;
+      }
+
+      openSheet('📲 Instalar Família Alves no Celular', `
+        <p class="hint">Instale na tela inicial para abrir em tela cheia, sem barra do navegador e com acesso rápido para toda a família.</p>
+        ${guideHTML}
+      `, () => {}, { hideSave: true, cancelLabel: 'Entendi' });
+    }
+
+    initPWA();
+
     const firebaseConfig = {
       apiKey: "AIzaSyDytzPCQOItH7iUSSRwDAdMA7u1znNBIz4",
       authDomain: "rotina-familia-alves.firebaseapp.com",
@@ -979,9 +1130,6 @@
       }
     }
 
-    // ============================================================================
-    // 2. UTILITÁRIOS DE DATA, SEMANA (SEG A DOM) E HORA
-    // ============================================================================
     function toISODate(dt) {
       const y = dt.getFullYear();
       const m = String(dt.getMonth() + 1).padStart(2, '0');
@@ -1052,9 +1200,6 @@
       return `${formatDateBR(itemISO)} às ${hora}`;
     }
 
-    // ============================================================================
-    // 3. INTEGRANTES DA FAMÍLIA & PALETA DE CORES
-    // ============================================================================
     const MEMBER_PALETTES = [
       { bg: '#EBF3EE', text: '#365E42', dot: '#4A7C59' },
       { bg: '#FDF3EF', text: '#9C4B31', dot: '#C96A48' },
@@ -1098,9 +1243,6 @@
       };
     }
 
-    // ============================================================================
-    // 4. ESTADO INICIAL E MIGRAÇÃO DE DADOS
-    // ============================================================================
     const todayStr = getTodayISO();
 
     function createDefaultState() {
@@ -1439,9 +1581,6 @@
       });
     }
 
-    // ============================================================================
-    // 5. CONTROLE DE PERFIS & SEGURANÇA POR SENHA
-    // ============================================================================
     let pendingAdultTarget = null;
     let modalSelectedWho = 'Paulo';
 
@@ -1615,9 +1754,6 @@
       });
     }
 
-    // ============================================================================
-    // 6. NAVEGAÇÃO ENTRE ABAS, FILTROS POR INTEGRANTE E CALENDÁRIO MENSAL
-    // ============================================================================
     function switchTab(tabId, title, btn) {
       activeAdultTab = tabId;
       document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
@@ -1834,9 +1970,6 @@
       grid.innerHTML = html;
     }
 
-    // ============================================================================
-    // 7. RENDERIZAÇÃO DAS TELAS (HOJE, FAMÍLIA, SAÚDE, DUDA, APOIO & ADMIN)
-    // ============================================================================
     function renderAll() {
       renderActiveView(true);
     }
@@ -2263,9 +2396,6 @@
       `;
     }
 
-    // ============================================================================
-    // 8. MISSÕES, HISTÓRICO SEMANAL (SEG A DOM), TRANSPARÊNCIA E DESEJOS
-    // ============================================================================
     function getDayMissionStats(dateISO) {
       const hoje = getTodayISO();
       const totalDefault = (appState.missoes || []).length;
@@ -2778,9 +2908,6 @@
       saveState();
     }
 
-    // ============================================================================
-    // 9. BOTTOM SHEET E FORMULÁRIOS (INCLUINDO PARES UNIFICADOS CRIAR/EDITAR)
-    // ============================================================================
     let currentSheetSaveHandler = null;
 
     function openSheet(title, bodyHTML, onSave, opts = {}) {
@@ -2844,7 +2971,6 @@
       `;
     }
 
-    // --- LOGÍSTICA DO DIA SELECIONADO NA ABA HOJE ---
     function openModalLogistica() {
       const logDia = getDayLogistica(hojeSelectedDateISO);
       const members = appState.integrantes || DEFAULT_INTEGRANTES;
@@ -2881,7 +3007,6 @@
       buscaEl.value = temp;
     }
 
-    // --- COMPROMISSO INDIVIDUAL / DO DIA (UNIFICADO CRIAR & EDITAR) ---
     function openModalCasal(editIdx = null) {
       const isEdit = editIdx !== null && appState.casalHoje[editIdx];
       const existing = isEdit ? appState.casalHoje[editIdx] : null;
@@ -2920,7 +3045,6 @@
       saveState();
     }
 
-    // --- PENDÊNCIAS (UNIFICADO CRIAR & EDITAR) ---
     function openModalPendencia(editIdx = null) {
       const isEdit = editIdx !== null && appState.pendencias[editIdx];
       const existing = isEdit ? appState.pendencias[editIdx] : null;
@@ -2959,7 +3083,6 @@
       saveState();
     }
 
-    // --- MURAL (UNIFICADO CRIAR & EDITAR) ---
     function openModalMural(editIdx = null) {
       const isEdit = editIdx !== null && appState.mural[editIdx];
       const existing = isEdit ? appState.mural[editIdx] : null;
@@ -2999,7 +3122,6 @@
       saveState();
     }
 
-    // --- AGENDA DO CALENDÁRIO (UNIFICADO CRIAR & EDITAR) ---
     function openModalAgenda(editIdx = null) {
       const isEdit = editIdx !== null && appState.agenda[editIdx];
       const existing = isEdit ? appState.agenda[editIdx] : null;
@@ -3049,7 +3171,6 @@
       saveState();
     }
 
-    // --- MERCADO (UNIFICADO CRIAR & EDITAR) ---
     function openModalMercado(editIdx = null) {
       const isEdit = editIdx !== null && appState.mercado[editIdx];
       const existing = isEdit ? appState.mercado[editIdx] : null;
@@ -3084,7 +3205,6 @@
       saveState();
     }
 
-    // --- DESPESAS COMPARTILHADAS ---
     function openModalDespesa() {
       const activeUser = sessionStorage.getItem('familia_alves_session_profile') === 'Isabela' ? 'Isabela' : 'Paulo';
       openSheet('Nova Despesa Compartilhada', `
@@ -3140,7 +3260,6 @@
       saveState();
     }
 
-    // --- SAÚDE: MÚLTIPLOS REMÉDIOS, HISTÓRICO DE DOSES, FICHA & VACINAS ---
     function buildRemedioFormHTML(rem = null) {
       const nome = rem ? rem.nome : '';
       const intervalo = rem ? (rem.intervaloHoras || 6) : 6;
@@ -3394,7 +3513,6 @@
       saveState();
     }
 
-    // --- MISSÕES (UNIFICADO CRIAR & EDITAR) ---
     function openModalMissao(editIdx = null) {
       const isEdit = editIdx !== null && appState.missoes[editIdx];
       const existing = isEdit ? appState.missoes[editIdx] : null;
