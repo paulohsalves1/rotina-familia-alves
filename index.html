@@ -1101,7 +1101,7 @@
     try {
       if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
         firebase.initializeApp(firebaseConfig);
-        db = firebase.database().ref('familia_alves_rotina');
+        db = firebase.database().ref('familia_alves');
       }
     } catch (e) {
       console.warn("Firebase offline:", e);
