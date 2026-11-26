@@ -154,6 +154,25 @@
     .sheet-actions button { flex: 1; padding: 13px; font-size: 15px; }
     .sheet-actions button:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    /* PONTE FINANÇAS (BADGES & BOTÕES) */
+    .btn-bridge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--primary-soft); color: var(--primary-dark); border: 1px solid var(--primary-border);
+      padding: 4px 9px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer;
+      transition: opacity 0.12s ease, transform 0.1s ease; white-space: nowrap;
+    }
+    .btn-bridge:active { transform: scale(0.96); }
+    .btn-bridge.sent {
+      background: var(--pill-bg); color: var(--text-muted); border-color: var(--border);
+    }
+    .bridge-summary-card {
+      background: var(--primary-soft); border: 1.5px solid var(--primary-border);
+      border-radius: 16px; padding: 12px 14px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .bridge-summary-card strong { font-size: 14px; color: var(--primary-dark); display: block; }
+    .bridge-summary-card small { font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-top: 2px; }
+
     /* TOAST DE FEEDBACK NÃO-INTRUSIVO */
     .app-toast {
       position: fixed;
@@ -270,7 +289,7 @@
       border-bottom: 1px solid var(--border-subtle); font-size: 14px; cursor: pointer; gap: 8px;
     }
     .check-item:last-child { border-bottom: none; }
-    .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
+    .check-item.done span.item-text-main { text-decoration: line-through; color: var(--text-muted); }
     .valor-pill {
       font-size: 11px; font-weight: 700; background: var(--pill-bg); color: var(--pill-text);
       padding: 2px 8px; border-radius: 8px; margin-left: 6px;
@@ -825,7 +844,10 @@
         <div class="card">
           <div class="card-header">
             <h2>🛒 Lista Compartilhada</h2>
-            <button type="button" class="btn-mini" onclick="openModalMercado()">+ Item</button>
+            <div class="btn-group-mini">
+              <button type="button" class="btn-mini" onclick="openBridgeFromMercado()" title="Enviar fechamento das compras ao Finanças">💸 Fechar Compra</button>
+              <button type="button" class="btn-mini" onclick="openModalMercado()">+ Item</button>
+            </div>
           </div>
           <div id="mercado-list" class="check-list"></div>
         </div>
@@ -846,6 +868,7 @@
           <div class="card-header">
             <h2>💊 Remédios Ativos</h2>
             <div class="btn-group-mini">
+              <button type="button" class="btn-mini" onclick="openBridgeFromSaude()" title="Lançar gasto com farmácia ou consulta no Finanças">💸 Gasto Saúde</button>
               <button type="button" class="btn-mini" onclick="openModalNovoRemedio()">+ Remédio</button>
               <button type="button" class="btn-mini" onclick="openModalLancarDoseAvulsa()">+ Dose</button>
             </div>
@@ -1085,7 +1108,7 @@
 
   <script>
     // ============================================================================
-    // 1. CONFIGURAÇÃO DO FIREBASE (PRESERVADA)
+    // 1. CONFIGURAÇÃO DO FIREBASE (ROTINA) & PONTE FINANÇAS (REST)
     // ============================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyDytzPCQOItH7iUSSRwDAdMA7u1znNBIz4",
@@ -1095,6 +1118,11 @@
       storageBucket: "rotina-familia-alves.firebasestorage.app",
       messagingSenderId: "809425013156",
       appId: "1:809425013156:web:71b324195a355ac29ad931"
+    };
+
+    const FINANCAS_BRIDGE_CONFIG = {
+      dbUrl: "https://financas-paulo-isabela-default-rtdb.firebaseio.com",
+      roomCode: "23250gros"
     };
 
     let db = null;
@@ -1138,7 +1166,7 @@
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
         el.classList.remove('show');
-      }, 2800);
+      }, 3000);
     }
 
     function showSheetError(msg) {
@@ -1190,6 +1218,17 @@
       return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
+    function parseCurrencyTextToNumber(str) {
+      if (typeof str === 'number') return str;
+      if (!str) return 0;
+      const cleaned = String(str)
+        .replace(/[R$\s]/g, '')
+        .replace(/\./g, '')
+        .replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    }
+
     function getMondayOfWeekISO(isoStr) {
       const d = parseISOToLocalDate(isoStr);
       const day = d.getDay();
@@ -1231,8 +1270,8 @@
       },
       logisticaPorDia: {},
       pendencias: [
-        { id: 1, texto: "Separar uniforme da natação da Duda", done: false },
-        { id: 2, texto: "Confirmar pediatra quinta-feira", done: true }
+        { id: 1, texto: "Separar uniforme da natação da Duda", valor: "", done: false, enviadoFinanceiro: false },
+        { id: 2, texto: "Confirmar pediatra quinta-feira", valor: "", done: true, enviadoFinanceiro: false }
       ],
       mural: [
         { id: 1, autor: "Isabela", texto: "Comprei frutas e iogurte pro lanche da escola 🍓", date: todayISO },
@@ -1247,8 +1286,8 @@
         { id: 2, item: "Banana prata", valor: "R$ 7,50", done: false }
       ],
       despesas: [
-        { id: 101, date: todayISO, descricao: "Feira e frutas da semana", valor: 86.50, pagoPor: "Isabela", dividido: true, status: "aprovada" },
-        { id: 102, date: todayISO, descricao: "Farmácia · Xarope e soro", valor: 54.00, pagoPor: "Paulo", dividido: true, status: "pendente" }
+        { id: 101, date: todayISO, descricao: "Feira e frutas da semana", valor: 86.50, pagoPor: "Isabela", dividido: true, status: "aprovada", enviadoFinanceiro: false },
+        { id: 102, date: todayISO, descricao: "Farmácia · Xarope e soro", valor: 54.00, pagoPor: "Paulo", dividido: true, status: "pendente", enviadoFinanceiro: false }
       ],
       saude: {
         remedios: [
@@ -1424,7 +1463,365 @@
     }
 
     // ============================================================================
-    // 4. CONTROLE DE TEMA (CLARO / ESCURO) E INSTALAÇÃO PWA
+    // 4. PONTE COM APP DE FINANÇAS (financas-paulo-isabela / rooms/23250gros)
+    // ============================================================================
+    let financasCatalogCache = {
+      accounts: ["Carteira", "Reserva Mercado Pago", "Inter"],
+      categories: ["Casa", "Alimentação", "Abastecimento", "Mercado", "Lazer", "Farmácia", "Saúde"]
+    };
+
+    function getFinancasBaseUrl() {
+      return `${FINANCAS_BRIDGE_CONFIG.dbUrl}/rooms/${FINANCAS_BRIDGE_CONFIG.roomCode}`;
+    }
+
+    function normalizeFirebaseList(raw) {
+      if (!raw) return [];
+      if (Array.isArray(raw)) return raw.filter(Boolean);
+      if (typeof raw === 'object') return Object.values(raw).filter(Boolean);
+      return [];
+    }
+
+    async function fetchFinancasCatalog() {
+      const base = getFinancasBaseUrl();
+      try {
+        const [accRes, catRes] = await Promise.all([
+          fetch(`${base}/accounts.json`),
+          fetch(`${base}/categories.json`)
+        ]);
+
+        const accRaw = accRes.ok ? await accRes.json() : null;
+        const catRaw = catRes.ok ? await catRes.json() : null;
+
+        const accList = normalizeFirebaseList(accRaw)
+          .map(a => (typeof a === 'string' ? a : (a && a.name)))
+          .filter(Boolean);
+
+        const accounts = ["Carteira"];
+        accList.forEach(name => {
+          if (!accounts.some(x => x.toLowerCase() === name.toLowerCase())) {
+            accounts.push(name);
+          }
+        });
+
+        const catList = normalizeFirebaseList(catRaw)
+          .map(c => (typeof c === 'string' ? c : (c && c.name)))
+          .filter(Boolean);
+
+        const categories = catList.length > 0 ? catList : financasCatalogCache.categories;
+        financasCatalogCache = { accounts, categories, loadedFromCloud: catList.length > 0 };
+        return financasCatalogCache;
+      } catch (err) {
+        console.warn("Falha ao buscar catálogo do Finanças:", err);
+        return { ...financasCatalogCache, loadedFromCloud: false };
+      }
+    }
+
+    function inferFinancasCategory(descricao, availableCategories, fallbackHint = '') {
+      const list = Array.isArray(availableCategories) ? availableCategories : [];
+      if (!list.length) return fallbackHint || 'Casa';
+
+      if (fallbackHint) {
+        const exactHint = list.find(c => c.toLowerCase() === fallbackHint.toLowerCase());
+        if (exactHint) return exactHint;
+      }
+
+      const text = String(descricao || '').toLowerCase();
+      const keywordRules = [
+        { keys: ['gasolina', 'etanol', 'diesel', 'combustível', 'combustivel', 'posto', 'abastecimento'], targets: ['Abastecimento'] },
+        { keys: ['mercado', 'supermercado', 'feira', 'hortifruti', 'açougue', 'acougue', 'compras'], targets: ['Mercado', 'Alimentação'] },
+        { keys: ['restaurante', 'lanche', 'pizza', 'padaria', 'café', 'cafe', 'almoço', 'almoco', 'jantar', 'ifood', 'sorvete'], targets: ['Alimentação', 'Lazer'] },
+        { keys: ['farmácia', 'farmacia', 'remédio', 'remedio', 'xarope', 'antibiótico', 'antibiotico', 'dipirona', 'soro', 'pomada'], targets: ['Farmácia', 'Saúde'] },
+        { keys: ['pediatra', 'médico', 'medico', 'consulta', 'exame', 'dentista', 'vacina', 'hospital', 'saúde', 'saude'], targets: ['Saúde', 'Farmácia'] },
+        { keys: ['cinema', 'parque', 'passeio', 'viagem', 'brinquedo', 'lazer', 'ingresso'], targets: ['Lazer'] },
+        { keys: ['luz', 'energia', 'água', 'agua', 'internet', 'aluguel', 'condomínio', 'condominio', 'gás', 'gas', 'casa', 'boleto'], targets: ['Casa'] }
+      ];
+
+      for (const rule of keywordRules) {
+        if (rule.keys.some(k => text.includes(k))) {
+          for (const target of rule.targets) {
+            const match = list.find(c => c.toLowerCase() === target.toLowerCase());
+            if (match) return match;
+          }
+        }
+      }
+
+      const priorityDefaults = ['Casa', 'Mercado', 'Alimentação', 'Saúde'];
+      for (const p of priorityDefaults) {
+        const match = list.find(c => c.toLowerCase() === p.toLowerCase());
+        if (match) return match;
+      }
+      return list[0];
+    }
+
+    function generateFinancasTxId() {
+      const rand = Math.random().toString(36).substring(2, 6);
+      return `tx_${Date.now()}_${rand}`;
+    }
+
+    async function pushTransactionToFinancas(txPayload) {
+      const base = getFinancasBaseUrl();
+      const itemsRes = await fetch(`${base}/items.json`);
+      if (!itemsRes.ok) {
+        throw new Error(`Erro HTTP ${itemsRes.status} ao ler items do Finanças`);
+      }
+      const rawItems = await itemsRes.json();
+
+      let nextIndex = 0;
+      if (Array.isArray(rawItems)) {
+        nextIndex = rawItems.length;
+      } else if (rawItems && typeof rawItems === 'object') {
+        const numericKeys = Object.keys(rawItems)
+          .map(k => Number(k))
+          .filter(n => !isNaN(n));
+        nextIndex = numericKeys.length > 0 ? Math.max(...numericKeys) + 1 : 0;
+      }
+
+      const putRes = await fetch(`${base}/items/${nextIndex}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(txPayload)
+      });
+
+      if (!putRes.ok) {
+        throw new Error(`Erro HTTP ${putRes.status} ao gravar lançamento no Finanças`);
+      }
+
+      await fetch(`${base}/updatedAt.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Date.now())
+      }).catch(() => {});
+
+      return { index: nextIndex, transaction: txPayload };
+    }
+
+    async function openFinancasBridgeModal(options) {
+      const {
+        sourceType = 'manual',
+        sourceId = null,
+        descricao = '',
+        valor = 0,
+        date = getTodayISO(),
+        user = getActiveAdultUser(),
+        categoryHint = '',
+        statusDefault = 'paid',
+        onSuccessCallback = null
+      } = options || {};
+
+      openSheet('💸 Lançar no App de Finanças', `
+        <p class="hint" style="margin:8px 0;">Carregando contas e categorias reais da sala <strong>${escapeHTML(FINANCAS_BRIDGE_CONFIG.roomCode)}</strong>...</p>
+      `, null, 'Cancelar');
+
+      const catalog = await fetchFinancasCatalog();
+      const accounts = catalog.accounts;
+      const categories = catalog.categories;
+      const suggestedCat = inferFinancasCategory(descricao, categories, categoryHint);
+      const validUser = (user === 'Paulo' || user === 'Isabela') ? user : getActiveAdultUser();
+      const initialAmount = Number(valor) > 0 ? Number(valor).toFixed(2) : '';
+
+      openSheet('💸 Lançar no App de Finanças', `
+        <div class="bridge-summary-card">
+          <div>
+            <strong>Destino: Finanças Paulo & Isabela</strong>
+            <small>${catalog.loadedFromCloud
+              ? `✅ ${accounts.length} contas e ${categories.length} categorias sincronizadas`
+              : '⚠️ Usando lista local (verifique conexão com Finanças)'}</small>
+          </div>
+          <span style="font-size:18px;">🔗</span>
+        </div>
+
+        <label>Descrição do Lançamento</label>
+        <input type="text" id="inp-br-desc" value="${escapeHTML(descricao)}" placeholder="Ex: Compras da semana, Posto, Farmácia..." />
+
+        <label>Valor (R$)</label>
+        <input type="number" step="0.01" inputmode="decimal" id="inp-br-amount" value="${escapeHTML(initialAmount)}" placeholder="0,00" />
+
+        <label>Conta (Account)</label>
+        <select id="inp-br-account">
+          ${accounts.map(acc => `<option value="${escapeHTML(acc)}" ${acc === 'Carteira' ? 'selected' : ''}>${escapeHTML(acc)}</option>`).join('')}
+        </select>
+
+        <label>Categoria (Impacta nos Relatórios)</label>
+        <select id="inp-br-category">
+          ${categories.map(cat => `<option value="${escapeHTML(cat)}" ${cat === suggestedCat ? 'selected' : ''}>${escapeHTML(cat)}</option>`).join('')}
+        </select>
+
+        <label>Data</label>
+        <input type="date" id="inp-br-date" value="${escapeHTML(date || getTodayISO())}" />
+
+        <label>Responsável</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${validUser === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-br-user')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${validUser === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-br-user')">👩 Isabela</button>
+        </div>
+        <input type="hidden" id="inp-br-user" value="${escapeHTML(validUser)}" />
+
+        <label>Situação no Finanças</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${statusDefault === 'paid' ? 'selected' : ''}" data-val="paid" onclick="selectChip(this, 'inp-br-status')">✅ Pago (Paid)</button>
+          <button type="button" class="chip-opt ${statusDefault === 'pending' ? 'selected' : ''}" data-val="pending" onclick="selectChip(this, 'inp-br-status')">⏳ Pendente (Pending)</button>
+        </div>
+        <input type="hidden" id="inp-br-status" value="${escapeHTML(statusDefault)}" />
+      `, async () => {
+        const finalDesc = document.getElementById('inp-br-desc').value.trim();
+        const finalAmount = parseFloat(String(document.getElementById('inp-br-amount').value).replace(',', '.'));
+        const finalAccount = document.getElementById('inp-br-account').value;
+        const finalCategory = document.getElementById('inp-br-category').value;
+        const finalDate = document.getElementById('inp-br-date').value || getTodayISO();
+        const finalUser = document.getElementById('inp-br-user').value || 'Paulo';
+        const finalStatus = document.getElementById('inp-br-status').value || 'paid';
+
+        if (!finalDesc) {
+          showSheetError('Informe uma descrição para o lançamento.');
+          return false;
+        }
+        if (isNaN(finalAmount) || finalAmount <= 0) {
+          showSheetError('Informe um valor válido maior que zero.');
+          return false;
+        }
+        if (!finalAccount || !finalCategory) {
+          showSheetError('Selecione a conta e a categoria do Finanças.');
+          return false;
+        }
+
+        const txPayload = {
+          account: finalAccount,
+          amount: Number(finalAmount.toFixed(2)),
+          category: finalCategory,
+          date: finalDate,
+          description: finalDesc,
+          id: generateFinancasTxId(),
+          status: finalStatus,
+          type: 'expense',
+          user: finalUser
+        };
+
+        try {
+          await pushTransactionToFinancas(txPayload);
+          if (typeof onSuccessCallback === 'function') {
+            onSuccessCallback(txPayload);
+          }
+          showToast(`✅ Lançado no Finanças (${finalCategory} · ${formatCurrencyBR(finalAmount)})!`);
+          return true;
+        } catch (err) {
+          console.error(err);
+          showSheetError('Não foi possível gravar no Finanças. Verifique a internet ou as regras da sala.');
+          return false;
+        }
+      });
+
+      const saveBtn = document.getElementById('sheet-save-btn');
+      if (saveBtn) saveBtn.textContent = '💸 Enviar ao Finanças';
+    }
+
+    function openBridgeFromDespesa(despesaId) {
+      const d = (appState.despesas || []).find(x => x.id === despesaId);
+      if (!d) return;
+
+      const proceed = () => {
+        openFinancasBridgeModal({
+          sourceType: 'despesa',
+          sourceId: d.id,
+          descricao: d.descricao,
+          valor: d.valor,
+          date: d.date || getTodayISO(),
+          user: d.pagoPor || getActiveAdultUser(),
+          statusDefault: 'paid',
+          onSuccessCallback: (tx) => {
+            d.enviadoFinanceiro = true;
+            d.financeiroTxId = tx.id;
+            d.financeiroMeta = `${tx.category} · ${tx.account}`;
+            saveState(['despesas']);
+          }
+        });
+      };
+
+      if (d.enviadoFinanceiro) {
+        openConfirmSheet(
+          'Despesa já enviada',
+          `Esta despesa já foi lançada no App de Finanças (${d.financeiroMeta || 'enviada'}). Deseja lançar novamente mesmo assim?`,
+          proceed,
+          'Enviar Novamente',
+          false
+        );
+      } else {
+        proceed();
+      }
+    }
+
+    function openBridgeFromPendencia(pendId) {
+      const p = (appState.pendencias || []).find(x => x.id === pendId);
+      if (!p) return;
+
+      const proceed = () => {
+        openFinancasBridgeModal({
+          sourceType: 'pendencia',
+          sourceId: p.id,
+          descricao: p.texto,
+          valor: parseCurrencyTextToNumber(p.valor),
+          date: getTodayISO(),
+          user: getActiveAdultUser(),
+          statusDefault: p.done ? 'paid' : 'pending',
+          onSuccessCallback: (tx) => {
+            p.enviadoFinanceiro = true;
+            p.financeiroTxId = tx.id;
+            p.financeiroMeta = `${tx.category} · ${tx.account}`;
+            if (!p.valor) p.valor = formatCurrencyBR(tx.amount);
+            saveState(['pendencias']);
+          }
+        });
+      };
+
+      if (p.enviadoFinanceiro) {
+        openConfirmSheet(
+          'Tarefa já enviada',
+          `Esta pendência já foi enviada ao App de Finanças (${p.financeiroMeta || 'enviada'}). Deseja enviar novamente?`,
+          proceed,
+          'Enviar Novamente',
+          false
+        );
+      } else {
+        proceed();
+      }
+    }
+
+    function openBridgeFromMercado() {
+      const lista = appState.mercado || [];
+      const marcados = lista.filter(i => i.done);
+      const baseItens = marcados.length > 0 ? marcados : lista;
+      let somaEstimada = 0;
+      baseItens.forEach(i => {
+        somaEstimada += parseCurrencyTextToNumber(i.valor);
+      });
+      const qtdTexto = baseItens.length > 0 ? ` (${baseItens.length} ${baseItens.length === 1 ? 'item' : 'itens'})` : '';
+
+      openFinancasBridgeModal({
+        sourceType: 'mercado',
+        descricao: `Compras Mercado${qtdTexto}`,
+        valor: somaEstimada,
+        date: getTodayISO(),
+        user: getActiveAdultUser(),
+        categoryHint: 'Mercado',
+        statusDefault: 'paid'
+      });
+    }
+
+    function openBridgeFromSaude() {
+      const ativos = appState.saude.remedios || [];
+      const descPadrao = ativos.length > 0 ? `Farmácia · ${ativos[0].nome}` : 'Farmácia / Saúde Duda';
+      openFinancasBridgeModal({
+        sourceType: 'saude',
+        descricao: descPadrao,
+        valor: 0,
+        date: getTodayISO(),
+        user: getActiveAdultUser(),
+        categoryHint: 'Farmácia',
+        statusDefault: 'paid'
+      });
+    }
+
+    // ============================================================================
+    // 5. CONTROLE DE TEMA (CLARO / ESCURO) E INSTALAÇÃO PWA
     // ============================================================================
     let deferredInstallPrompt = null;
 
@@ -1502,7 +1899,7 @@
     }
 
     // ============================================================================
-    // 5. CONTROLE DE PERFIS & SENHAS INDIVIDUAIS
+    // 6. CONTROLE DE PERFIS & SENHAS INDIVIDUAIS
     // ============================================================================
     let pendingAdultTarget = null;
     let modalSelectedWho = 'Paulo';
@@ -1650,7 +2047,7 @@
     }
 
     // ============================================================================
-    // 6. MENU PRÓPRIO DE CONFIGURAÇÕES, INTEGRANTES & SEGURANÇA (BOTÃO ⚙️ NO TOPO)
+    // 7. MENU PRÓPRIO DE CONFIGURAÇÕES, INTEGRANTES & SEGURANÇA (BOTÃO ⚙️ NO TOPO)
     // ============================================================================
     function openSettingsMenu() {
       const currentUser = getActiveAdultUser();
@@ -1676,6 +2073,13 @@
         <div style="margin-bottom:14px;">${integrantesRows}</div>
 
         <hr class="divider" />
+        <span class="sub-title">💸 Ponte App de Finanças</span>
+        <p class="hint">Conectado à sala <strong>${escapeHTML(FINANCAS_BRIDGE_CONFIG.roomCode)}</strong> (Finanças Paulo & Isabela). Você pode enviar gastos direto das Despesas, Pendências, Mercado ou Saúde.</p>
+        <div class="row-buttons" style="margin-bottom:14px;">
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="openFinancasBridgeModal({ descricao: '', valor: 0 })">💸 Novo Lançamento no Finanças</button>
+        </div>
+
+        <hr class="divider" />
         <span class="sub-title">🎨 Aparência & Aplicativo</span>
         <div class="row-buttons" style="margin-bottom:14px;">
           <button type="button" class="btn-secondary" style="flex:1;" onclick="toggleThemeMode(); openSettingsMenu();">${isDark ? '☀️ Modo Claro' : '🌙 Modo Escuro'}</button>
@@ -1696,7 +2100,7 @@
     }
 
     // ============================================================================
-    // 7. MOTOR DE BOTTOM SHEET MODALS (COM PROTEÇÃO CONTRA DOUBLE-TAP)
+    // 8. MOTOR DE BOTTOM SHEET MODALS (SUPORTA SINCRONO E ASYNC)
     // ============================================================================
     let currentSheetSaveCallback = null;
 
@@ -1717,18 +2121,23 @@
       } else {
         saveBtn.classList.remove('hidden');
         cancelBtn.textContent = 'Cancelar';
-        saveBtn.onclick = () => {
+        saveBtn.onclick = async () => {
           if (saveBtn.disabled) return;
+          const originalText = saveBtn.textContent;
           saveBtn.disabled = true;
+          saveBtn.textContent = 'Salvando...';
           try {
-            const keepOpen = currentSheetSaveCallback && currentSheetSaveCallback() === false;
+            const result = currentSheetSaveCallback ? await currentSheetSaveCallback() : true;
+            const keepOpen = result === false;
             if (!keepOpen) {
               closeSheet();
             } else {
               saveBtn.disabled = false;
+              saveBtn.textContent = originalText;
             }
           } catch (err) {
             saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
             console.error(err);
           }
         };
@@ -1852,7 +2261,7 @@
     }
 
     // ============================================================================
-    // 8. NAVEGAÇÃO POR ABAS & DIAS (HOJE E REDE DE APOIO)
+    // 9. NAVEGAÇÃO POR ABAS & DIAS (HOJE E REDE DE APOIO)
     // ============================================================================
     function switchTab(tabId, titleText, btnEl) {
       document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
@@ -1933,20 +2342,24 @@
     }
 
     // ============================================================================
-    // 9. PENDÊNCIAS DA CASA & MURAL
+    // 10. PENDÊNCIAS DA CASA & MURAL
     // ============================================================================
     function openModalPendencia(editId = null) {
       const item = editId ? appState.pendencias.find(p => p.id === editId) : null;
       openSheet(item ? 'Editar Pendência ✏️' : 'Nova Pendência da Casa', `
         <label>O que precisa ser feito?</label>
-        <input type="text" id="inp-pend-texto" value="${escapeHTML(item ? item.texto : '')}" placeholder="Ex: Pagar conta de luz, lavar roupa..." />
+        <input type="text" id="inp-pend-texto" value="${escapeHTML(item ? item.texto : '')}" placeholder="Ex: Pagar conta de luz, abastecer carro..." />
+        <label>Valor (opcional · permite enviar ao Finanças)</label>
+        <input type="text" id="inp-pend-valor" value="${escapeHTML(item ? (item.valor || '') : '')}" placeholder="Ex: R$ 150,00" />
       `, () => {
         const texto = document.getElementById('inp-pend-texto').value.trim();
+        const valor = document.getElementById('inp-pend-valor').value.trim();
         if (!texto) { showSheetError('Descreva a tarefa.'); return false; }
         if (item) {
           item.texto = texto;
+          item.valor = valor;
         } else {
-          appState.pendencias.push({ id: Date.now(), texto, done: false });
+          appState.pendencias.push({ id: Date.now(), texto, valor, done: false, enviadoFinanceiro: false });
         }
         saveState(['pendencias']);
         showToast(item ? 'Pendência atualizada!' : 'Pendência adicionada!');
@@ -1996,7 +2409,7 @@
     }
 
     // ============================================================================
-    // 10. AGENDA COM RECORRÊNCIA & LINHA DO TEMPO
+    // 11. AGENDA COM RECORRÊNCIA & LINHA DO TEMPO
     // ============================================================================
     function getEventsForDate(isoStr) {
       const targetDate = parseISOToLocalDate(isoStr);
@@ -2122,7 +2535,7 @@
     }
 
     // ============================================================================
-    // 11. LISTA DE MERCADO & DESPESAS COMPARTILHADAS
+    // 12. LISTA DE MERCADO & DESPESAS COMPARTILHADAS
     // ============================================================================
     function openModalMercado(editId = null) {
       const item = editId ? appState.mercado.find(m => m.id === editId) : null;
@@ -2201,7 +2614,7 @@
           item.dividido = dividido;
           item.status = status;
         } else {
-          appState.despesas.unshift({ id: Date.now(), date: getTodayISO(), descricao, valor, pagoPor, dividido, status });
+          appState.despesas.unshift({ id: Date.now(), date: getTodayISO(), descricao, valor, pagoPor, dividido, status, enviadoFinanceiro: false });
         }
         saveState(['despesas']);
         showToast(item ? 'Despesa atualizada!' : 'Despesa lançada!');
@@ -2225,7 +2638,7 @@
     }
 
     // ============================================================================
-    // 12. SAÚDE: REMÉDIOS, HISTÓRICO DE DOSES, FICHA & VACINAS
+    // 13. SAÚDE: REMÉDIOS, HISTÓRICO DE DOSES, FICHA & VACINAS
     // ============================================================================
     function buildTimestampFromTimeInput(hhmm) {
       if (!hhmm || !hhmm.includes(':')) return Date.now();
@@ -2485,7 +2898,7 @@
     }
 
     // ============================================================================
-    // 13. MISSÕES, ESTRELAS COM TRANSPARÊNCIA E DESEJOS
+    // 14. MISSÕES, ESTRELAS COM TRANSPARÊNCIA E DESEJOS
     // ============================================================================
     function getCompletedIdsForDate(isoStr) {
       if (appState.missoesHistorico && Array.isArray(appState.missoesHistorico[isoStr])) {
@@ -2744,7 +3157,7 @@
     }
 
     // ============================================================================
-    // 14. RENDERIZAÇÃO DAS TELAS
+    // 15. RENDERIZAÇÃO DAS TELAS
     // ============================================================================
     function renderAll() {
       renderHoje();
@@ -2815,8 +3228,16 @@
       document.getElementById('pendencias-list').innerHTML = appState.pendencias.length
         ? appState.pendencias.map(p => `
             <div class="check-item ${p.done ? 'done' : ''}">
-              <span style="flex:1;" onclick="togglePendencia(${p.id})">${p.done ? '✅' : '⬜'} ${escapeHTML(p.texto)}</span>
+              <span class="item-text-main" style="flex:1;" onclick="togglePendencia(${p.id})">
+                ${p.done ? '✅' : '⬜'} ${escapeHTML(p.texto)}
+                ${p.valor ? `<span class="valor-pill">${escapeHTML(p.valor)}</span>` : ''}
+              </span>
               <span class="item-actions-inline">
+                ${(p.valor || p.enviadoFinanceiro) ? `
+                  <button type="button" class="btn-bridge ${p.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromPendencia(${p.id})" title="Enviar ao App de Finanças">
+                    ${p.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
+                  </button>
+                ` : ''}
                 <span class="act-icon" title="Editar" onclick="openModalPendencia(${p.id})">✏️</span>
                 <span class="act-icon" title="Excluir" onclick="deletePendencia(${p.id})">🗑️</span>
               </span>
@@ -2959,7 +3380,7 @@
       document.getElementById('mercado-list').innerHTML = appState.mercado.length
         ? appState.mercado.map(m => `
             <div class="check-item ${m.done ? 'done' : ''}">
-              <span style="flex:1;" onclick="toggleMercado(${m.id})">
+              <span class="item-text-main" style="flex:1;" onclick="toggleMercado(${m.id})">
                 ${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}
                 ${m.valor ? `<span class="valor-pill">${escapeHTML(m.valor)}</span>` : ''}
               </span>
@@ -3006,9 +3427,10 @@
       document.getElementById('familia-despesas-list').innerHTML = lista.length
         ? lista.map(d => {
             const isOk = d.status === 'aprovada';
+            const isSent = !!d.enviadoFinanceiro;
             return `
               <div class="despesa-row">
-                <div style="flex:1;">
+                <div style="flex:1; min-width:0;">
                   <strong>${escapeHTML(d.descricao)}</strong>
                   <span class="despesa-status-badge ${isOk ? 'aprovada' : ''}" style="cursor:pointer;" onclick="toggleDespesaStatus(${d.id})">
                     ${isOk ? '✅ Conferida' : '⏳ Pendente'}
@@ -3019,10 +3441,13 @@
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
                   <strong style="display:block; font-size:14px;">${formatCurrencyBR(d.valor)}</strong>
-                  <span class="item-actions-inline" style="justify-content:flex-end; margin-top:2px;">
+                  <div class="item-actions-inline" style="justify-content:flex-end; margin-top:4px;">
+                    <button type="button" class="btn-bridge ${isSent ? 'sent' : ''}" onclick="openBridgeFromDespesa(${d.id})" title="${isSent ? 'Já enviado ao App de Finanças' : 'Lançar no App de Finanças'}">
+                      ${isSent ? '✅ No Finanças' : '💸 Lançar'}
+                    </button>
                     <span class="act-icon" title="Editar" onclick="openModalDespesa(${d.id})">✏️</span>
                     <span class="act-icon" title="Excluir" onclick="deleteDespesa(${d.id})">🗑️</span>
-                  </span>
+                  </div>
                 </div>
               </div>
             `;
@@ -3200,7 +3625,7 @@
     }
 
     // ============================================================================
-    // 15. RENDERIZAÇÃO DA REDE DE APOIO (DIA NAVEGÁVEL + AGENDA SÓ DA DUDA)
+    // 16. RENDERIZAÇÃO DA REDE DE APOIO (DIA NAVEGÁVEL + AGENDA SÓ DA DUDA)
     // ============================================================================
     function renderApoio() {
       const today = getTodayISO();
@@ -3214,7 +3639,6 @@
       document.getElementById('apoio-day-sublabel').textContent = isToday ? dowName : formatFullDateBR(apoioSelectedDateISO);
       document.getElementById('btn-apoio-back-today').classList.toggle('hidden', isToday);
 
-      // Logística da Duda na data escolhida
       const log = getLogisticaForDate(apoioSelectedDateISO);
       document.getElementById('apoio-logistica-title').textContent = isToday
         ? '🎒 Logística da Duda · Hoje'
@@ -3222,7 +3646,6 @@
       document.getElementById('apoio-leva').textContent = log.leva;
       document.getElementById('apoio-busca').textContent = log.busca;
 
-      // Agenda filtrada SÓ da Duda (incluindo compromissos da Família/Casal na data escolhida)
       document.getElementById('apoio-agenda-title').textContent = isToday
         ? '📅 Agenda da Duda · Hoje'
         : `📅 Agenda da Duda · ${formatShortBR(apoioSelectedDateISO)}`;
@@ -3252,7 +3675,6 @@
           }).join('')
         : `<p class="hint" style="margin:0;">Nenhum compromisso da Duda ou da Família em ${isToday ? 'hoje' : formatShortBR(apoioSelectedDateISO)}.</p>`;
 
-      // Remédios ativos da Duda
       const remedios = appState.saude.remedios || [];
       document.getElementById('apoio-remedio-box').innerHTML = remedios.length
         ? remedios.map(rem => {
@@ -3270,7 +3692,6 @@
           }).join('')
         : '<p class="hint" style="margin:0;">Nenhum remédio ativo hoje.</p>';
 
-      // Ficha rápida
       const f = appState.saude.ficha;
       document.getElementById('apoio-ficha-box').innerHTML = `
         <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(f.tipoSanguineo)}</p>
@@ -3281,7 +3702,7 @@
     }
 
     // ============================================================================
-    // 16. RENDERIZAÇÃO DA VISÃO INFANTIL (MODO DUDA)
+    // 17. RENDERIZAÇÃO DA VISÃO INFANTIL (MODO DUDA)
     // ============================================================================
     function renderDuda() {
       const today = getTodayISO();
@@ -3410,7 +3831,7 @@
     }
 
     // ============================================================================
-    // 17. INICIALIZAÇÃO & ATUALIZAÇÃO PERIÓDICA DE HORÁRIOS
+    // 18. INICIALIZAÇÃO & ATUALIZAÇÃO PERIÓDICA DE HORÁRIOS
     // ============================================================================
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
