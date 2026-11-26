@@ -155,6 +155,45 @@
     .sheet-actions button { flex: 1; padding: 13px; font-size: 15px; }
     .sheet-actions button:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    /* MÓDULO ABASTECIMENTO & CONSUMO */
+    .fuel-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 12px; }
+    .fuel-kpi-box {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 15px; padding: 10px 9px;
+    }
+    .fuel-kpi-box span {
+      display: block; font-size: 10px; font-weight: 800; text-transform: uppercase;
+      color: var(--text-muted); letter-spacing: 0.35px;
+    }
+    .fuel-kpi-box strong {
+      display: block; font-size: 15px; font-weight: 800; color: var(--primary-dark); margin-top: 3px;
+    }
+    .fuel-kpi-box small {
+      display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); margin-top: 1px;
+    }
+    .fuel-oil-banner {
+      background: var(--note-bg); border: 1px solid var(--note-border); color: var(--note-text);
+      border-radius: 13px; padding: 9px 12px; font-size: 12px; font-weight: 800;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    .fuel-oil-banner.alert {
+      background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-dark);
+    }
+    .fuel-row {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 15px;
+      padding: 11px 12px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    }
+    .fuel-row:last-child { margin-bottom: 0; }
+    .fuel-badge {
+      display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 7px;
+      border-radius: 8px; background: var(--primary-soft); color: var(--primary-dark);
+      border: 1px solid var(--primary-border); margin-left: 4px;
+    }
+    .fuel-badge.partial {
+      background: var(--pill-bg); color: var(--text-muted); border-color: var(--border);
+    }
+    .fuel-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
     /* PONTE FINANÇAS (BADGES & BOTÕES) */
     .btn-bridge {
       display: inline-flex; align-items: center; gap: 4px;
@@ -845,7 +884,7 @@
         <h1 id="header-title">Família Alves · Dia</h1>
       </div>
       <div class="header-actions">
-        <button type="button" class="btn-icon-lock" title="Configurações, Integrantes & Segurança" onclick="openSettingsMenu()">⚙️</button>
+        <button type="button" class="btn-icon-lock" title="Configurações, Abastecimento & Segurança" onclick="openSettingsMenu()">⚙️</button>
         <button type="button" class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
         <button type="button" class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
       </div>
@@ -1372,6 +1411,7 @@
     let dudaSelectedDateISO = todayISO;
     let adminWeekSelectedDateISO = todayISO;
     let currentAgendaFilter = 'Todos';
+    let selectedFuelVehicleFilter = 'Todos';
 
     const DEFAULT_INTEGRANTES = [
       { id: 'int_fam', nome: 'Família', emoji: '🏡', cor: '#4A7C59', fixo: true },
@@ -1379,6 +1419,15 @@
       { id: 'int_isabela', nome: 'Isabela', emoji: '👩', cor: '#B83280', fixo: true },
       { id: 'int_duda', nome: 'Duda', emoji: '🌟', cor: '#C96A48', fixo: true }
     ];
+
+    const DEFAULT_ABASTECIMENTO = {
+      veiculos: ['Carro', 'Moto'],
+      ultimaTrocaOleo: {
+        Carro: { km: 0, intervaloKm: 10000 },
+        Moto: { km: 0, intervaloKm: 3000 }
+      },
+      registros: []
+    };
 
     const defaultState = {
       pins: { Paulo: "1234", Isabela: "1234" },
@@ -1409,6 +1458,7 @@
         { id: 101, date: todayISO, descricao: "Feira e frutas da semana", valor: 86.50, pagoPor: "Isabela", dividido: true, status: "aprovada", enviadoFinanceiro: false },
         { id: 102, date: todayISO, descricao: "Farmácia · Xarope e soro", valor: 54.00, pagoPor: "Paulo", dividido: true, status: "pendente", enviadoFinanceiro: false }
       ],
+      abastecimento: JSON.parse(JSON.stringify(DEFAULT_ABASTECIMENTO)),
       saude: {
         remedios: [
           {
@@ -1469,6 +1519,19 @@
       return merged;
     }
 
+    function normalizeAbastecimentoState(rawAb) {
+      const ab = rawAb || {};
+      const veiculos = Array.isArray(ab.veiculos) && ab.veiculos.length ? ab.veiculos : ['Carro', 'Moto'];
+      const registros = Array.isArray(ab.registros) ? ab.registros : [];
+      const ultimaTrocaOleo = (ab.ultimaTrocaOleo && typeof ab.ultimaTrocaOleo === 'object') ? ab.ultimaTrocaOleo : {};
+      veiculos.forEach(v => {
+        if (!ultimaTrocaOleo[v]) {
+          ultimaTrocaOleo[v] = { km: 0, intervaloKm: v.toLowerCase().includes('moto') ? 3000 : 10000 };
+        }
+      });
+      return { veiculos, ultimaTrocaOleo, registros };
+    }
+
     function normalizeSaudeState(rawSaude) {
       const s = rawSaude || {};
       let remedios = Array.isArray(s.remedios) ? s.remedios : [];
@@ -1494,6 +1557,7 @@
     let appState = JSON.parse(localStorage.getItem('familia_alves_v24')) || defaultState;
     appState.pins = normalizePins(appState);
     appState.integrantes = normalizeIntegrantes(appState.integrantes);
+    appState.abastecimento = normalizeAbastecimentoState(appState.abastecimento);
     appState.saude = normalizeSaudeState(appState.saude);
     if (!Array.isArray(appState.desejos)) appState.desejos = defaultState.desejos;
     if (!Array.isArray(appState.despesas)) appState.despesas = defaultState.despesas;
@@ -1507,6 +1571,9 @@
       }
       if (Array.isArray(appState.historicoEstrelas) && appState.historicoEstrelas.length > 120) {
         appState.historicoEstrelas = appState.historicoEstrelas.slice(0, 120);
+      }
+      if (appState.abastecimento && Array.isArray(appState.abastecimento.registros) && appState.abastecimento.registros.length > 200) {
+        appState.abastecimento.registros = appState.abastecimento.registros.slice(0, 200);
       }
     }
 
@@ -1552,6 +1619,7 @@
           appState = merged;
           appState.pins = normalizePins(appState);
           appState.integrantes = normalizeIntegrantes(appState.integrantes);
+          appState.abastecimento = normalizeAbastecimentoState(appState.abastecimento);
           appState.saude = normalizeSaudeState(appState.saude);
           if (!Array.isArray(appState.desejos)) appState.desejos = [];
           if (!Array.isArray(appState.despesas)) appState.despesas = [];
@@ -1935,6 +2003,529 @@
         categoryHint: 'Farmácia',
         statusDefault: 'paid'
       });
+    }
+
+    // ============================================================================
+    // 4B. MÓDULO ⛽ ABASTECIMENTO & CONSUMO (ACESSÍVEL PELO MENU ⚙️)
+    // ============================================================================
+    function computeFuelAnalytics(veiculoFiltro = 'Todos') {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      const allSorted = [...ab.registros].sort((a, b) => {
+        if ((a.date || '') !== (b.date || '')) return (a.date || '').localeCompare(b.date || '');
+        return (Number(a.odometro) || 0) - (Number(b.odometro) || 0);
+      });
+
+      // Calcula consumo trecho a trecho por veículo entre tanques cheios
+      const byVehicle = {};
+      allSorted.forEach(r => {
+        const v = r.veiculo || 'Carro';
+        if (!byVehicle[v]) byVehicle[v] = [];
+        byVehicle[v].push(r);
+      });
+
+      const computedMap = {};
+      Object.keys(byVehicle).forEach(v => {
+        const list = byVehicle[v];
+        let lastFullKm = null;
+        let accLitros = 0;
+        let accValor = 0;
+
+        list.forEach(item => {
+          const km = Number(item.odometro) || 0;
+          const litros = Number(item.litros) || 0;
+          const valor = Number(item.valor) || 0;
+          const precoLitro = litros > 0 ? valor / litros : 0;
+
+          let kmRodados = null;
+          let kmPorLitro = null;
+          let custoPorKm = null;
+
+          if (lastFullKm !== null && km > lastFullKm) {
+            accLitros += litros;
+            accValor += valor;
+            if (item.tanqueCheio) {
+              kmRodados = km - lastFullKm;
+              kmPorLitro = accLitros > 0 ? (kmRodados / accLitros) : null;
+              custoPorKm = kmRodados > 0 ? (accValor / kmRodados) : null;
+              lastFullKm = km;
+              accLitros = 0;
+              accValor = 0;
+            }
+          } else if (item.tanqueCheio && km > 0) {
+            lastFullKm = km;
+            accLitros = 0;
+            accValor = 0;
+          }
+
+          computedMap[item.id] = {
+            ...item,
+            precoLitro,
+            kmRodados,
+            kmPorLitro,
+            custoPorKm
+          };
+        });
+      });
+
+      const enrichedDesc = [...allSorted]
+        .reverse()
+        .map(r => computedMap[r.id] || r)
+        .filter(r => veiculoFiltro === 'Todos' || r.veiculo === veiculoFiltro);
+
+      const currentMonthPrefix = getTodayISO().slice(0, 7);
+      let gastoMes = 0;
+      let litrosMes = 0;
+      let totalKmCalc = 0;
+      let totalLitrosCalc = 0;
+      let totalCustoCalc = 0;
+      let ultimoKmPorLitro = null;
+      let maiorOdometro = 0;
+
+      enrichedDesc.forEach(r => {
+        if ((r.date || '').startsWith(currentMonthPrefix)) {
+          gastoMes += Number(r.valor) || 0;
+          litrosMes += Number(r.litros) || 0;
+        }
+        if ((Number(r.odometro) || 0) > maiorOdometro) {
+          maiorOdometro = Number(r.odometro) || 0;
+        }
+        if (r.kmPorLitro && r.kmRodados) {
+          if (ultimoKmPorLitro === null) ultimoKmPorLitro = r.kmPorLitro;
+          totalKmCalc += r.kmRodados;
+          totalLitrosCalc += (r.kmRodados / r.kmPorLitro);
+          totalCustoCalc += (r.custoPorKm ? r.custoPorKm * r.kmRodados : 0);
+        }
+      });
+
+      const mediaGeralKmL = totalLitrosCalc > 0 ? (totalKmCalc / totalLitrosCalc) : null;
+      const mediaCustoKm = totalKmCalc > 0 ? (totalCustoCalc / totalKmCalc) : null;
+
+      return {
+        veiculos: ab.veiculos,
+        ultimaTrocaOleo: ab.ultimaTrocaOleo,
+        registros: enrichedDesc,
+        gastoMes,
+        litrosMes,
+        ultimoKmPorLitro,
+        mediaGeralKmL,
+        mediaCustoKm,
+        maiorOdometro
+      };
+    }
+
+    function setFuelVehicleFilter(v) {
+      selectedFuelVehicleFilter = v;
+      openAbastecimentoModal();
+    }
+
+    function openAbastecimentoModal() {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      if (selectedFuelVehicleFilter !== 'Todos' && !ab.veiculos.includes(selectedFuelVehicleFilter)) {
+        selectedFuelVehicleFilter = 'Todos';
+      }
+      const stats = computeFuelAnalytics(selectedFuelVehicleFilter);
+
+      const filterPills = ['Todos', ...stats.veiculos].map(v => `
+        <button type="button" class="chip-opt ${selectedFuelVehicleFilter === v ? 'selected' : ''}" onclick="setFuelVehicleFilter('${escapeJSArg(v)}')">
+          ${v === 'Todos' ? '🚘 Todos' : (v.toLowerCase().includes('moto') ? `🏍️ ${escapeHTML(v)}` : `🚗 ${escapeHTML(v)}`)}
+        </button>
+      `).join('');
+
+      let oilBannerHTML = '';
+      if (selectedFuelVehicleFilter !== 'Todos') {
+        const oilInfo = stats.ultimaTrocaOleo[selectedFuelVehicleFilter] || { km: 0, intervaloKm: 10000 };
+        const proxTrocaKm = (Number(oilInfo.km) || 0) + (Number(oilInfo.intervaloKm) || 10000);
+        const kmAtual = stats.maiorOdometro;
+        const faltamKm = kmAtual > 0 && oilInfo.km > 0 ? (proxTrocaKm - kmAtual) : null;
+        const isAlert = faltamKm !== null && faltamKm <= 500;
+
+        oilBannerHTML = `
+          <div class="fuel-oil-banner ${isAlert ? 'alert' : ''}">
+            <div>
+              <span>🛢️ Troca de Óleo (${escapeHTML(selectedFuelVehicleFilter)})</span>
+              <div style="font-size:11px; margin-top:2px;">
+                ${oilInfo.km > 0
+                  ? `Última: ${oilInfo.km.toLocaleString('pt-BR')} km · Próxima: ${proxTrocaKm.toLocaleString('pt-BR')} km ${faltamKm !== null ? `(${faltamKm >= 0 ? `faltam ${faltamKm.toLocaleString('pt-BR')} km` : `passou ${Math.abs(faltamKm).toLocaleString('pt-BR')} km!`})` : ''}`
+                  : 'Nenhuma troca de óleo registrada ainda'}
+              </div>
+            </div>
+            <button type="button" class="btn-mini" onclick="openModalTrocaOleo('${escapeJSArg(selectedFuelVehicleFilter)}')">Ajustar</button>
+          </div>
+        `;
+      }
+
+      const rowsHTML = stats.registros.length
+        ? stats.registros.slice(0, 25).map(r => {
+            const mediaBadge = r.kmPorLitro
+              ? `<span class="fuel-badge">⚡ ${r.kmPorLitro.toFixed(1).replace('.', ',')} km/L (${r.kmRodados} km)</span>`
+              : (r.tanqueCheio
+                  ? `<span class="fuel-badge">⛽ Tanque Cheio (Base)</span>`
+                  : `<span class="fuel-badge partial">Parcial</span>`);
+
+            return `
+              <div class="fuel-row">
+                <div style="flex:1; min-width:0;">
+                  <div>
+                    <strong>${escapeHTML(r.veiculo)} · ${escapeHTML(r.combustivel || 'Gasolina')}</strong>
+                    ${mediaBadge}
+                  </div>
+                  <div style="font-size:12px; color:var(--text-main); margin-top:3px; font-weight:700;">
+                    ${formatShortBR(r.date)} · ${Number(r.odometro).toLocaleString('pt-BR')} km · ${Number(r.litros).toFixed(2).replace('.', ',')} L (${formatCurrencyBR(r.precoLitro)}/L)
+                  </div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                    Por <strong>${escapeHTML(r.pagoPor || 'Paulo')}</strong>${r.posto ? ` · ${escapeHTML(r.posto)}` : ''}${r.custoPorKm ? ` · ${formatCurrencyBR(r.custoPorKm)}/km` : ''}
+                  </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <strong style="display:block; font-size:14px; color:var(--text-main);">${formatCurrencyBR(r.valor)}</strong>
+                  <div class="item-actions-inline" style="justify-content:flex-end; margin-top:5px;">
+                    <button type="button" class="btn-bridge ${r.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromAbastecimento(${r.id})" title="Lançar no App de Finanças">
+                      ${r.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
+                    </button>
+                    <span class="act-icon" title="Editar" onclick="openModalNovoAbastecimento(${r.id})">✏️</span>
+                    <span class="act-icon" title="Excluir" onclick="deleteAbastecimento(${r.id})">🗑️</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:6px 0;">Nenhum abastecimento registrado ainda. Toque em <strong>+ Abastecer</strong> para começar!</p>';
+
+      openSheet('⛽ Abastecimento & Consumo', `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+          <div class="chip-group" style="margin-top:0;">${filterPills}</div>
+          <div class="btn-group-mini">
+            <button type="button" class="btn-mini export" onclick="openModalGerenciarVeiculos()" title="Gerenciar veículos">+ Veículo</button>
+            <button type="button" class="btn-mini" onclick="openModalNovoAbastecimento()">+ Abastecer</button>
+          </div>
+        </div>
+
+        <div class="fuel-kpi-grid">
+          <div class="fuel-kpi-box">
+            <span>Média Consumo</span>
+            <strong>${stats.mediaGeralKmL ? `${stats.mediaGeralKmL.toFixed(1).replace('.', ',')} km/L` : '-- km/L'}</strong>
+            <small>${stats.ultimoKmPorLitro ? `Última: ${stats.ultimoKmPorLitro.toFixed(1).replace('.', ',')} km/L` : 'Marque tanque cheio'}</small>
+          </div>
+          <div class="fuel-kpi-box">
+            <span>Gasto no Mês</span>
+            <strong>${formatCurrencyBR(stats.gastoMes)}</strong>
+            <small>${stats.litrosMes.toFixed(1).replace('.', ',')} litros</small>
+          </div>
+          <div class="fuel-kpi-box">
+            <span>Custo por Km</span>
+            <strong>${stats.mediaCustoKm ? formatCurrencyBR(stats.mediaCustoKm) : 'R$ --'}</strong>
+            <small>${stats.maiorOdometro > 0 ? `Odôm: ${stats.maiorOdometro.toLocaleString('pt-BR')} km` : 'Sem odômetro'}</small>
+          </div>
+        </div>
+
+        ${oilBannerHTML}
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span class="sub-title" style="margin:0;">Histórico de Abastecimentos (${stats.registros.length})</span>
+          <button type="button" class="btn-mini export" onclick="exportAbastecimentoWhatsApp()">📋 Copiar Resumo</button>
+        </div>
+        <div>${rowsHTML}</div>
+      `, null, 'Fechar');
+    }
+
+    function openModalNovoAbastecimento(editId = null) {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      const item = editId ? ab.registros.find(r => r.id === editId) : null;
+      const defaultVeiculo = item ? item.veiculo : (selectedFuelVehicleFilter !== 'Todos' ? selectedFuelVehicleFilter : ab.veiculos[0]);
+      const defaultComb = item ? item.combustivel : 'Gasolina';
+      const defaultTanque = item ? (item.tanqueCheio ? 'sim' : 'nao') : 'sim';
+      const defaultPagou = item ? item.pagoPor : getActiveAdultUser();
+      const defaultDate = item ? item.date : getTodayISO();
+
+      // Sugere último odômetro conhecido do veículo
+      const ultimosDoVeiculo = ab.registros
+        .filter(r => r.veiculo === defaultVeiculo)
+        .sort((a, b) => (Number(b.odometro) || 0) - (Number(a.odometro) || 0));
+      const hintKm = ultimosDoVeiculo.length > 0 ? `Último: ${Number(ultimosDoVeiculo[0].odometro).toLocaleString('pt-BR')} km` : 'Ex: 45230';
+
+      openSheet(item ? 'Editar Abastecimento ✏️' : 'Novo Abastecimento ⛽', `
+        <label>Veículo</label>
+        <div class="chip-group">
+          ${ab.veiculos.map(v => `
+            <button type="button" class="chip-opt ${v === defaultVeiculo ? 'selected' : ''}" data-val="${escapeHTML(v)}" onclick="selectChip(this, 'inp-fuel-veiculo')">
+              ${v.toLowerCase().includes('moto') ? '🏍️' : '🚗'} ${escapeHTML(v)}
+            </button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-fuel-veiculo" value="${escapeHTML(defaultVeiculo)}" />
+
+        <div class="fuel-grid-2">
+          <div>
+            <label>Data</label>
+            <input type="date" id="inp-fuel-date" value="${escapeHTML(defaultDate)}" />
+          </div>
+          <div>
+            <label>Odômetro Atual (km)</label>
+            <input type="number" inputmode="numeric" id="inp-fuel-km" value="${escapeHTML(item ? item.odometro : '')}" placeholder="${escapeHTML(hintKm)}" />
+          </div>
+        </div>
+
+        <div class="fuel-grid-2">
+          <div>
+            <label>Litros Abastecidos</label>
+            <input type="number" step="0.01" inputmode="decimal" id="inp-fuel-litros" value="${escapeHTML(item ? item.litros : '')}" placeholder="Ex: 38,50" oninput="updateFuelPreview()" />
+          </div>
+          <div>
+            <label>Valor Total (R$)</label>
+            <input type="number" step="0.01" inputmode="decimal" id="inp-fuel-valor" value="${escapeHTML(item ? item.valor : '')}" placeholder="Ex: 225,00" oninput="updateFuelPreview()" />
+          </div>
+        </div>
+
+        <div id="fuel-unit-price-preview" class="hint" style="margin-top:6px; font-weight:800; color:var(--primary-dark);">
+          ${item && item.litros > 0 ? `Preço por litro: ${formatCurrencyBR(item.valor / item.litros)}/L` : 'Preço por litro será calculado automaticamente'}
+        </div>
+
+        <label>Combustível</label>
+        <div class="chip-group">
+          ${['Gasolina', 'Etanol', 'Diesel', 'GNV'].map(c => `
+            <button type="button" class="chip-opt ${c === defaultComb ? 'selected' : ''}" data-val="${c}" onclick="selectChip(this, 'inp-fuel-comb')">${c}</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-fuel-comb" value="${escapeHTML(defaultComb)}" />
+
+        <label>Encheu o tanque até a trava? (Calcula km/L exato)</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultTanque === 'sim' ? 'selected' : ''}" data-val="sim" onclick="selectChip(this, 'inp-fuel-cheio')">⛽ Sim · Tanque Cheio</button>
+          <button type="button" class="chip-opt ${defaultTanque === 'nao' ? 'selected' : ''}" data-val="nao" onclick="selectChip(this, 'inp-fuel-cheio')">💧 Não · Parcial</button>
+        </div>
+        <input type="hidden" id="inp-fuel-cheio" value="${defaultTanque}" />
+
+        <label>Quem pagou?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultPagou === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-fuel-pagou')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${defaultPagou === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-fuel-pagou')">👩 Isabela</button>
+        </div>
+        <input type="hidden" id="inp-fuel-pagou" value="${escapeHTML(defaultPagou)}" />
+
+        <label>Posto / Observação (opcional)</label>
+        <input type="text" id="inp-fuel-posto" value="${escapeHTML(item ? (item.posto || '') : '')}" placeholder="Ex: Posto Shell Av. Brasil" />
+
+        ${!item ? `
+          <label>Lançar também no App de Finanças (2325Ogros)?</label>
+          <div class="chip-group">
+            <button type="button" class="chip-opt selected" data-val="sim" onclick="selectChip(this, 'inp-fuel-bridge')">💸 Sim · Abrir envio agora</button>
+            <button type="button" class="chip-opt" data-val="nao" onclick="selectChip(this, 'inp-fuel-bridge')">Só salvar aqui</button>
+          </div>
+          <input type="hidden" id="inp-fuel-bridge" value="sim" />
+        ` : ''}
+      `, () => {
+        const veiculo = document.getElementById('inp-fuel-veiculo').value || ab.veiculos[0];
+        const date = document.getElementById('inp-fuel-date').value || getTodayISO();
+        const odometro = parseFloat(String(document.getElementById('inp-fuel-km').value).replace(',', '.'));
+        const litros = parseFloat(String(document.getElementById('inp-fuel-litros').value).replace(',', '.'));
+        const valor = parseFloat(String(document.getElementById('inp-fuel-valor').value).replace(',', '.'));
+        const combustivel = document.getElementById('inp-fuel-comb').value || 'Gasolina';
+        const tanqueCheio = document.getElementById('inp-fuel-cheio').value === 'sim';
+        const pagoPor = document.getElementById('inp-fuel-pagou').value || getActiveAdultUser();
+        const posto = document.getElementById('inp-fuel-posto').value.trim();
+        const sendBridgeEl = document.getElementById('inp-fuel-bridge');
+        const shouldBridge = sendBridgeEl ? sendBridgeEl.value === 'sim' : false;
+
+        if (isNaN(odometro) || odometro <= 0) {
+          showSheetError('Informe o odômetro (km) atual do veículo.');
+          return false;
+        }
+        if (isNaN(litros) || litros <= 0) {
+          showSheetError('Informe a quantidade de litros abastecidos.');
+          return false;
+        }
+        if (isNaN(valor) || valor <= 0) {
+          showSheetError('Informe o valor total pago (R$).');
+          return false;
+        }
+
+        if (item) {
+          item.veiculo = veiculo;
+          item.date = date;
+          item.odometro = odometro;
+          item.litros = litros;
+          item.valor = valor;
+          item.combustivel = combustivel;
+          item.tanqueCheio = tanqueCheio;
+          item.pagoPor = pagoPor;
+          item.posto = posto;
+          saveState(['abastecimento']);
+          showToast('Abastecimento atualizado!');
+          setTimeout(() => openAbastecimentoModal(), 120);
+        } else {
+          const newRecord = {
+            id: Date.now(),
+            veiculo,
+            date,
+            odometro,
+            litros,
+            valor,
+            combustivel,
+            tanqueCheio,
+            pagoPor,
+            posto,
+            enviadoFinanceiro: false
+          };
+          appState.abastecimento.registros.unshift(newRecord);
+          saveState(['abastecimento']);
+          showToast('⛽ Abastecimento registrado!');
+
+          if (shouldBridge) {
+            setTimeout(() => {
+              openBridgeFromAbastecimento(newRecord.id);
+            }, 150);
+          } else {
+            setTimeout(() => openAbastecimentoModal(), 120);
+          }
+        }
+      });
+    }
+
+    function updateFuelPreview() {
+      const litros = parseFloat(String((document.getElementById('inp-fuel-litros') || {}).value || '').replace(',', '.'));
+      const valor = parseFloat(String((document.getElementById('inp-fuel-valor') || {}).value || '').replace(',', '.'));
+      const el = document.getElementById('fuel-unit-price-preview');
+      if (!el) return;
+      if (!isNaN(litros) && litros > 0 && !isNaN(valor) && valor > 0) {
+        el.textContent = `Preço por litro: ${formatCurrencyBR(valor / litros)}/L`;
+      } else {
+        el.textContent = 'Preço por litro será calculado automaticamente';
+      }
+    }
+
+    function openBridgeFromAbastecimento(regId) {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      const r = ab.registros.find(x => x.id === regId);
+      if (!r) return;
+
+      const desc = `Abastecimento ${r.veiculo} · ${r.combustivel} (${Number(r.litros).toFixed(1).replace('.', ',')}L${r.posto ? ` - ${r.posto}` : ''})`;
+
+      const proceed = () => {
+        openFinancasBridgeModal({
+          descricao: desc,
+          valor: r.valor,
+          date: r.date || getTodayISO(),
+          user: r.pagoPor || getActiveAdultUser(),
+          categoryHint: 'Abastecimento',
+          statusDefault: 'paid',
+          onSuccessCallback: (tx) => {
+            r.enviadoFinanceiro = true;
+            r.financeiroTxId = tx.id;
+            r.financeiroMeta = `${tx.category} · ${tx.account}`;
+            saveState(['abastecimento']);
+            setTimeout(() => openAbastecimentoModal(), 150);
+          }
+        });
+      };
+
+      if (r.enviadoFinanceiro) {
+        openConfirmSheet(
+          'Abastecimento já enviado',
+          `Este abastecimento já foi enviado ao App de Finanças (${r.financeiroMeta || 'enviado'}). Deseja lançar novamente?`,
+          proceed,
+          'Enviar Novamente',
+          false
+        );
+      } else {
+        proceed();
+      }
+    }
+
+    function deleteAbastecimento(regId) {
+      openConfirmSheet('Excluir Abastecimento', 'Remover este registro de abastecimento?', () => {
+        appState.abastecimento.registros = (appState.abastecimento.registros || []).filter(r => r.id !== regId);
+        saveState(['abastecimento']);
+        showToast('Registro excluído.');
+        setTimeout(() => openAbastecimentoModal(), 120);
+      }, 'Excluir', true);
+    }
+
+    function openModalGerenciarVeiculos() {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      const listHTML = ab.veiculos.map((v, idx) => `
+        <div class="week-history-row" style="margin-bottom:6px;">
+          <strong>${v.toLowerCase().includes('moto') ? '🏍️' : '🚗'} ${escapeHTML(v)}</strong>
+          ${idx === 0
+            ? '<small style="color:var(--text-muted); font-weight:700;">Principal</small>'
+            : `<span class="act-icon" title="Remover veículo" onclick="removeFuelVehicle('${escapeJSArg(v)}')">🗑️</span>`}
+        </div>
+      `).join('');
+
+      openSheet('Veículos Cadastrados 🚘', `
+        <div style="margin-bottom:12px;">${listHTML}</div>
+        <label>Adicionar Novo Veículo</label>
+        <input type="text" id="inp-new-vehicle-name" placeholder="Ex: Carro 2, Utilitário..." />
+      `, () => {
+        const nome = document.getElementById('inp-new-vehicle-name').value.trim();
+        if (!nome) {
+          setTimeout(() => openAbastecimentoModal(), 100);
+          return true;
+        }
+        if (ab.veiculos.some(v => v.toLowerCase() === nome.toLowerCase())) {
+          showSheetError('Já existe um veículo com esse nome.');
+          return false;
+        }
+        appState.abastecimento.veiculos.push(nome);
+        appState.abastecimento.ultimaTrocaOleo[nome] = { km: 0, intervaloKm: 10000 };
+        saveState(['abastecimento']);
+        showToast(`Veículo "${nome}" adicionado!`);
+        setTimeout(() => openAbastecimentoModal(), 120);
+      });
+    }
+
+    function removeFuelVehicle(nome) {
+      appState.abastecimento.veiculos = (appState.abastecimento.veiculos || []).filter(v => v !== nome);
+      if (selectedFuelVehicleFilter === nome) selectedFuelVehicleFilter = 'Todos';
+      saveState(['abastecimento']);
+      showToast('Veículo removido.');
+      setTimeout(() => openAbastecimentoModal(), 120);
+    }
+
+    function openModalTrocaOleo(veiculo) {
+      const ab = normalizeAbastecimentoState(appState.abastecimento);
+      const info = ab.ultimaTrocaOleo[veiculo] || { km: 0, intervaloKm: 10000 };
+      openSheet(`🛢️ Troca de Óleo · ${veiculo}`, `
+        <p class="hint">Informe o odômetro (km) da última troca de óleo para acompanhar automaticamente quando vencer a próxima.</p>
+        <label>Odômetro da Última Troca (km)</label>
+        <input type="number" inputmode="numeric" id="inp-oil-km" value="${escapeHTML(info.km || '')}" placeholder="Ex: 40000" />
+        <label>Intervalo para Próxima Troca (km)</label>
+        <div class="chip-group">
+          ${[3000, 5000, 7500, 10000].map(iv => `
+            <button type="button" class="chip-opt ${Number(info.intervaloKm) === iv ? 'selected' : ''}" data-val="${iv}" onclick="selectChip(this, 'inp-oil-int')">${iv.toLocaleString('pt-BR')} km</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-oil-int" value="${Number(info.intervaloKm) || 10000}" />
+      `, () => {
+        const km = parseFloat(String(document.getElementById('inp-oil-km').value).replace(',', '.')) || 0;
+        const intervaloKm = Number(document.getElementById('inp-oil-int').value) || 10000;
+        appState.abastecimento.ultimaTrocaOleo[veiculo] = { km, intervaloKm };
+        saveState(['abastecimento']);
+        showToast('Controle de troca de óleo atualizado!');
+        setTimeout(() => openAbastecimentoModal(), 120);
+      });
+    }
+
+    async function exportAbastecimentoWhatsApp() {
+      const stats = computeFuelAnalytics(selectedFuelVehicleFilter);
+      let txt = `⛽ *CONTROLE DE ABASTECIMENTO (${selectedFuelVehicleFilter})*\n`;
+      txt += `📅 Gerado em: ${formatFullDateBR(getTodayISO())}\n\n`;
+      txt += `• Média Geral: *${stats.mediaGeralKmL ? `${stats.mediaGeralKmL.toFixed(1).replace('.', ',')} km/L` : 'N/D'}*\n`;
+      txt += `• Gasto no Mês: *${formatCurrencyBR(stats.gastoMes)}* (${stats.litrosMes.toFixed(1).replace('.', ',')} L)\n`;
+      if (stats.mediaCustoKm) txt += `• Custo por km: *${formatCurrencyBR(stats.mediaCustoKm)}/km*\n`;
+      txt += `\n*ÚLTIMOS ABASTECIMENTOS*\n`;
+      stats.registros.slice(0, 10).forEach(r => {
+        const mTxt = r.kmPorLitro ? ` · ⚡ ${r.kmPorLitro.toFixed(1).replace('.', ',')} km/L` : '';
+        txt += `• ${formatShortBR(r.date)} (${r.veiculo}) — ${formatCurrencyBR(r.valor)} · ${Number(r.litros).toFixed(1).replace('.', ',')}L · ${Number(r.odometro).toLocaleString('pt-BR')} km${mTxt}\n`;
+      });
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(txt.trim());
+        }
+        showToast('📋 Resumo de abastecimento copiado!');
+      } catch (e) {
+        showToast('Não foi possível copiar automaticamente.', true);
+      }
     }
 
     // ============================================================================
@@ -2496,11 +3087,16 @@
     }
 
     // ============================================================================
-    // 8. MENU DE CONFIGURAÇÕES, INTEGRANTES & SEGURANÇA
+    // 8. MENU DE CONFIGURAÇÕES, ABASTECIMENTO, INTEGRANTES & SEGURANÇA
     // ============================================================================
     function openSettingsMenu() {
       const currentUser = getActiveAdultUser();
       const isDark = document.body.classList.contains('dark-mode');
+      const fuelStats = computeFuelAnalytics('Todos');
+      const fuelSubLabel = fuelStats.mediaGeralKmL
+        ? `Média: ${fuelStats.mediaGeralKmL.toFixed(1).replace('.', ',')} km/L · Mês: ${formatCurrencyBR(fuelStats.gastoMes)}`
+        : `${fuelStats.registros.length} registro(s) · Mês: ${formatCurrencyBR(fuelStats.gastoMes)}`;
+
       const integrantesRows = (appState.integrantes || []).map(m => `
         <div class="week-history-row" style="margin-bottom:6px;">
           <span style="display:inline-flex; align-items:center; gap:7px;">
@@ -2514,6 +3110,20 @@
       `).join('');
 
       openSheet('Configurações & Família ⚙️', `
+        <span class="sub-title">⛽ Veículos & Abastecimento</span>
+        <div class="bridge-summary-card" style="margin-bottom:10px; cursor:pointer;" onclick="openAbastecimentoModal()">
+          <div>
+            <strong>⛽ Abastecimento & Consumo</strong>
+            <small>${escapeHTML(fuelSubLabel)}</small>
+          </div>
+          <span style="font-size:18px;">›</span>
+        </div>
+        <div class="row-buttons" style="margin-bottom:14px;">
+          <button type="button" class="btn-primary" style="flex:1;" onclick="openAbastecimentoModal()">⛽ Abrir Painel</button>
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="openModalNovoAbastecimento()">+ Abastecer</button>
+        </div>
+
+        <hr class="divider" />
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <span class="sub-title" style="margin:0;">👨‍👩‍👧 Integrantes & Lançamentos</span>
           <button type="button" class="btn-mini" onclick="openModalNovoIntegrante()">+ Integrante</button>
@@ -2523,7 +3133,7 @@
 
         <hr class="divider" />
         <span class="sub-title">💸 Ponte App de Finanças</span>
-        <p class="hint">Conectado à sala <strong>${escapeHTML(FINANCAS_BRIDGE_CONFIG.roomCode)}</strong> (Finanças Paulo & Isabela). Você pode enviar gastos direto das Despesas, Pendências, Mercado ou Saúde.</p>
+        <p class="hint">Conectado à sala <strong>${escapeHTML(FINANCAS_BRIDGE_CONFIG.roomCode)}</strong> (Finanças Paulo & Isabela). Você pode enviar gastos direto das Despesas, Pendências, Mercado, Saúde ou Abastecimento.</p>
         <div class="row-buttons" style="margin-bottom:14px;">
           <button type="button" class="btn-secondary" style="flex:1;" onclick="openFinancasBridgeModal({ descricao: '', valor: 0 })">💸 Novo Lançamento no Finanças</button>
         </div>
@@ -3698,23 +4308,23 @@
           <button type="button" class="chip-opt ${defaultTurno === 'Tarde' ? 'selected' : ''}" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
           <button type="button" class="chip-opt ${defaultTurno === 'Noite' ? 'selected' : ''}" data-val="Noite" onclick="selectChip(this, 'inp-mis-turno')">🌙 Noite</button>
         </div>
-        <input type="hidden" id="inp-mis-turno" value="${defaultTurno}" />
-        <label>Emoji</label>
+        <input type="hidden" id="inp-mis-turno" value="${escapeHTML(defaultTurno)}" />
+        <label>Ícone</label>
         <div class="chip-group">
           ${['⭐', '🪥', '🛏️', '📚', '🧸', '🥗', '🚿', '🎒'].map(em => `
             <button type="button" class="chip-opt ${defaultEmoji === em ? 'selected' : ''}" data-val="${em}" onclick="selectChip(this, 'inp-mis-emoji')">${em}</button>
           `).join('')}
         </div>
-        <input type="hidden" id="inp-mis-emoji" value="${defaultEmoji}" />
+        <input type="hidden" id="inp-mis-emoji" value="${escapeHTML(defaultEmoji)}" />
         <label>Nome da Missão</label>
         <input type="text" id="inp-mis-titulo" value="${escapeHTML(item ? item.titulo : '')}" placeholder="Ex: Guardar os sapatos" />
         <label>Detalhamento / Como fazer (opcional)</label>
-        <textarea id="inp-mis-descricao" rows="3" placeholder="Ex: Colocar o tênis na sapateira do quarto e as meias no cesto de roupa suja.">${escapeHTML(item ? (item.descricao || '') : '')}</textarea>
+        <textarea id="inp-mis-desc" rows="3" placeholder="Ex: Colocar os tênis na sapateira do corredor e guardar as meias no cesto.">${escapeHTML(item ? (item.descricao || '') : '')}</textarea>
       `, () => {
         const turno = document.getElementById('inp-mis-turno').value;
         const emoji = document.getElementById('inp-mis-emoji').value;
         const titulo = document.getElementById('inp-mis-titulo').value.trim();
-        const descricao = document.getElementById('inp-mis-descricao').value.trim();
+        const descricao = document.getElementById('inp-mis-desc').value.trim();
         if (!titulo) { showSheetError('Escreva o nome da missão.'); return false; }
         if (item) {
           item.turno = turno;
@@ -3730,40 +4340,49 @@
     }
 
     function deleteMissao(id) {
-      openConfirmSheet('Excluir Missão', 'Excluir esta missão recorrente?', () => {
+      openConfirmSheet('Remover Missão', 'Remover esta missão da rotina diária?', () => {
         appState.missoes = appState.missoes.filter(m => m.id !== id);
         saveState(['missoes']);
-        showToast('Missão excluída.');
-      }, 'Excluir', true);
+        showToast('Missão removida.');
+      }, 'Remover', true);
+    }
+
+    function getPastWeeksSummary(numWeeks = 6) {
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const totalMissions = (appState.missoes || []).length;
+      const list = [];
+      for (let w = 1; w <= numWeeks; w++) {
+        const mon = addDaysISO(thisMon, -7 * w);
+        const sun = addDaysISO(mon, 6);
+        let sum = 0;
+        getWeekDatesArray(mon).forEach(d => { sum += getCompletedIdsForDate(d).length; });
+        list.push({
+          mondayISO: mon,
+          label: `${formatShortBR(mon)} a ${formatShortBR(sun)}`,
+          stars: sum,
+          maxStars: totalMissions * 7
+        });
+      }
+      return list;
     }
 
     function openModalDudaPastWeeks() {
-      const today = getTodayISO();
-      const thisMon = getMondayOfWeekISO(today);
-      const totalMissions = appState.missoes.length || 1;
-      let html = '';
-
-      for (let w = 1; w <= 6; w++) {
-        const mon = addDaysISO(thisMon, -7 * w);
-        const sun = addDaysISO(mon, 6);
-        const days = getWeekDatesArray(mon);
-        let starsSum = 0;
-        days.forEach(d => { starsSum += getCompletedIdsForDate(d).length; });
-        html += `
-          <div class="week-history-row">
-            <div>
-              <strong>Semana ${formatShortBR(mon)} a ${formatShortBR(sun)}</strong>
-              <div class="hint" style="margin:2px 0 0;">Meta semanal: ${totalMissions * 7} estrelas</div>
-            </div>
-            <span class="week-badge-stars">⭐ ${starsSum} estrelas</span>
+      const weeks = getPastWeeksSummary(6);
+      const html = weeks.map(w => `
+        <div class="week-history-row" style="margin-bottom:8px;">
+          <div>
+            <strong>Semana ${escapeHTML(w.label)}</strong>
+            <div style="font-size:11px; color:var(--text-muted);">De segunda a domingo</div>
           </div>
-        `;
-      }
+          <span class="week-badge-stars">⭐ ${w.stars} / ${w.maxStars}</span>
+        </div>
+      `).join('');
       openSheet('Minhas Semanas Anteriores 📅', html, null, 'Fechar');
     }
 
     // ============================================================================
-    // 16. RENDERIZAÇÃO DAS TELAS
+    // 16. RENDERIZAÇÃO UNIFICADA DA INTERFACE
     // ============================================================================
     function renderAll() {
       renderHoje();
@@ -3773,8 +4392,8 @@
       renderMercado();
       renderDespesas();
       renderSaude();
-      renderAdminDuda();
       renderApoio();
+      renderAdminDuda();
       renderDuda();
     }
 
@@ -3782,144 +4401,146 @@
       const today = getTodayISO();
       const isToday = hojeSelectedDateISO === today;
       const dObj = parseISOToLocalDate(hojeSelectedDateISO);
-      const dowName = DIAS_SEMANA_PT[dObj.getDay()];
+      const diaSemana = DIAS_SEMANA_PT[dObj.getDay()];
 
-      document.getElementById('hoje-day-label').textContent = isToday
-        ? `Hoje · ${formatShortBR(hojeSelectedDateISO)}`
-        : `${dowName.split('-')[0]} · ${formatShortBR(hojeSelectedDateISO)}`;
-      document.getElementById('hoje-day-sublabel').textContent = isToday ? dowName : formatFullDateBR(hojeSelectedDateISO);
+      document.getElementById('hoje-day-label').textContent = isToday ? `Hoje · ${formatShortBR(hojeSelectedDateISO)}` : formatShortBR(hojeSelectedDateISO);
+      document.getElementById('hoje-day-sublabel').textContent = diaSemana;
       document.getElementById('btn-back-today').classList.toggle('hidden', isToday);
 
       const alertBox = document.getElementById('hoje-med-alert-box');
       if (alertBox) {
         const overdueMeds = (appState.saude.remedios || []).filter(r => {
-          const info = getProximaDoseInfo(r);
-          return info && info.overdue;
+          const prox = getProximaDoseInfo(r);
+          return prox && prox.overdue;
         });
-        alertBox.innerHTML = overdueMeds.map(rem => {
-          const info = getProximaDoseInfo(rem);
+        alertBox.innerHTML = overdueMeds.map(r => {
+          const prox = getProximaDoseInfo(r);
           return `
             <div class="med-alert-banner">
               <div>
-                <strong>⏰ Remédio no horário: ${escapeHTML(rem.nome)}</strong>
-                <small>${escapeHTML(rem.dosagem)} · Previsto às ${escapeHTML(info.texto)}</small>
+                <strong>⏰ Dose atrasada: ${escapeHTML(r.nome)} (${escapeHTML(r.dosagem)})</strong>
+                <small>Prevista para ${escapeHTML(prox.texto)} · Última: ${escapeHTML(r.ultimaDoseTexto)}</small>
               </div>
-              <button type="button" class="btn-med-quick" onclick="openModalRegistrarDose(${rem.id})">✔️ Dar Dose</button>
+              <button type="button" class="btn-med-quick" onclick="openModalRegistrarDose(${r.id})">Dar Agora</button>
             </div>
           `;
         }).join('');
       }
 
       const log = getLogisticaForDate(hojeSelectedDateISO);
-      document.getElementById('logistica-card-title').textContent = isToday
-        ? 'Duda · Logística & Missões'
-        : `Duda · ${formatShortBR(hojeSelectedDateISO)}`;
       document.getElementById('hoje-leva').textContent = log.leva;
       document.getElementById('hoje-busca').textContent = log.busca;
 
+      const totalM = appState.missoes.length;
       const doneIds = getCompletedIdsForDate(hojeSelectedDateISO);
-      const total = appState.missoes.length;
-      const feitos = doneIds.length;
-      const pct = total ? Math.round((feitos / total) * 100) : 0;
+      const doneM = appState.missoes.filter(m => doneIds.includes(m.id)).length;
+      const pct = totalM ? Math.round((doneM / totalM) * 100) : 0;
+      const pendentesCasa = (appState.pendencias || []).filter(p => !p.done).length;
+      const dayEvents = getEventsForDate(hojeSelectedDateISO);
 
-      document.getElementById('adult-duda-progress-label').textContent = isToday ? 'Missões de hoje' : `Missões de ${formatShortBR(hojeSelectedDateISO)}`;
-      document.getElementById('adult-duda-progress-text').textContent = `${feitos} de ${total} (${pct}%)`;
-      document.getElementById('adult-duda-progress-fill').style.width = `${pct}%`;
-
-      const pendentesCount = (appState.pendencias || []).filter(p => !p.done).length;
-      document.getElementById('hoje-status-badge').textContent = isToday ? '✨ Relance de Hoje' : `📅 Dia ${formatShortBR(hojeSelectedDateISO)}`;
-      document.getElementById('hoje-glance-summary').textContent = `${feitos}/${total} missões da Duda · ${pendentesCount} pendência(s) da casa`;
+      document.getElementById('hoje-status-badge').textContent = isToday
+        ? `✨ Relance de Hoje · ${dayEvents.length} ${dayEvents.length === 1 ? 'evento' : 'eventos'}`
+        : `📅 Visão de ${formatShortBR(hojeSelectedDateISO)} · ${dayEvents.length} ${dayEvents.length === 1 ? 'evento' : 'eventos'}`;
+      document.getElementById('logistica-card-title').textContent = isToday ? 'Duda · Relance de Hoje' : `Duda · ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('hoje-glance-summary').textContent = `${doneM}/${totalM} missões feitas · ${pendentesCasa} ${pendentesCasa === 1 ? 'pendência aberta' : 'pendências abertas'}`;
+      document.getElementById('adult-duda-progress-label').textContent = isToday ? 'Missões da Duda (Hoje)' : `Missões da Duda (${formatShortBR(hojeSelectedDateISO)})`;
+      document.getElementById('adult-duda-progress-text').textContent = `${doneM} de ${totalM}`;
+      document.getElementById('adult-duda-progress-fill').style.width = pct + '%';
 
       document.getElementById('pendencias-list').innerHTML = appState.pendencias.length
         ? appState.pendencias.map(p => `
             <div class="check-item ${p.done ? 'done' : ''}">
-              <span class="item-text-main" style="flex:1;" onclick="togglePendencia(${p.id})">
-                ${p.done ? '✅' : '⬜'} ${escapeHTML(p.texto)}
+              <span onclick="togglePendencia(${p.id})" style="flex:1;">
+                <span class="item-text-main">${p.done ? '✅' : '⬜'} ${escapeHTML(p.texto)}</span>
                 ${p.valor ? `<span class="valor-pill">${escapeHTML(p.valor)}</span>` : ''}
               </span>
               <span class="item-actions-inline">
-                ${(p.valor || p.enviadoFinanceiro) ? `
-                  <button type="button" class="btn-bridge ${p.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromPendencia(${p.id})" title="Enviar ao App de Finanças">
-                    ${p.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
-                  </button>
-                ` : ''}
+                <button type="button" class="btn-bridge ${p.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromPendencia(${p.id})" title="Enviar pendência ao App de Finanças">
+                  ${p.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
+                </button>
                 <span class="act-icon" title="Editar" onclick="openModalPendencia(${p.id})">✏️</span>
                 <span class="act-icon" title="Excluir" onclick="deletePendencia(${p.id})">🗑️</span>
               </span>
             </div>
           `).join('')
-        : '<p class="hint" style="margin:4px 0;">Nenhuma pendência cadastrada.</p>';
+        : '<p class="hint" style="margin:2px 0;">Nenhuma pendência aberta na casa.</p>';
 
-      const muralItems = appState.mural.filter(m => !m.date || m.date === hojeSelectedDateISO);
-      document.getElementById('mural-card-title').textContent = isToday ? '📌 Mural Rápido' : `📌 Mural · ${formatShortBR(hojeSelectedDateISO)}`;
-      document.getElementById('mural-list').innerHTML = muralItems.length
-        ? muralItems.map(m => `
-            <div class="check-item">
-              <span style="flex:1;"><strong>${escapeHTML(m.autor)}:</strong> ${escapeHTML(m.texto)}</span>
+      document.getElementById('mural-card-title').textContent = isToday ? '📌 Mural de Hoje' : `📌 Mural · ${formatShortBR(hojeSelectedDateISO)}`;
+      const muralDoDia = appState.mural.filter(m => !m.date || m.date === hojeSelectedDateISO);
+      document.getElementById('mural-list').innerHTML = muralDoDia.length
+        ? muralDoDia.map(m => `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid rgba(133,77,14,0.12); font-size:14px;">
+              <div><strong>${escapeHTML(m.autor)}:</strong> ${escapeHTML(m.texto)}</div>
               <span class="item-actions-inline">
                 <span class="act-icon" title="Editar" onclick="openModalMural(${m.id})">✏️</span>
                 <span class="act-icon" title="Excluir" onclick="deleteMural(${m.id})">🗑️</span>
               </span>
             </div>
           `).join('')
-        : '<p class="hint" style="margin:0;">Nenhum recado para este dia.</p>';
+        : '<p class="hint" style="margin:0;">Nenhum recado registrado neste dia.</p>';
 
-      const memberCache = buildMemberMetaCache();
-      const eventsDay = getEventsForDate(hojeSelectedDateISO).sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
       const timelineItems = [];
+      const memberMeta = buildMemberMetaCache();
 
-      eventsDay.forEach(ev => {
-        const catName = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
-        const meta = memberCache[catName] || { nome: catName, emoji: '📌', cor: '#4A7C59' };
-        const recTag = getRecorrenciaLabel(ev.recorrencia);
-        timelineItems.push(`
-          <div class="timeline-row">
-            <div class="timeline-time-col" style="background:${escapeHTML(meta.cor)}18; color:${escapeHTML(meta.cor)};">${escapeHTML(ev.time || 'Dia todo')}</div>
-            <div class="timeline-main-col">
-              <div class="timeline-title-line">
-                <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(catName)}</span>
-                <span>${escapeHTML(ev.titulo)}</span>
-              </div>
-              ${recTag ? `<div class="timeline-meta">${recTag}</div>` : ''}
-            </div>
-            <span class="item-actions-inline">
-              <span class="act-icon" title="Editar" onclick="openModalAgenda(${ev.id})">✏️</span>
-              <span class="act-icon" title="Excluir" onclick="deleteAgenda(${ev.id})">🗑️</span>
-            </span>
-          </div>
-        `);
+      dayEvents.forEach(ev => {
+        const cat = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
+        const meta = memberMeta[cat] || { emoji: '📌', cor: '#4A7C59' };
+        const recLabel = getRecorrenciaLabel(ev.recorrencia);
+        timelineItems.push({
+          sortKey: ev.time || '00:00',
+          timeBadge: ev.time || 'Dia todo',
+          title: ev.titulo,
+          tag: `${meta.emoji} ${cat}`,
+          tagColor: meta.cor,
+          subMeta: recLabel ? recLabel : 'Compromisso agendado',
+          done: false,
+          isMission: false,
+          id: ev.id
+        });
       });
 
-      const turnoHorario = { 'Manhã': '☀️ Manhã', 'Tarde': '🌤️ Tarde', 'Noite': '🌙 Noite' };
-      (appState.missoes || []).forEach(m => {
+      const turnoHorarioMap = { 'Manhã': '07:45', 'Tarde': '14:00', 'Noite': '19:30' };
+      appState.missoes.forEach(m => {
         const isDone = doneIds.includes(m.id);
-        const hasDesc = Boolean((m.descricao || '').trim());
-        timelineItems.push(`
-          <div class="timeline-row">
-            <div class="timeline-time-col">${turnoHorario[m.turno] || escapeHTML(m.turno)}</div>
-            <div class="timeline-main-col" style="${isToday ? 'cursor:pointer;' : ''}" ${isToday ? `onclick="toggleMissao(${m.id})"` : ''}>
-              <div class="timeline-title-line ${isDone ? 'done' : ''}">
-                <span>${isDone ? '✅' : '⬜'}</span>
-                <span>${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</span>
-              </div>
-              ${hasDesc ? `<span class="mission-desc-preview">${escapeHTML(m.descricao)}</span>` : ''}
-              <div class="timeline-meta">🌟 Missão da Duda · ${isDone ? '+1 estrela conquistada' : 'Pendente'}</div>
-            </div>
-            ${hasDesc ? `
-              <span class="item-actions-inline">
-                <button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})" title="Ver detalhamento da missão">ℹ️ Detalhes</button>
-              </span>
-            ` : ''}
-          </div>
-        `);
+        const descText = (m.descricao || '').trim();
+        timelineItems.push({
+          sortKey: turnoHorarioMap[m.turno] || '12:00',
+          timeBadge: m.turno,
+          title: `${m.emoji} ${m.titulo}`,
+          tag: '🌟 Duda',
+          tagColor: '#C96A48',
+          subMeta: isDone ? 'Missão concluída (+1 ⭐)' : `Missão · Turno da ${m.turno}`,
+          descText,
+          done: isDone,
+          isMission: true,
+          id: m.id
+        });
       });
 
-      const tlContainer = document.getElementById('hoje-timeline-list');
-      if (tlContainer) {
-        tlContainer.innerHTML = timelineItems.length
-          ? timelineItems.join('')
-          : '<p class="hint" style="margin:4px 0;">Dia livre! Nenhum compromisso ou missão cadastrada.</p>';
-      }
+      timelineItems.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+      document.getElementById('hoje-timeline-list').innerHTML = timelineItems.length
+        ? timelineItems.map(it => `
+            <div class="timeline-row">
+              <div class="timeline-time-col">${escapeHTML(it.timeBadge)}</div>
+              <div class="timeline-main-col">
+                <div class="timeline-title-line ${it.done ? 'done' : ''}">
+                  <span class="agenda-tag" style="background:${escapeHTML(it.tagColor)}1A; color:${escapeHTML(it.tagColor)};">${escapeHTML(it.tag)}</span>
+                  <span>${it.isMission ? (it.done ? '✅ ' : '⬜ ') : ''}${escapeHTML(it.title)}</span>
+                  ${it.isMission && it.descText ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${it.id})">ℹ️ Detalhes</button>` : ''}
+                </div>
+                ${it.isMission && it.descText ? `<span class="mission-desc-preview">${escapeHTML(it.descText)}</span>` : ''}
+                <div class="timeline-meta">${escapeHTML(it.subMeta)}</div>
+              </div>
+              ${!it.isMission ? `
+                <span class="item-actions-inline">
+                  <span class="act-icon" title="Editar" onclick="openModalAgenda(${it.id})">✏️</span>
+                  <span class="act-icon" title="Excluir" onclick="deleteAgenda(${it.id})">🗑️</span>
+                </span>
+              ` : ''}
+            </div>
+          `).join('')
+        : '<p class="hint" style="margin:0;">Nada agendado para este dia.</p>';
     }
 
     function renderCalendar() {
@@ -3928,26 +4549,28 @@
       const firstDayWeek = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
       const daysInMonth = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
       const today = getTodayISO();
-      const memberCache = buildMemberMetaCache();
+      const memberMeta = buildMemberMetaCache();
 
       let html = '';
       for (let i = 0; i < firstDayWeek; i++) html += `<div class="cal-day empty"></div>`;
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const iso = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayEvents = getEventsForDate(iso).filter(a => {
-          const cat = a.categoria === 'Casal' ? 'Família' : a.categoria;
+        const isoStr = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = getEventsForDate(isoStr).filter(a => {
+          const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
           return currentAgendaFilter === 'Todos' || cat === currentAgendaFilter;
         });
+        const isToday = isoStr === today;
+        const isSelected = isoStr === selectedDateISO;
 
         const dots = dayEvents.slice(0, 3).map(ev => {
-          const cat = ev.categoria === 'Casal' ? 'Família' : ev.categoria;
-          const meta = memberCache[cat] || { cor: '#4A7C59' };
-          return `<span class="cal-dot" style="background:${escapeHTML(meta.cor)};"></span>`;
+          const cat = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
+          const cor = (memberMeta[cat] && memberMeta[cat].cor) || '#4A7C59';
+          return `<span class="cal-dot" style="background:${escapeHTML(cor)};"></span>`;
         }).join('');
 
         html += `
-          <div class="cal-day ${iso === today ? 'today' : ''} ${iso === selectedDateISO ? 'selected' : ''}" onclick="selectCalendarDay('${iso}')">
+          <div class="cal-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectCalendarDay('${isoStr}')">
             <span>${day}</span>
             <div class="cal-dots">${dots}</div>
           </div>
@@ -3957,26 +4580,29 @@
     }
 
     function renderAgenda() {
-      document.getElementById('selected-day-title').textContent = `📅 ${formatFullDateBR(selectedDateISO)}`;
-      const memberCache = buildMemberMetaCache();
-      const filtered = getEventsForDate(selectedDateISO)
+      const today = getTodayISO();
+      const label = selectedDateISO === today ? `Hoje (${formatShortBR(selectedDateISO)})` : formatShortBR(selectedDateISO);
+      document.getElementById('selected-day-title').textContent = `📅 Eventos · ${label}`;
+      const memberMeta = buildMemberMetaCache();
+
+      const filtrados = getEventsForDate(selectedDateISO)
         .filter(a => {
-          const cat = a.categoria === 'Casal' ? 'Família' : a.categoria;
+          const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
           return currentAgendaFilter === 'Todos' || cat === currentAgendaFilter;
         })
         .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
 
-      document.getElementById('agenda-list').innerHTML = filtered.length
-        ? filtered.map(a => {
+      document.getElementById('agenda-list').innerHTML = filtrados.length
+        ? filtrados.map(a => {
             const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
-            const meta = memberCache[cat] || { nome: cat, emoji: '📌', cor: '#4A7C59' };
-            const recTag = getRecorrenciaLabel(a.recorrencia);
+            const meta = memberMeta[cat] || { emoji: '📌', cor: '#4A7C59' };
+            const rec = getRecorrenciaLabel(a.recorrencia);
             return `
               <div class="agenda-item">
                 <div>
-                  <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(cat)}</span>
-                  <strong>${escapeHTML(a.time || '')}</strong> ${escapeHTML(a.titulo)}
-                  ${recTag ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${recTag}</div>` : ''}
+                  <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}1A; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(cat)}</span>
+                  <strong>${a.time ? escapeHTML(a.time) + ' - ' : ''}</strong>${escapeHTML(a.titulo)}
+                  ${rec ? `<span class="valor-pill">${escapeHTML(rec)}</span>` : ''}
                 </div>
                 <span class="item-actions-inline">
                   <span class="act-icon" title="Editar" onclick="openModalAgenda(${a.id})">✏️</span>
@@ -3985,15 +4611,15 @@
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Nenhum compromisso neste dia.</p>';
+        : '<p class="hint" style="margin:0;">Nenhum compromisso nesta data/filtro.</p>';
     }
 
     function renderMercado() {
       document.getElementById('mercado-list').innerHTML = appState.mercado.length
         ? appState.mercado.map(m => `
             <div class="check-item ${m.done ? 'done' : ''}">
-              <span class="item-text-main" style="flex:1;" onclick="toggleMercado(${m.id})">
-                ${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}
+              <span onclick="toggleMercado(${m.id})" style="flex:1;">
+                <span class="item-text-main">${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}</span>
                 ${m.valor ? `<span class="valor-pill">${escapeHTML(m.valor)}</span>` : ''}
               </span>
               <span class="item-actions-inline">
@@ -4039,23 +4665,24 @@
       document.getElementById('familia-despesas-list').innerHTML = lista.length
         ? lista.map(d => {
             const isOk = d.status === 'aprovada';
-            const isSent = !!d.enviadoFinanceiro;
             return `
               <div class="despesa-row">
                 <div style="flex:1; min-width:0;">
-                  <strong>${escapeHTML(d.descricao)}</strong>
-                  <span class="despesa-status-badge ${isOk ? 'aprovada' : ''}" style="cursor:pointer;" onclick="toggleDespesaStatus(${d.id})">
-                    ${isOk ? '✅ Conferida' : '⏳ Pendente'}
-                  </span>
+                  <div>
+                    <strong>${escapeHTML(d.descricao)}</strong>
+                    <span class="despesa-status-badge ${isOk ? 'aprovada' : ''}" onclick="toggleDespesaStatus(${d.id})" style="cursor:pointer;">
+                      ${isOk ? '✅ OK' : '⏳ Pendente'}
+                    </span>
+                  </div>
                   <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
                     ${formatShortBR(d.date)} · Pago por <strong>${escapeHTML(d.pagoPor)}</strong> · ${d.dividido ? 'Dividido 50/50' : 'Individual'}
                   </div>
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
-                  <strong style="display:block; font-size:14px;">${formatCurrencyBR(d.valor)}</strong>
+                  <strong style="display:block; font-size:14px; color:var(--text-main);">${formatCurrencyBR(d.valor)}</strong>
                   <div class="item-actions-inline" style="justify-content:flex-end; margin-top:4px;">
-                    <button type="button" class="btn-bridge ${isSent ? 'sent' : ''}" onclick="openBridgeFromDespesa(${d.id})" title="${isSent ? 'Já enviado ao App de Finanças' : 'Lançar no App de Finanças'}">
-                      ${isSent ? '✅ No Finanças' : '💸 Lançar'}
+                    <button type="button" class="btn-bridge ${d.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromDespesa(${d.id})" title="Lançar no App de Finanças">
+                      ${d.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
                     </button>
                     <span class="act-icon" title="Editar" onclick="openModalDespesa(${d.id})">✏️</span>
                     <span class="act-icon" title="Excluir" onclick="deleteDespesa(${d.id})">🗑️</span>
@@ -4064,264 +4691,100 @@
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Nenhuma despesa registrada ainda.</p>';
+        : '<p class="hint" style="margin:0;">Nenhuma despesa compartilhada lançada.</p>';
     }
 
     function renderSaude() {
-      const remedios = appState.saude.remedios || [];
+      const s = appState.saude;
+      const remedios = s.remedios || [];
+
       document.getElementById('remedio-box').innerHTML = remedios.length
-        ? remedios.map(rem => {
-            const prox = getProximaDoseInfo(rem);
+        ? remedios.map(r => {
+            const prox = getProximaDoseInfo(r);
             return `
               <div class="remedio-card ${prox && prox.overdue ? 'overdue' : ''}">
                 <div class="remedio-top">
                   <div>
-                    <strong>${escapeHTML(rem.nome)}</strong> · <span style="font-size:13px;">${escapeHTML(rem.dosagem)}</span>
+                    <strong style="font-size:15px;">${escapeHTML(r.nome)}</strong> (${escapeHTML(r.dosagem)})
+                    <div style="font-size:13px; color:var(--text-muted); margin-top:3px;">
+                      Última dose: <strong>${escapeHTML(r.ultimaDoseTexto)}</strong> por ${escapeHTML(r.responsavelUltima)}
+                    </div>
+                    ${prox ? `<div style="font-size:12px; font-weight:800; color:${prox.overdue ? 'var(--accent-dark)' : 'var(--primary-dark)'}; margin-top:3px;">
+                      ${prox.overdue ? '⏰ Dose atrasada! Prevista para ' : '⏱️ Próxima dose prevista: '}${escapeHTML(prox.texto)}
+                    </div>` : ''}
                   </div>
                   <div class="remedio-actions-top">
-                    <button type="button" class="icon-btn-tiny" title="Editar" onclick="openModalNovoRemedio(${rem.id})">✏️</button>
-                    <button type="button" class="icon-btn-tiny" title="Encerrar" onclick="deleteRemedio(${rem.id})">🗑️</button>
+                    <button type="button" class="icon-btn-tiny" title="Editar remédio" onclick="openModalNovoRemedio(${r.id})">✏️</button>
+                    <button type="button" class="icon-btn-tiny" title="Encerrar remédio" onclick="deleteRemedio(${r.id})">🗑️</button>
                   </div>
                 </div>
-                <p class="hint" style="margin:6px 0 0;">
-                  Última dose: <strong>${escapeHTML(rem.ultimaDoseTexto)}</strong> (${escapeHTML(rem.responsavelUltima)})<br/>
-                  ${prox ? `Próxima dose: <strong>${escapeHTML(prox.texto)}</strong> ${prox.overdue ? '⚠️ Horário atingido!' : ''}` : 'Aguardando 1ª dose'}
-                </p>
-                <button type="button" class="btn-dose" onclick="openModalRegistrarDose(${rem.id})">✔️ Registrar Dose Agora</button>
+                <button type="button" class="btn-dose" onclick="openModalRegistrarDose(${r.id})">✅ Registrar Dose Agora</button>
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Nenhum remédio ativo no momento. Toque em <strong>+ Remédio</strong> para iniciar.</p>';
+        : '<p class="hint" style="margin:0;">Nenhum remédio contínuo/ativo cadastrado. Toque em "+ Remédio".</p>';
 
-      const logs = appState.saude.historicoDoses || [];
+      const logs = s.historicoDoses || [];
       document.getElementById('dose-history-box').innerHTML = logs.length
-        ? logs.slice(0, 15).map(log => `
+        ? logs.slice(0, 15).map(l => `
             <div class="dose-log-row">
               <div class="dose-log-main">
-                <strong>${escapeHTML(log.remedioNome)}</strong> · ${escapeHTML(formatTimeFromTimestamp(log.timestamp))}
-                <div class="dose-log-meta">${escapeHTML(log.dosagem)} · por <strong>${escapeHTML(log.responsavel)}</strong></div>
+                <strong>${escapeHTML(l.remedioNome)}</strong> <span style="color:var(--text-muted);">(${escapeHTML(l.dosagem)})</span>
+                <div class="dose-log-meta">🕒 ${escapeHTML(formatTimeFromTimestamp(l.timestamp))} · por <strong>${escapeHTML(l.responsavel)}</strong></div>
               </div>
               <div class="dose-log-btns">
-                <button type="button" class="icon-btn-tiny" title="Corrigir" onclick="openModalEditarDoseLog(${log.id})">✏️</button>
-                <button type="button" class="icon-btn-tiny" title="Excluir" onclick="deleteDoseLog(${log.id})">🗑️</button>
+                <button type="button" class="icon-btn-tiny" title="Corrigir horário ou responsável" onclick="openModalEditarDoseLog(${l.id})">✏️</button>
+                <button type="button" class="icon-btn-tiny" title="Excluir registro errado" onclick="deleteDoseLog(${l.id})">🗑️</button>
               </div>
             </div>
           `).join('')
-        : '<p class="hint" style="margin:0;">Nenhuma dose registrada ainda.</p>';
+        : '<p class="hint" style="margin:0;">Nenhuma dose registrada no histórico.</p>';
 
-      const f = appState.saude.ficha;
       document.getElementById('ficha-saude-box').innerHTML = `
-        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(f.tipoSanguineo)}</p>
-        <p><strong>Alergias:</strong> ${escapeHTML(f.alergias)}</p>
-        <p><strong>Pediatra:</strong> ${escapeHTML(f.pediatra)}</p>
-        <p><strong>Plano / Carteirinha:</strong> ${escapeHTML(f.plano)}</p>
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(s.ficha.tipoSanguineo)}</p>
+        <p><strong>⚠️ Alergias:</strong> ${escapeHTML(s.ficha.alergias)}</p>
+        <p><strong>Pediatra:</strong> ${escapeHTML(s.ficha.pediatra)}</p>
+        <p><strong>Plano / Cart.:</strong> ${escapeHTML(s.ficha.plano)}</p>
       `;
 
-      const vacinas = appState.saude.vacinas || [];
+      const vacinas = s.vacinas || [];
       document.getElementById('vacinas-list-box').innerHTML = vacinas.length
-        ? vacinas.map(v => {
-            const isProx = v.status === 'proxima';
-            return `
-              <div class="vaccine-row">
-                <div>
-                  <strong>${escapeHTML(v.nome)}</strong>
-                  <div style="font-size:11px; color:var(--text-muted);">${isProx ? 'Previsão:' : 'Aplicada em:'} ${formatFullDateBR(v.data)}</div>
-                </div>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span class="vaccine-pill ${isProx ? 'upcoming' : ''}">${isProx ? '📅 Próxima' : '✅ Tomada'}</span>
-                  <span class="act-icon" title="Editar" onclick="openModalVacina(${v.id})">✏️</span>
-                  <span class="act-icon" title="Excluir" onclick="deleteVacina(${v.id})">🗑️</span>
-                </div>
+        ? vacinas.map(v => `
+            <div class="vaccine-row">
+              <div>
+                <strong>${escapeHTML(v.nome)}</strong>
+                <div style="font-size:11px; color:var(--text-muted);">${formatShortBR(v.data)}</div>
               </div>
-            `;
-          }).join('')
+              <span class="item-actions-inline">
+                <span class="vaccine-pill ${v.status === 'proxima' ? 'upcoming' : ''}">
+                  ${v.status === 'proxima' ? '📅 Próxima' : '✅ Tomada'}
+                </span>
+                <span class="act-icon" title="Editar" onclick="openModalVacina(${v.id})">✏️</span>
+                <span class="act-icon" title="Excluir" onclick="deleteVacina(${v.id})">🗑️</span>
+              </span>
+            </div>
+          `).join('')
         : '<p class="hint" style="margin:0;">Nenhuma vacina cadastrada.</p>';
-    }
-
-    function renderAdminDuda() {
-      const today = getTodayISO();
-      const thisMon = getMondayOfWeekISO(today);
-      const thisSun = addDaysISO(thisMon, 6);
-      const weekDates = getWeekDatesArray(thisMon);
-      const totalMissions = appState.missoes.length;
-
-      if (!weekDates.includes(adminWeekSelectedDateISO) || adminWeekSelectedDateISO > today) {
-        adminWeekSelectedDateISO = today;
-      }
-
-      document.getElementById('admin-week-range-label').textContent = `Semana atual: ${formatShortBR(thisMon)} a ${formatShortBR(thisSun)} · Toque no dia para detalhar`;
-      document.getElementById('admin-week-strip').innerHTML = weekDates.map((iso, idx) => {
-        const doneCount = getCompletedIdsForDate(iso).length;
-        const isToday = iso === today;
-        const isSel = iso === adminWeekSelectedDateISO;
-        const isFuture = iso > today;
-        return `
-          <div class="week-day-pill ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''} ${isFuture ? 'future' : ''}"
-            ${!isFuture ? `onclick="selectAdminWeekDay('${iso}')"` : ''}>
-            <small>${DIAS_CURTOS_SEG_DOM[idx]}</small>
-            <strong>${iso.split('-')[2]}</strong>
-            <span>${isFuture ? '-' : `⭐${doneCount}/${totalMissions}`}</span>
-          </div>
-        `;
-      }).join('');
-
-      const dayDetailBox = document.getElementById('admin-week-day-detail');
-      if (dayDetailBox) {
-        const selDoneIds = getCompletedIdsForDate(adminWeekSelectedDateISO);
-        const isSelToday = adminWeekSelectedDateISO === today;
-        const selDow = DIAS_SEMANA_PT[parseISOToLocalDate(adminWeekSelectedDateISO).getDay()];
-        const missoesList = appState.missoes || [];
-
-        dayDetailBox.innerHTML = `
-          <div class="admin-day-detail-box">
-            <div class="admin-day-detail-head">
-              <strong>📅 ${isSelToday ? 'Hoje' : selDow.split('-')[0]} (${formatShortBR(adminWeekSelectedDateISO)}) · ${selDoneIds.length}/${missoesList.length} concluídas</strong>
-              <button type="button" class="btn-mini" onclick="openModalEstrelasManual('bonus', 'Missão extra em ${formatShortBR(adminWeekSelectedDateISO)}')">+ Estrela Extra</button>
-            </div>
-            ${missoesList.length ? missoesList.map(m => {
-              const isDone = selDoneIds.includes(m.id);
-              const hasDesc = Boolean((m.descricao || '').trim());
-              return `
-                <div class="admin-day-mission-row">
-                  <div style="flex:1; min-width:0; cursor:pointer;" onclick="toggleMissionOnSpecificAdminDate('${adminWeekSelectedDateISO}', ${m.id})" title="Toque para marcar ou desmarcar nesta data">
-                    <span>${isDone ? '✅' : '⬜'}</span>
-                    <strong style="${isDone ? '' : 'color:var(--text-muted); font-weight:700;'}">${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</strong>
-                    <span class="valor-pill">${escapeHTML(m.turno)}</span>
-                  </div>
-                  ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})">ℹ️ Detalhes</button>` : ''}
-                </div>
-              `;
-            }).join('') : '<p class="hint" style="margin:0;">Nenhuma missão cadastrada.</p>'}
-          </div>
-        `;
-      }
-
-      const { medals } = computeDudaStatsAndMedals();
-      const adminMedalsBox = document.getElementById('admin-duda-medals-box');
-      if (adminMedalsBox) {
-        adminMedalsBox.innerHTML = medals.map(m => `
-          <span class="medal-pill ${m.unlocked ? '' : 'locked'}" title="${m.unlocked ? 'Conquistada!' : 'Ainda não desbloqueada'}">
-            ${m.icon} ${escapeHTML(m.label)}
-          </span>
-        `).join('');
-      }
-
-      const adminLongGoalBox = document.getElementById('admin-duda-long-goal-box');
-      if (adminLongGoalBox) {
-        adminLongGoalBox.innerHTML = renderLongGoalCardHTML(true);
-      }
-
-      let pastHtml = '';
-      for (let w = 1; w <= 4; w++) {
-        const mon = addDaysISO(thisMon, -7 * w);
-        const sun = addDaysISO(mon, 6);
-        let sum = 0;
-        getWeekDatesArray(mon).forEach(d => { sum += getCompletedIdsForDate(d).length; });
-        pastHtml += `
-          <div class="week-history-row">
-            <span><strong>${formatShortBR(mon)} a ${formatShortBR(sun)}</strong></span>
-            <span class="week-badge-stars">⭐ ${sum} / ${totalMissions * 7} estrelas</span>
-          </div>
-        `;
-      }
-      document.getElementById('admin-past-weeks-list').innerHTML = pastHtml;
-
-      document.getElementById('admin-estrelas-count').textContent = `⭐ ${appState.estrelasTotais || 0} estrelas`;
-
-      const starLogs = (appState.historicoEstrelas || []).slice(0, 12);
-      document.getElementById('admin-star-history-list').innerHTML = starLogs.length
-        ? starLogs.map(h => {
-            const isPen = h.tipo === 'penalty' || h.delta < 0;
-            const sign = h.delta > 0 ? `+${h.delta}` : `${h.delta}`;
-            return `
-              <div class="star-log-row ${isPen ? 'penalty' : ''}">
-                <div>
-                  <strong>${isPen ? '⚠️ Penalidade' : (h.tipo === 'redeem' ? '🎁 Resgate de Desejo' : '⭐ Bônus')}</strong>
-                  <div style="margin-top:2px;">${escapeHTML(h.motivo)}</div>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${formatShortBR(h.date)} · por ${escapeHTML(h.autor || 'Pais')}</div>
-                </div>
-                <span class="star-log-delta">${sign} ⭐</span>
-              </div>
-            `;
-          }).join('')
-        : '<p class="hint" style="margin:0;">Nenhuma penalidade ou bônus extra registrado.</p>';
-
-      const wishes = appState.desejos || [];
-      const activeGoal = getActiveLongGoalWish();
-      document.getElementById('admin-wishes-list').innerHTML = wishes.length
-        ? wishes.map(w => {
-            const isApproved = w.status === 'aprovado';
-            const isRejected = w.status === 'recusado';
-            const isPinnedGoal = activeGoal && activeGoal.id === w.id;
-            return `
-              <div class="wish-admin-card">
-                <div class="wish-admin-top">
-                  <div>
-                    <strong>${escapeHTML(w.titulo)}</strong> ${isPinnedGoal ? '<span class="valor-pill">🎯 Meta Principal</span>' : ''}
-                    <div class="hint" style="margin:2px 0 0;">Custo: <strong>${w.custo} ⭐</strong></div>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    ${(!isApproved && !isRejected && !isPinnedGoal) ? `<span class="act-icon" title="Fixar como meta principal" onclick="pinWishAsMainGoal(${w.id})">🎯</span>` : ''}
-                    <span class="wish-status-pill ${isApproved ? 'approved' : (isRejected ? 'rejected' : '')}">
-                      ${isApproved ? '✅ Aprovado' : (isRejected ? '❌ Recusado' : '⏳ Aguardando')}
-                    </span>
-                    <span class="act-icon" title="Excluir" onclick="deleteWish(${w.id})">🗑️</span>
-                  </div>
-                </div>
-                ${isRejected && w.motivoRecusa ? `<div class="wish-reason-box">💬 Motivo informado à Duda: "${escapeHTML(w.motivoRecusa)}"</div>` : ''}
-                ${(!isApproved && !isRejected) ? `
-                  <div class="wish-actions">
-                    <button type="button" class="btn-approve" onclick="approveWish(${w.id})">✅ Aprovar (-${w.custo}⭐)</button>
-                    <button type="button" class="btn-reject" onclick="openModalRecusarDesejo(${w.id})">💬 Recusar c/ Motivo</button>
-                  </div>
-                ` : ''}
-              </div>
-            `;
-          }).join('')
-        : '<p class="hint" style="margin:0;">Nenhum desejo pedido pela Duda no momento.</p>';
-
-      document.getElementById('admin-missoes-list').innerHTML = appState.missoes.map(m => {
-        const hasDesc = Boolean((m.descricao || '').trim());
-        return `
-          <div class="check-item" style="align-items:flex-start;">
-            <div style="flex:1; min-width:0;">
-              <div><span class="agenda-tag">${escapeHTML(m.turno)}</span> ${escapeHTML(m.emoji)} <strong>${escapeHTML(m.titulo)}</strong></div>
-              ${hasDesc ? `<span class="mission-desc-preview">${escapeHTML(m.descricao)}</span>` : ''}
-            </div>
-            <span class="item-actions-inline">
-              ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})">ℹ️ Detalhes</button>` : ''}
-              <span class="act-icon" title="Editar" onclick="openModalMissao(${m.id})">✏️</span>
-              <span class="act-icon" title="Excluir" onclick="deleteMissao(${m.id})">🗑️</span>
-            </span>
-          </div>
-        `;
-      }).join('');
     }
 
     function renderApoio() {
       const today = getTodayISO();
-      const isToday = apoioSelectedDateISO === today;
-      const dObj = parseISOToLocalDate(apoioSelectedDateISO);
-      const dowName = DIAS_SEMANA_PT[dObj.getDay()];
+      const iso = apoioSelectedDateISO || today;
+      const isToday = iso === today;
+      const dObj = parseISOToLocalDate(iso);
+      const diaSemana = DIAS_SEMANA_PT[dObj.getDay()];
 
-      document.getElementById('apoio-day-label').textContent = isToday
-        ? `Hoje · ${formatShortBR(apoioSelectedDateISO)}`
-        : `${dowName.split('-')[0]} · ${formatShortBR(apoioSelectedDateISO)}`;
-      document.getElementById('apoio-day-sublabel').textContent = isToday ? dowName : formatFullDateBR(apoioSelectedDateISO);
+      document.getElementById('apoio-day-label').textContent = isToday ? `Hoje · ${formatShortBR(iso)}` : formatShortBR(iso);
+      document.getElementById('apoio-day-sublabel').textContent = diaSemana;
       document.getElementById('btn-apoio-back-today').classList.toggle('hidden', isToday);
 
-      const log = getLogisticaForDate(apoioSelectedDateISO);
-      document.getElementById('apoio-logistica-title').textContent = isToday
-        ? '🎒 Logística da Duda · Hoje'
-        : `🎒 Logística da Duda · ${formatShortBR(apoioSelectedDateISO)}`;
+      const log = getLogisticaForDate(iso);
+      document.getElementById('apoio-logistica-title').textContent = isToday ? '🎒 Logística da Duda · Hoje' : `🎒 Logística · ${formatShortBR(iso)}`;
       document.getElementById('apoio-leva').textContent = log.leva;
       document.getElementById('apoio-busca').textContent = log.busca;
 
-      document.getElementById('apoio-agenda-title').textContent = isToday
-        ? '📅 Agenda da Duda · Hoje'
-        : `📅 Agenda da Duda · ${formatShortBR(apoioSelectedDateISO)}`;
-      const memberCache = buildMemberMetaCache();
-      const dudaAgenda = getEventsForDate(apoioSelectedDateISO)
+      document.getElementById('apoio-agenda-title').textContent = isToday ? '📅 Agenda da Duda · Hoje' : `📅 Agenda · ${formatShortBR(iso)}`;
+      const dudaAgenda = getEventsForDate(iso)
         .filter(ev => {
           const cat = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
           return cat === 'Duda' || cat === 'Família';
@@ -4331,90 +4794,242 @@
       document.getElementById('apoio-agenda-list').innerHTML = dudaAgenda.length
         ? dudaAgenda.map(a => {
             const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
-            const meta = memberCache[cat] || { nome: cat, emoji: '📌', cor: '#4A7C59' };
-            const recTag = getRecorrenciaLabel(a.recorrencia);
+            const rec = getRecorrenciaLabel(a.recorrencia);
             return `
               <div class="agenda-item">
                 <div>
-                  <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(cat)}</span>
-                  <strong>${escapeHTML(a.time || '')}</strong> ${escapeHTML(a.titulo)}
-                  ${recTag ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${recTag}</div>` : ''}
+                  <span class="agenda-tag">${cat === 'Duda' ? '🌟 Duda' : '🏡 Família'}</span>
+                  <strong>${a.time ? escapeHTML(a.time) + ' - ' : ''}</strong>${escapeHTML(a.titulo)}
+                  ${rec ? `<span class="valor-pill">${escapeHTML(rec)}</span>` : ''}
                 </div>
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Nenhum compromisso da Duda neste dia.</p>';
+        : '<p class="hint" style="margin:0;">Sem compromissos da Duda nesta data.</p>';
 
-      const remedios = appState.saude.remedios || [];
+      const s = appState.saude;
+      const remedios = s.remedios || [];
       document.getElementById('apoio-remedio-box').innerHTML = remedios.length
-        ? remedios.map(rem => {
-            const prox = getProximaDoseInfo(rem);
+        ? remedios.map(r => {
+            const prox = getProximaDoseInfo(r);
             return `
               <div class="remedio-card ${prox && prox.overdue ? 'overdue' : ''}">
-                <strong>${escapeHTML(rem.nome)}</strong> · <span style="font-size:13px;">${escapeHTML(rem.dosagem)}</span>
-                <p class="hint" style="margin:6px 0 0;">
-                  Última dose: <strong>${escapeHTML(rem.ultimaDoseTexto)}</strong> (${escapeHTML(rem.responsavelUltima)})<br/>
-                  ${prox ? `Próxima dose: <strong>${escapeHTML(prox.texto)}</strong>` : 'Aguardando 1ª dose'}
-                </p>
-                <button type="button" class="btn-dose" onclick="openModalRegistrarDose(${rem.id})">✔️ Registrar Dose Agora</button>
+                <strong>${escapeHTML(r.nome)}</strong> (${escapeHTML(r.dosagem)})
+                <div style="font-size:13px; color:var(--text-muted); margin-top:3px;">
+                  Última dose: <strong>${escapeHTML(r.ultimaDoseTexto)}</strong> por ${escapeHTML(r.responsavelUltima)}
+                </div>
+                ${prox ? `<div style="font-size:12px; font-weight:800; color:${prox.overdue ? 'var(--accent-dark)' : 'var(--primary-dark)'}; margin-top:3px;">
+                  ${prox.overdue ? '⏰ Dose atrasada! Prevista para ' : '⏱️ Próxima dose: '}${escapeHTML(prox.texto)}
+                </div>` : ''}
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Nenhum remédio ativo no momento.</p>';
+        : '<p class="hint" style="margin:0;">Nenhum remédio ativo hoje.</p>';
 
-      const f = appState.saude.ficha;
       document.getElementById('apoio-ficha-box').innerHTML = `
-        <p><strong>Alergias:</strong> ${escapeHTML(f.alergias)}</p>
-        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(f.tipoSanguineo)}</p>
-        <p><strong>Pediatra:</strong> ${escapeHTML(f.pediatra)}</p>
-        <p><strong>Plano / Carteirinha:</strong> ${escapeHTML(f.plano)}</p>
+        <p><strong>⚠️ Alergias:</strong> ${escapeHTML(s.ficha.alergias)}</p>
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(s.ficha.tipoSanguineo)}</p>
+        <p><strong>Pediatra:</strong> ${escapeHTML(s.ficha.pediatra)}</p>
+        <p><strong>Plano / Cart.:</strong> ${escapeHTML(s.ficha.plano)}</p>
       `;
+    }
+
+    function renderAdminDuda() {
+      const saldo = appState.estrelasTotais || 0;
+      document.getElementById('admin-estrelas-count').textContent = `⭐ ${saldo} estrelas`;
+
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const weekDates = getWeekDatesArray(thisMon);
+      const totalM = appState.missoes.length;
+
+      if (!weekDates.includes(adminWeekSelectedDateISO) || adminWeekSelectedDateISO > today) {
+        adminWeekSelectedDateISO = today;
+      }
+
+      document.getElementById('admin-week-range-label').textContent = `Semana atual (${formatShortBR(weekDates[0])} a ${formatShortBR(weekDates[6])}) · Toque em um dia`;
+      document.getElementById('admin-week-strip').innerHTML = weekDates.map((iso, idx) => {
+        const doneCount = getCompletedIdsForDate(iso).length;
+        const isToday = iso === today;
+        const isSelected = iso === adminWeekSelectedDateISO;
+        const isFuture = iso > today;
+        return `
+          <button type="button" class="week-day-pill ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFuture ? 'future' : ''}"
+            ${isFuture ? 'disabled' : `onclick="selectAdminWeekDay('${iso}')"`}>
+            <small>${DIAS_CURTOS_SEG_DOM[idx]}</small>
+            <strong>${iso.split('-')[2]}</strong>
+            <span>${isFuture ? '-' : `${doneCount}/${totalM}`}</span>
+          </button>
+        `;
+      }).join('');
+
+      const selDayObj = parseISOToLocalDate(adminWeekSelectedDateISO);
+      const selDayLabel = adminWeekSelectedDateISO === today
+        ? `Hoje (${formatShortBR(adminWeekSelectedDateISO)} · ${DIAS_SEMANA_PT[selDayObj.getDay()]})`
+        : `${formatShortBR(adminWeekSelectedDateISO)} · ${DIAS_SEMANA_PT[selDayObj.getDay()]}`;
+      const selDoneIds = getCompletedIdsForDate(adminWeekSelectedDateISO);
+      const selDoneCount = (appState.missoes || []).filter(m => selDoneIds.includes(m.id)).length;
+
+      document.getElementById('admin-week-day-detail').innerHTML = `
+        <div class="admin-day-detail-box">
+          <div class="admin-day-detail-head">
+            <strong>📋 Missões de ${escapeHTML(selDayLabel)}</strong>
+            <span class="week-badge-stars">⭐ ${selDoneCount} / ${totalM} feitas</span>
+          </div>
+          ${(appState.missoes || []).length
+            ? (appState.missoes || []).map(m => {
+                const isDone = selDoneIds.includes(m.id);
+                return `
+                  <div class="admin-day-mission-row">
+                    <span onclick="toggleMissionOnSpecificAdminDate('${adminWeekSelectedDateISO}', ${m.id})" style="cursor:pointer; flex:1;">
+                      ${isDone ? '✅' : '⬜'} <strong>${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</strong>
+                      <small style="color:var(--text-muted); font-weight:700;">(${escapeHTML(m.turno)})</small>
+                    </span>
+                    <span class="item-actions-inline">
+                      ${(m.descricao || '').trim() ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})">ℹ️</button>` : ''}
+                      <span class="badge-user" style="cursor:pointer;" onclick="toggleMissionOnSpecificAdminDate('${adminWeekSelectedDateISO}', ${m.id})">
+                        ${isDone ? '+1 ⭐' : 'Pendente'}
+                      </span>
+                    </span>
+                  </div>
+                `;
+              }).join('')
+            : '<p class="hint" style="margin:0;">Nenhuma missão cadastrada.</p>'}
+        </div>
+      `;
+
+      const { medals } = computeDudaStatsAndMedals();
+      document.getElementById('admin-duda-medals-box').innerHTML = medals.map(med => `
+        <span class="medal-pill ${med.unlocked ? '' : 'locked'}">${med.unlocked ? med.icon : '🔒'} ${escapeHTML(med.label)}</span>
+      `).join('');
+
+      document.getElementById('admin-duda-long-goal-box').innerHTML = renderLongGoalCardHTML(true);
+
+      const pastWeeks = getPastWeeksSummary(4);
+      document.getElementById('admin-past-weeks-list').innerHTML = pastWeeks.map(w => `
+        <div class="week-history-row">
+          <span>Semana <strong>${escapeHTML(w.label)}</strong></span>
+          <span class="week-badge-stars">⭐ ${w.stars} / ${w.maxStars}</span>
+        </div>
+      `).join('');
+
+      const starLogs = appState.historicoEstrelas || [];
+      document.getElementById('admin-star-history-list').innerHTML = starLogs.length
+        ? starLogs.slice(0, 10).map(h => {
+            const isPen = h.tipo === 'penalty' || h.delta < 0;
+            const sign = h.delta > 0 ? `+${h.delta}` : `${h.delta}`;
+            return `
+              <div class="star-log-row ${isPen ? 'penalty' : ''}">
+                <div>
+                  <strong>${isPen ? '⚠️ Penalidade' : (h.tipo === 'redeem' ? '🎁 Resgate' : '🌟 Bônus')}</strong>
+                  <div style="font-size:13px; margin-top:2px;">${escapeHTML(h.motivo)}</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                    ${formatShortBR(h.date)} · por <strong>${escapeHTML(h.autor || 'Pais')}</strong>
+                    ${isPen ? (h.vistaPelaDuda ? ' · 👀 Duda já leu' : ' · 🔔 Visível no topo da Duda') : ''}
+                  </div>
+                </div>
+                <span class="star-log-delta">${sign} ⭐</span>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum ajuste manual ou penalidade registrada.</p>';
+
+      const wishes = appState.desejos || [];
+      const activeGoal = getActiveLongGoalWish();
+      document.getElementById('admin-wishes-list').innerHTML = wishes.length
+        ? wishes.map(w => {
+            const isPending = w.status === 'pendente';
+            const isRejected = w.status === 'recusado';
+            const canApprove = isPending && saldo >= w.custo;
+            const isPinned = activeGoal && activeGoal.id === w.id;
+            return `
+              <div class="wish-admin-card" style="${isRejected ? 'background:var(--accent-soft); border-color:var(--accent-border);' : (w.status === 'aprovado' ? 'background:var(--primary-soft); border-color:var(--primary-border);' : '')}">
+                <div class="wish-admin-top">
+                  <div>
+                    <strong style="font-size:15px;">${escapeHTML(w.titulo)}</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Custo: <strong>⭐ ${w.custo} estrelas</strong> ${isPinned ? '· 🎯 Meta Principal' : ''}</div>
+                  </div>
+                  <span class="item-actions-inline">
+                    <span class="wish-status-pill ${w.status === 'aprovado' ? 'approved' : (isRejected ? 'rejected' : '')}">
+                      ${w.status === 'aprovado' ? '✅ Aprovado' : (isRejected ? '❌ Recusado' : '⏳ Pendente')}
+                    </span>
+                    <span class="act-icon" title="Excluir pedido" onclick="deleteWish(${w.id})">🗑️</span>
+                  </span>
+                </div>
+                ${isRejected && w.motivoRecusa ? `<div class="wish-reason-box">Motivo enviado à Duda: "${escapeHTML(w.motivoRecusa)}"</div>` : ''}
+                ${isPending ? `
+                  <div class="wish-actions">
+                    <button type="button" class="btn-approve" onclick="approveWish(${w.id})" ${!canApprove ? 'style="opacity:0.55;"' : ''}>
+                      ${canApprove ? `✅ Aprovar (-${w.custo}⭐)` : `Faltam ${w.custo - saldo}⭐`}
+                    </button>
+                    ${!isPinned ? `<button type="button" class="btn-secondary" style="padding:10px;" onclick="pinWishAsMainGoal(${w.id})" title="Fixar como meta principal">🎯</button>` : ''}
+                    <button type="button" class="btn-reject" onclick="openModalRecusarDesejo(${w.id})">❌ Recusar</button>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">A Duda ainda não enviou nenhum pedido de desejo.</p>';
+
+      document.getElementById('admin-missoes-list').innerHTML = appState.missoes.map(m => {
+        const desc = (m.descricao || '').trim();
+        return `
+          <div class="check-item">
+            <div style="flex:1; min-width:0;">
+              <div><strong>[${escapeHTML(m.turno)}]</strong> ${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</div>
+              ${desc ? `<span class="mission-desc-preview">${escapeHTML(desc)}</span>` : ''}
+            </div>
+            <span class="item-actions-inline">
+              <span class="badge-user">+1 ⭐</span>
+              <span class="act-icon" title="Editar missão e detalhamento" onclick="openModalMissao(${m.id})">✏️</span>
+              <span class="act-icon" title="Remover" onclick="deleteMissao(${m.id})">🗑️</span>
+            </span>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderDuda() {
       const today = getTodayISO();
-      const thisMon = getMondayOfWeekISO(today);
-      const weekDates = getWeekDatesArray(thisMon);
-      if (!weekDates.includes(dudaSelectedDateISO)) dudaSelectedDateISO = today;
+      if (dudaSelectedDateISO > today) dudaSelectedDateISO = today;
 
-      const isViewingToday = dudaSelectedDateISO === today;
+      const isSelectedToday = dudaSelectedDateISO === today;
       const doneIds = getCompletedIdsForDate(dudaSelectedDateISO);
       const total = appState.missoes.length;
-      const feitos = doneIds.length;
-      const pct = total ? Math.round((feitos / total) * 100) : 0;
+      const done = appState.missoes.filter(m => doneIds.includes(m.id)).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      const saldo = appState.estrelasTotais || 0;
 
-      document.getElementById('duda-today-stars').textContent = `⭐ ${feitos} ${feitos === 1 ? 'estrela' : 'estrelas'} nesse dia`;
-      document.getElementById('duda-total-stars').textContent = `🏆 Saldo: ${appState.estrelasTotais || 0} estrelas`;
-      document.getElementById('duda-counter-text').textContent = `${feitos} de ${total} Missões Feitas!`;
-      document.getElementById('duda-progress-fill').style.width = `${pct}%`;
+      document.getElementById('duda-today-stars').textContent = `⭐ ${done} ${done === 1 ? 'estrela' : 'estrelas'} ${isSelectedToday ? 'hoje' : `em ${formatShortBR(dudaSelectedDateISO)}`}`;
+      document.getElementById('duda-total-stars').textContent = `🏆 Saldo: ${saldo} ${saldo === 1 ? 'estrela' : 'estrelas'} ▾`;
+      document.getElementById('duda-counter-text').textContent = `${done} de ${total} Missões Feitas!`;
+      document.getElementById('duda-progress-fill').style.width = pct + '%';
 
-      const celebBanner = document.getElementById('duda-celebration-banner');
-      if (total > 0 && feitos === total) {
-        celebBanner.textContent = isViewingToday
-          ? '🎉 Parabéns Duda! Você completou TODAS as missões de hoje!'
-          : `🎉 Você completou todas as missões no dia ${formatShortBR(dudaSelectedDateISO)}!`;
-        celebBanner.classList.remove('hidden');
+      const banner = document.getElementById('duda-celebration-banner');
+      if (total > 0 && done === total) {
+        banner.textContent = isSelectedToday
+          ? '🎉 INCRÍVEL DUDA! Você completou TODAS as missões de hoje!'
+          : `🎉 Você completou TODAS as missões de ${formatShortBR(dudaSelectedDateISO)}!`;
+        banner.classList.remove('hidden');
       } else {
-        celebBanner.classList.add('hidden');
+        banner.classList.add('hidden');
       }
 
       const recentPenalties = (appState.historicoEstrelas || []).filter(h => (h.tipo === 'penalty' || h.delta < 0) && !h.vistaPelaDuda);
-      const transpContainer = document.getElementById('duda-transparency-container');
+      const transContainer = document.getElementById('duda-transparency-container');
       if (recentPenalties.length > 0) {
-        transpContainer.innerHTML = `
+        transContainer.innerHTML = `
           <div class="duda-transparency-card">
             <div class="duda-transparency-head">
-              <div>
-                <h3>💬 Combinados & Ajustes</h3>
-                <span class="duda-transparency-sub">Veja por que algumas estrelas foram descontadas:</span>
-              </div>
+              <h3>💬 Recado Importante sobre Estrelas</h3>
+              <span class="duda-transparency-sub">Transparência</span>
             </div>
             ${recentPenalties.map(p => `
               <div class="duda-penalty-item">
                 <div>
-                  <strong>${p.delta} ${Math.abs(p.delta) === 1 ? 'estrela descontada' : 'estrelas descontadas'}</strong>
-                  <p>"${escapeHTML(p.motivo)}"</p>
-                  <small>${formatShortBR(p.date)} · por ${escapeHTML(p.autor || 'Papai / Isabela')}</small>
+                  <strong>${p.delta} ${Math.abs(p.delta) === 1 ? 'estrela' : 'estrelas'} (${formatShortBR(p.date)})</strong>
+                  <p>${escapeHTML(p.motivo)}</p>
+                  <small>Explicado por ${escapeHTML(p.autor || 'Pais')}</small>
                 </div>
                 <button type="button" class="btn-duda-ack" onclick="acknowledgePenaltyDuda(${p.id})">Entendi 👍</button>
               </div>
@@ -4422,46 +5037,44 @@
           </div>
         `;
       } else {
-        transpContainer.innerHTML = '';
+        transContainer.innerHTML = '';
       }
 
+      const thisMon = getMondayOfWeekISO(today);
+      const weekDates = getWeekDatesArray(thisMon);
+      let weekTotalStars = 0;
+      weekDates.forEach(d => { weekTotalStars += getCompletedIdsForDate(d).length; });
+
+      document.getElementById('duda-week-title').textContent = `📅 Minha Semana (${weekTotalStars} ⭐)`;
       document.getElementById('duda-week-strip').innerHTML = weekDates.map((iso, idx) => {
-        const c = getCompletedIdsForDate(iso).length;
-        const isToday = iso === today;
+        const dCount = getCompletedIdsForDate(iso).length;
+        const isT = iso === today;
         const isSel = iso === dudaSelectedDateISO;
-        const isFuture = iso > today;
+        const isFut = iso > today;
         return `
-          <div class="week-day-pill ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''} ${isFuture ? 'future' : ''}"
-            ${!isFuture ? `onclick="selectDudaWeekDay('${iso}')"` : ''}>
+          <button type="button" class="week-day-pill ${isT ? 'today' : ''} ${isSel ? 'selected' : ''} ${isFut ? 'future' : ''}"
+            ${isFut ? 'disabled' : `onclick="selectDudaWeekDay('${iso}')"`}>
             <small>${DIAS_CURTOS_SEG_DOM[idx]}</small>
             <strong>${iso.split('-')[2]}</strong>
-            <span>${isFuture ? '-' : `⭐${c}`}</span>
-          </div>
+            <span>${isFut ? '-' : `${dCount}⭐`}</span>
+          </button>
         `;
       }).join('');
 
       const { medals } = computeDudaStatsAndMedals();
-      const dudaMedalsEl = document.getElementById('duda-medals-container');
-      if (dudaMedalsEl) {
-        dudaMedalsEl.innerHTML = medals.map(m => `
-          <span class="medal-pill ${m.unlocked ? '' : 'locked'}">
-            ${m.icon} ${escapeHTML(m.label)}
-          </span>
-        `).join('');
-      }
+      document.getElementById('duda-medals-container').innerHTML = medals.map(med => `
+        <span class="medal-pill ${med.unlocked ? '' : 'locked'}">${med.unlocked ? med.icon : '🔒'} ${escapeHTML(med.label)}</span>
+      `).join('');
 
-      const readonlyBanner = document.getElementById('duda-readonly-notice');
-      if (!isViewingToday) {
-        readonlyBanner.innerHTML = `👀 Consultando ${formatShortBR(dudaSelectedDateISO)} (somente leitura) · <u style="cursor:pointer;" onclick="selectDudaWeekDay('${today}')">Voltar para Hoje</u>`;
-        readonlyBanner.classList.remove('hidden');
+      const roNotice = document.getElementById('duda-readonly-notice');
+      if (!isSelectedToday) {
+        roNotice.innerHTML = `👀 Você está vendo as missões de <strong>${formatShortBR(dudaSelectedDateISO)}</strong> (somente consulta). <span style="text-decoration:underline; cursor:pointer;" onclick="selectDudaWeekDay('${today}')">Voltar para Hoje</span>`;
+        roNotice.classList.remove('hidden');
       } else {
-        readonlyBanner.classList.add('hidden');
+        roNotice.classList.add('hidden');
       }
 
-      const longGoalContainer = document.getElementById('duda-long-goal-container');
-      if (longGoalContainer) {
-        longGoalContainer.innerHTML = renderLongGoalCardHTML(false);
-      }
+      document.getElementById('duda-long-goal-container').innerHTML = renderLongGoalCardHTML(false);
 
       const wishes = appState.desejos || [];
       document.getElementById('duda-wishes-container').innerHTML = wishes.length
@@ -4471,44 +5084,40 @@
             return `
               <div class="duda-wish-item ${isApproved ? 'approved' : (isRejected ? 'rejected' : '')}">
                 <div style="flex:1;">
-                  <div><strong>${escapeHTML(w.titulo)}</strong> (${w.custo} ⭐)</div>
-                  ${isRejected && w.motivoRecusa ? `<div class="duda-wish-reason">💬 Recado: "${escapeHTML(w.motivoRecusa)}"</div>` : ''}
+                  <div>${isApproved ? '🎉' : (isRejected ? '💬' : '🎁')} <strong>${escapeHTML(w.titulo)}</strong></div>
+                  ${isRejected && w.motivoRecusa ? `<div class="duda-wish-reason">Recado: ${escapeHTML(w.motivoRecusa)}</div>` : ''}
                 </div>
                 <span class="wish-tag-mini">
-                  ${isApproved ? '✅ Aprovado!' : (isRejected ? '❌ Recusado' : '⏳ Esperando aprovar')}
+                  ${isApproved ? '✅ Aprovado!' : (isRejected ? '❌ Recusado' : `⭐ ${w.custo}`)}
                 </span>
               </div>
             `;
           }).join('')
-        : '<p class="hint" style="margin:0;">Toque no botão acima para pedir um desejo ou ver seu extrato tocando no saldo!</p>';
+        : '<p class="hint" style="margin:4px 0 0;">Toque em "+ Escolher Desejo" para pedir uma recompensa ou meta!</p>';
 
+      const turnos = ["Manhã", "Tarde", "Noite"];
       const container = document.getElementById('duda-missoes-container');
-      const turnos = [
-        { nome: 'Manhã', icon: '☀️' },
-        { nome: 'Tarde', icon: '🌤️' },
-        { nome: 'Noite', icon: '🌙' }
-      ];
-
-      container.innerHTML = turnos.map(t => {
-        const lista = appState.missoes.filter(m => m.turno === t.nome);
-        if (!lista.length) return '';
+      container.innerHTML = turnos.map(turno => {
+        const list = appState.missoes.filter(m => m.turno === turno);
+        if (!list.length) return '';
+        const icon = turno === "Manhã" ? "☀️" : (turno === "Tarde" ? "🌤️" : "🌙");
         return `
-          <h3 class="duda-turno-title">${t.icon} ${t.nome}</h3>
-          ${lista.map(m => {
+          <div class="duda-turno-title">${icon} ${turno}</div>
+          ${list.map(m => {
             const isDone = doneIds.includes(m.id);
-            const hasDesc = Boolean((m.descricao || '').trim());
+            const desc = (m.descricao || '').trim();
             return `
-              <div class="duda-mission-card ${isDone ? 'completed' : ''} ${!isViewingToday ? 'locked-past' : ''}" onclick="toggleMissao(${m.id})">
+              <div class="duda-mission-card ${isDone ? 'completed' : ''} ${!isSelectedToday ? 'locked-past' : ''}" onclick="toggleMissao(${m.id})">
                 <div class="mission-left">
                   <span class="mission-emoji">${escapeHTML(m.emoji)}</span>
                   <div class="mission-text-col">
                     <span>${escapeHTML(m.titulo)}</span>
-                    ${hasDesc ? `<span class="mission-sub-hint">${escapeHTML(m.descricao)}</span>` : ''}
+                    ${desc ? `<span class="mission-sub-hint">${escapeHTML(desc)}</span>` : ''}
                   </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                  ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="event.stopPropagation(); openModalDetalheMissao(${m.id})" title="Ver como fazer">ℹ️</button>` : ''}
-                  <span class="mission-star-tag">${isDone ? '+1 ⭐' : '1 ⭐'}</span>
+                  ${desc ? `<button type="button" class="btn-mission-detail" onclick="event.stopPropagation(); openModalDetalheMissao(${m.id})">ℹ️</button>` : ''}
+                  <span class="mission-star-tag">${isDone ? '⭐ +1' : '+1 ⭐'}</span>
                   <div class="mission-circle">${isDone ? '✓' : ''}</div>
                 </div>
               </div>
