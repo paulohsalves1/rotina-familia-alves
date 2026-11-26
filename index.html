@@ -2056,4 +2056,2470 @@
         totalGeral += val;
         if (d.dividido) {
           if (d.pagoPor === 'Paulo') pauloPagouDiv += val;
-          else if (d.pagoPor === 'Isabela') isabelaP
+          else if (d.pagoPor === 'Isabela') isabelaPagouDiv += val;
+        }
+      });
+
+      const diff = (pauloPagouDiv - isabelaPagouDiv) / 2;
+      let acertoTexto = 'Contas compartilhadas empatadas (R$ 0,00)';
+      if (diff > 0.01) acertoTexto = `Isabela acerta ${formatCurrencyBR(diff)} com Paulo`;
+      else if (diff < -0.01) acertoTexto = `Paulo acerta ${formatCurrencyBR(Math.abs(diff))} com Isabela`;
+
+      let txt = `💸 *EXTRATO DE DESPESAS · FAMÍLIA ALVES*\n`;
+      txt += `📅 Gerado em: ${formatFullDateBR(getTodayISO())}\n\n`;
+      txt += `*RESUMO DO ACERTO (50/50)*\n`;
+      txt += `• Total Geral Lançado: ${formatCurrencyBR(totalGeral)}\n`;
+      txt += `• Paulo pagou (divididas): ${formatCurrencyBR(pauloPagouDiv)}\n`;
+      txt += `• Isabela pagou (divididas): ${formatCurrencyBR(isabelaPagouDiv)}\n`;
+      txt += `• ⚖️ Resultado: *${acertoTexto}*\n\n`;
+
+      txt += `*LANÇAMENTOS (${lista.length})*\n`;
+      if (lista.length) {
+        lista.forEach(d => {
+          const modo = d.dividido ? '50/50' : 'Individual';
+          const st = d.status === 'aprovada' ? '✅' : '⏳';
+          txt += `• ${st} ${formatShortBR(d.date)} — ${d.descricao}: *${formatCurrencyBR(d.valor)}* (${d.pagoPor} · ${modo})\n`;
+        });
+      } else {
+        txt += `• Nenhuma despesa lançada.\n`;
+      }
+
+      const html = `
+        <h1>💸 Extrato de Despesas Compartilhadas</h1>
+        <p class="subtitle">Família Alves · Emitido em ${escapeHTML(formatFullDateBR(getTodayISO()))}</p>
+        <div class="summary-box">
+          <p><strong>Total Geral Lançado:</strong> ${escapeHTML(formatCurrencyBR(totalGeral))}</p>
+          <p><strong>Paulo (despesas divididas):</strong> ${escapeHTML(formatCurrencyBR(pauloPagouDiv))}</p>
+          <p><strong>Isabela (despesas divididas):</strong> ${escapeHTML(formatCurrencyBR(isabelaPagouDiv))}</p>
+          <p><strong>Acerto Final:</strong> ${escapeHTML(acertoTexto)}</p>
+        </div>
+        <h2>Detalhamento dos Lançamentos</h2>
+        ${lista.length ? `
+          <table>
+            <thead><tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Divisão</th><th>Status</th><th>Valor</th></tr></thead>
+            <tbody>
+              ${lista.map(d => `<tr>
+                <td>${escapeHTML(formatShortBR(d.date))}</td>
+                <td>${escapeHTML(d.descricao)}</td>
+                <td>${escapeHTML(d.pagoPor)}</td>
+                <td>${d.dividido ? '50/50' : 'Individual'}</td>
+                <td>${d.status === 'aprovada' ? 'Conferida' : 'Pendente'}</td>
+                <td><strong>${escapeHTML(formatCurrencyBR(d.valor))}</strong></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : '<p>Nenhuma despesa registrada.</p>'}
+      `;
+
+      return { title: 'Exportar Despesas Compartilhadas 💸', text: txt.trim(), html };
+    }
+
+    function buildApoioExportData() {
+      const iso = apoioSelectedDateISO || getTodayISO();
+      const log = getLogisticaForDate(iso);
+      const f = appState.saude.ficha || {};
+      const remedios = appState.saude.remedios || [];
+      const dudaAgenda = getEventsForDate(iso)
+        .filter(ev => {
+          const cat = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
+          return cat === 'Duda' || cat === 'Família';
+        })
+        .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+
+      let txt = `👵 *ROTINA & CUIDADOS DUDA · ${formatFullDateBR(iso)}*\n\n`;
+      txt += `*🎒 LOGÍSTICA DO DIA*\n`;
+      txt += `• Leva: ${log.leva}\n`;
+      txt += `• Busca: ${log.busca}\n\n`;
+
+      txt += `*📅 AGENDA DA DUDA*\n`;
+      if (dudaAgenda.length) {
+        dudaAgenda.forEach(a => {
+          txt += `• ${a.time || 'Dia todo'} — ${a.titulo}\n`;
+        });
+      } else {
+        txt += `• Sem compromissos agendados neste dia.\n`;
+      }
+
+      txt += `\n*💊 REMÉDIOS ATIVOS*\n`;
+      if (remedios.length) {
+        remedios.forEach(r => {
+          const prox = getProximaDoseInfo(r);
+          txt += `• ${r.nome} (${r.dosagem}) — Última: ${r.ultimaDoseTexto}${prox ? ` | Próxima: ${prox.texto}` : ''}\n`;
+        });
+      } else {
+        txt += `• Nenhum remédio ativo.\n`;
+      }
+
+      txt += `\n*🩺 EMERGÊNCIA & ALERGIAS*\n`;
+      txt += `• ⚠️ Alergias: ${f.alergias || 'Nenhuma'}\n`;
+      txt += `• Tipo Sanguíneo: ${f.tipoSanguineo || '-'}\n`;
+      txt += `• Pediatra: ${f.pediatra || '-'}\n`;
+      txt += `• Plano: ${f.plano || '-'}`;
+
+      const html = `
+        <h1>👵 Guia Rápido · Cuidados da Duda</h1>
+        <p class="subtitle">Data: ${escapeHTML(formatFullDateBR(iso))} · Família Alves</p>
+        <h2>Logística Escolar / Transporte</h2>
+        <table>
+          <tr><th>Quem Leva</th><td>${escapeHTML(log.leva)}</td></tr>
+          <tr><th>Quem Busca</th><td>${escapeHTML(log.busca)}</td></tr>
+        </table>
+        <h2>Agenda do Dia</h2>
+        ${dudaAgenda.length ? `
+          <table>
+            <thead><tr><th>Horário</th><th>Compromisso</th></tr></thead>
+            <tbody>
+              ${dudaAgenda.map(a => `<tr><td>${escapeHTML(a.time || 'Dia todo')}</td><td>${escapeHTML(a.titulo)}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        ` : '<p>Sem compromissos neste dia.</p>'}
+        <h2>Remédios Ativos</h2>
+        ${remedios.length ? `
+          <table>
+            <thead><tr><th>Remédio</th><th>Dosagem</th><th>Última Dose</th><th>Próxima Dose</th></tr></thead>
+            <tbody>
+              ${remedios.map(r => {
+                const prox = getProximaDoseInfo(r);
+                return `<tr><td>${escapeHTML(r.nome)}</td><td>${escapeHTML(r.dosagem)}</td><td>${escapeHTML(r.ultimaDoseTexto)}</td><td>${prox ? escapeHTML(prox.texto) : '-'}</td></tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        ` : '<p>Nenhum remédio ativo.</p>'}
+        <h2>Ficha de Emergência</h2>
+        <table>
+          <tr><th>Alergias</th><td><strong>${escapeHTML(f.alergias || 'Nenhuma')}</strong></td></tr>
+          <tr><th>Tipo Sanguíneo</th><td>${escapeHTML(f.tipoSanguineo || '-')}</td></tr>
+          <tr><th>Pediatra</th><td>${escapeHTML(f.pediatra || '-')}</td></tr>
+          <tr><th>Plano</th><td>${escapeHTML(f.plano || '-')}</td></tr>
+        </table>
+      `;
+
+      return { title: 'Exportar Guia da Rede de Apoio 👵', text: txt.trim(), html };
+    }
+
+    let currentExportPayload = null;
+
+    function openExportModal(scope) {
+      if (scope === 'saude') currentExportPayload = buildSaudeExportData();
+      else if (scope === 'despesas') currentExportPayload = buildDespesasExportData();
+      else currentExportPayload = buildApoioExportData();
+
+      openSheet(currentExportPayload.title, `
+        <p class="hint">Escolha como deseja compartilhar ou salvar este resumo:</p>
+        <div class="row-buttons" style="margin-bottom:12px;">
+          <button type="button" class="btn-primary" style="flex:1;" onclick="copyExportText()">📋 Copiar p/ WhatsApp</button>
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="printExportPDF()">🖨️ PDF / Imprimir</button>
+        </div>
+        <label>Prévia do Texto Formatado</label>
+        <textarea id="export-preview-textarea" rows="10" readonly>${escapeHTML(currentExportPayload.text)}</textarea>
+      `, null, 'Fechar');
+    }
+
+    async function copyExportText() {
+      if (!currentExportPayload) return;
+      const text = currentExportPayload.text;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.getElementById('export-preview-textarea');
+          if (ta) { ta.select(); document.execCommand('copy'); }
+        }
+        showToast('📋 Resumo copiado! Agora é só colar no WhatsApp.');
+      } catch (e) {
+        const ta = document.getElementById('export-preview-textarea');
+        if (ta) { ta.select(); document.execCommand('copy'); }
+        showToast('📋 Resumo copiado para a área de transferência!');
+      }
+    }
+
+    function printExportPDF() {
+      if (!currentExportPayload) return;
+      const win = window.open('', '_blank');
+      if (!win) {
+        showToast('Permita pop-ups no navegador para gerar o PDF.', true);
+        return;
+      }
+      win.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8" />
+          <title>${escapeHTML(currentExportPayload.title)}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1F2933; padding: 28px; max-width: 760px; margin: 0 auto; line-height: 1.45; }
+            h1 { font-size: 20px; color: #365E42; margin-bottom: 4px; }
+            .subtitle { font-size: 12px; color: #5F6C7B; margin-bottom: 18px; }
+            h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.4px; color: #365E42; border-bottom: 1.5px solid #C4DCCB; padding-bottom: 4px; margin: 18px 0 8px; }
+            table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; }
+            th, td { border: 1px solid #D9E2EC; padding: 7px 10px; text-align: left; }
+            th { background: #F4F8F5; font-weight: 700; width: 32%; }
+            thead th { width: auto; }
+            .summary-box { background: #F4F8F5; border: 1px solid #C4DCCB; border-radius: 8px; padding: 12px 14px; font-size: 13px; }
+            .summary-box p { margin: 4px 0; }
+            @media print { body { padding: 12px; } }
+          </style>
+        </head>
+        <body>
+          ${currentExportPayload.html}
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    // ============================================================================
+    // 6. CONTROLE DE TEMA (CLARO / ESCURO) E INSTALAÇÃO PWA
+    // ============================================================================
+    let deferredInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('familia_alves_theme');
+      const isDark = savedTheme === 'dark';
+      document.body.classList.toggle('dark-mode', isDark);
+      updateThemeButtons(isDark);
+    }
+
+    function toggleThemeMode() {
+      const isDark = !document.body.classList.contains('dark-mode');
+      document.body.classList.toggle('dark-mode', isDark);
+      localStorage.setItem('familia_alves_theme', isDark ? 'dark' : 'light');
+      updateThemeButtons(isDark);
+    }
+
+    function updateThemeButtons(isDark) {
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', isDark ? '#121614' : '#4A7C59');
+      document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+        const isCompact = !btn.textContent.includes('Modo');
+        if (isCompact) {
+          btn.textContent = isDark ? '☀️' : '🌙';
+        } else {
+          btn.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Escuro';
+        }
+      });
+    }
+
+    async function triggerInstallApp() {
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        showToast('O aplicativo já está instalado neste aparelho!');
+        return;
+      }
+
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          showToast('Instalação iniciada! Procure o ícone Família Alves na tela inicial.');
+        }
+        deferredInstallPrompt = null;
+        return;
+      }
+
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      openSheet('Instalar como Aplicativo 📲', `
+        <p class="hint">Adicione o <strong>Família Alves</strong> à tela inicial para abrir em tela cheia e sem barra de navegador:</p>
+        ${isIOS ? `
+          <div class="install-steps-box">
+            <strong>No iPhone / iPad (Safari):</strong>
+            <ol>
+              <li>Toque no ícone <strong>Compartilhar</strong> (quadrado com seta para cima) na barra inferior.</li>
+              <li>Role para baixo e toque em <strong>"Adicionar à Tela de Início"</strong>.</li>
+              <li>Toque em <strong>Adicionar</strong> no canto superior direito.</li>
+            </ol>
+          </div>
+        ` : `
+          <div class="install-steps-box">
+            <strong>No Android (Chrome / Edge):</strong>
+            <ol>
+              <li>Toque no menu <strong>⋮</strong> (três pontinhos) no canto superior direito do navegador.</li>
+              <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+              <li>Confirme tocando em <strong>Instalar</strong>.</li>
+            </ol>
+          </div>
+        `}
+      `, null, 'Entendi');
+    }
+
+    // ============================================================================
+    // 7. CONTROLE DE PERFIS & SENHAS INDIVIDUAIS
+    // ============================================================================
+    let pendingAdultTarget = null;
+    let modalSelectedWho = 'Paulo';
+
+    function getActiveAdultUser() {
+      return sessionStorage.getItem('familia_alves_session_profile') || localStorage.getItem('familia_alves_last_adult') || 'Paulo';
+    }
+
+    function initProfile() {
+      checkDailyReset();
+      const params = new URLSearchParams(window.location.search);
+      const urlModo = params.get('modo');
+
+      if (urlModo === 'apoio') { selectPublicProfile('Apoio'); return; }
+      if (urlModo === 'duda') { selectPublicProfile('Duda'); return; }
+
+      const activeSessionProfile = sessionStorage.getItem('familia_alves_session_profile');
+      if (activeSessionProfile === 'Paulo' || activeSessionProfile === 'Isabela') {
+        applyProfileView(activeSessionProfile);
+        renderAll();
+        return;
+      }
+
+      const lockedPublicMode = localStorage.getItem('familia_alves_public_mode');
+      if (lockedPublicMode === 'Duda' || lockedPublicMode === 'Apoio') {
+        applyProfileView(lockedPublicMode);
+        renderAll();
+        return;
+      }
+
+      document.getElementById('profile-gate').classList.remove('hidden');
+      renderAll();
+    }
+
+    function selectPinWho(who) {
+      modalSelectedWho = who;
+      document.getElementById('pin-who-paulo').classList.toggle('selected', who === 'Paulo');
+      document.getElementById('pin-who-isabela').classList.toggle('selected', who === 'Isabela');
+      document.getElementById('pin-modal-title').textContent = `Acesso · ${who}`;
+      document.getElementById('pin-input').focus();
+    }
+
+    function requestAdultProfile(profile) {
+      pendingAdultTarget = profile;
+      modalSelectedWho = profile;
+      document.getElementById('pin-who-selector').classList.add('hidden');
+      document.getElementById('pin-modal-title').textContent = `Acesso · ${profile}`;
+      document.getElementById('pin-modal-subtitle').textContent = `Digite a senha individual de ${profile} (4 dígitos)`;
+      openPinModal();
+    }
+
+    function selectPublicProfile(profile) {
+      sessionStorage.removeItem('familia_alves_session_profile');
+      localStorage.setItem('familia_alves_public_mode', profile);
+      document.getElementById('profile-gate').classList.add('hidden');
+      applyProfileView(profile);
+      renderAll();
+    }
+
+    function applyProfileView(profile) {
+      const adultApp = document.getElementById('adult-app');
+      const dudaApp = document.getElementById('duda-app');
+      const apoioApp = document.getElementById('apoio-app');
+
+      adultApp.classList.add('hidden');
+      dudaApp.classList.add('hidden');
+      apoioApp.classList.add('hidden');
+
+      if (profile === 'Duda') {
+        dudaApp.classList.remove('hidden');
+      } else if (profile === 'Apoio') {
+        apoioApp.classList.remove('hidden');
+      } else {
+        adultApp.classList.remove('hidden');
+        document.getElementById('current-user-label').textContent = profile;
+      }
+    }
+
+    function enterDudaMode() {
+      localStorage.setItem('familia_alves_last_adult', getActiveAdultUser());
+      selectPublicProfile('Duda');
+    }
+
+    function enterApoioMode() {
+      closeSheet();
+      localStorage.setItem('familia_alves_last_adult', getActiveAdultUser());
+      selectPublicProfile('Apoio');
+    }
+
+    function lockApp() {
+      closeSheet();
+      const current = sessionStorage.getItem('familia_alves_session_profile');
+      if (current) localStorage.setItem('familia_alves_last_adult', current);
+      sessionStorage.removeItem('familia_alves_session_profile');
+      localStorage.removeItem('familia_alves_public_mode');
+      document.getElementById('adult-app').classList.add('hidden');
+      document.getElementById('duda-app').classList.add('hidden');
+      document.getElementById('apoio-app').classList.add('hidden');
+      document.getElementById('profile-gate').classList.remove('hidden');
+    }
+
+    function switchAdultProfile(name) {
+      closeSheet();
+      const current = sessionStorage.getItem('familia_alves_session_profile');
+      if (current === name) return;
+      requestAdultProfile(name);
+    }
+
+    function openPinModal() {
+      if (!pendingAdultTarget) {
+        const defaultWho = localStorage.getItem('familia_alves_last_adult') || 'Paulo';
+        document.getElementById('pin-who-selector').classList.remove('hidden');
+        selectPinWho(defaultWho);
+        document.getElementById('pin-modal-subtitle').textContent = 'Selecione seu perfil e digite sua senha de 4 dígitos';
+      }
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-modal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('pin-input').focus(), 100);
+    }
+
+    function closePinModal() {
+      pendingAdultTarget = null;
+      document.getElementById('pin-who-selector').classList.add('hidden');
+      document.getElementById('pin-modal').classList.add('hidden');
+    }
+
+    function verifyPin() {
+      const entered = document.getElementById('pin-input').value;
+      const targetProfile = pendingAdultTarget || modalSelectedWho || 'Paulo';
+      const pins = normalizePins(appState);
+      const validPin = String(pins[targetProfile] || "1234");
+
+      if (entered === validPin) {
+        closePinModal();
+        localStorage.removeItem('familia_alves_public_mode');
+        localStorage.setItem('familia_alves_last_adult', targetProfile);
+        sessionStorage.setItem('familia_alves_session_profile', targetProfile);
+        document.getElementById('profile-gate').classList.add('hidden');
+        applyProfileView(targetProfile);
+        renderAll();
+      } else {
+        showToast(`Senha de ${targetProfile} incorreta!`, true);
+        document.getElementById('pin-input').value = '';
+      }
+    }
+
+    // ============================================================================
+    // 8. MENU DE CONFIGURAÇÕES, INTEGRANTES & SEGURANÇA
+    // ============================================================================
+    function openSettingsMenu() {
+      const currentUser = getActiveAdultUser();
+      const isDark = document.body.classList.contains('dark-mode');
+      const integrantesRows = (appState.integrantes || []).map(m => `
+        <div class="week-history-row" style="margin-bottom:6px;">
+          <span style="display:inline-flex; align-items:center; gap:7px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:${escapeHTML(m.cor)}; display:inline-block;"></span>
+            <strong>${escapeHTML(m.emoji)} ${escapeHTML(m.nome)}</strong>
+          </span>
+          ${m.fixo
+            ? `<small style="color:var(--text-muted); font-weight:700;">Principal</small>`
+            : `<span class="act-icon" title="Remover integrante" onclick="deleteIntegrante('${escapeJSArg(m.id)}')">🗑️</span>`}
+        </div>
+      `).join('');
+
+      openSheet('Configurações & Família ⚙️', `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span class="sub-title" style="margin:0;">👨‍👩‍👧 Integrantes & Lançamentos</span>
+          <button type="button" class="btn-mini" onclick="openModalNovoIntegrante()">+ Integrante</button>
+        </div>
+        <p class="hint">Quem aparece nos filtros da agenda e nos compromissos individuais:</p>
+        <div style="margin-bottom:14px;">${integrantesRows}</div>
+
+        <hr class="divider" />
+        <span class="sub-title">💸 Ponte App de Finanças</span>
+        <p class="hint">Conectado à sala <strong>${escapeHTML(FINANCAS_BRIDGE_CONFIG.roomCode)}</strong> (Finanças Paulo & Isabela). Você pode enviar gastos direto das Despesas, Pendências, Mercado ou Saúde.</p>
+        <div class="row-buttons" style="margin-bottom:14px;">
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="openFinancasBridgeModal({ descricao: '', valor: 0 })">💸 Novo Lançamento no Finanças</button>
+        </div>
+
+        <hr class="divider" />
+        <span class="sub-title">🎨 Aparência & Aplicativo</span>
+        <div class="row-buttons" style="margin-bottom:14px;">
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="toggleThemeMode(); openSettingsMenu();">${isDark ? '☀️ Modo Claro' : '🌙 Modo Escuro'}</button>
+          <button type="button" class="btn-secondary" style="flex:1;" onclick="triggerInstallApp()">📲 Instalar App</button>
+        </div>
+
+        <hr class="divider" />
+        <span class="sub-title">🔐 Perfil & Segurança (${escapeHTML(currentUser)})</span>
+        <p class="hint">Cada responsável possui senha individual de 4 dígitos (padrão inicial: 1234).</p>
+        <div class="row-buttons">
+          <button type="button" class="btn-secondary" onclick="openModalAlterarPin()">🔑 Alterar Senha</button>
+          <button type="button" class="btn-secondary" onclick="switchAdultProfile('Paulo')">🧔🏾 Paulo</button>
+          <button type="button" class="btn-secondary" onclick="switchAdultProfile('Isabela')">👩 Isabela</button>
+          <button type="button" class="btn-secondary" onclick="enterApoioMode()">👵 Apoio</button>
+          <button type="button" class="btn-secondary" onclick="lockApp()">🔒 Bloquear</button>
+        </div>
+      `, null, 'Fechar');
+    }
+
+    // ============================================================================
+    // 9. MOTOR DE BOTTOM SHEET MODALS (SUPORTA SÍNCRONO E ASYNC)
+    // ============================================================================
+    let currentSheetSaveCallback = null;
+
+    function openSheet(title, bodyHTML, onSave, singleCloseLabel = null) {
+      document.getElementById('sheet-title').textContent = title;
+      document.getElementById('sheet-body').innerHTML = bodyHTML;
+      showSheetError('');
+      currentSheetSaveCallback = onSave;
+      const actionsBar = document.getElementById('sheet-actions-bar');
+      const saveBtn = document.getElementById('sheet-save-btn');
+      const cancelBtn = document.getElementById('sheet-cancel-btn');
+
+      saveBtn.disabled = false;
+
+      if (!onSave) {
+        saveBtn.classList.add('hidden');
+        cancelBtn.textContent = singleCloseLabel || 'Fechar';
+      } else {
+        saveBtn.classList.remove('hidden');
+        cancelBtn.textContent = 'Cancelar';
+        saveBtn.onclick = async () => {
+          if (saveBtn.disabled) return;
+          const originalText = saveBtn.textContent;
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Salvando...';
+          try {
+            const result = currentSheetSaveCallback ? await currentSheetSaveCallback() : true;
+            const keepOpen = result === false;
+            if (!keepOpen) {
+              closeSheet();
+            } else {
+              saveBtn.disabled = false;
+              saveBtn.textContent = originalText;
+            }
+          } catch (err) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+            console.error(err);
+          }
+        };
+      }
+      actionsBar.classList.remove('hidden');
+      document.getElementById('bottom-sheet').classList.remove('hidden');
+    }
+
+    function openConfirmSheet(title, message, onConfirm, confirmLabel = 'Confirmar', isDanger = true) {
+      openSheet(title, `<p style="font-size:14px; color:var(--text-main); line-height:1.5;">${escapeHTML(message)}</p>`, () => {
+        if (onConfirm) onConfirm();
+      });
+      const saveBtn = document.getElementById('sheet-save-btn');
+      saveBtn.textContent = confirmLabel;
+      saveBtn.className = isDanger ? 'btn-primary penalty' : 'btn-primary';
+    }
+
+    function closeSheet() {
+      const saveBtn = document.getElementById('sheet-save-btn');
+      saveBtn.textContent = 'Salvar';
+      saveBtn.className = 'btn-primary';
+      saveBtn.disabled = false;
+      showSheetError('');
+      document.getElementById('bottom-sheet').classList.add('hidden');
+      currentSheetSaveCallback = null;
+    }
+
+    function selectChip(el, hiddenInputId) {
+      const group = el.parentElement;
+      group.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById(hiddenInputId).value = el.dataset.val;
+    }
+
+    function renderIntegrantesChips(selectedValue, hiddenId) {
+      const lista = appState.integrantes || DEFAULT_INTEGRANTES;
+      return `
+        <div class="chip-group">
+          ${lista.map(m => `
+            <button type="button" class="chip-opt ${m.nome === selectedValue ? 'selected' : ''}"
+              data-val="${escapeHTML(m.nome)}" onclick="selectChip(this, '${hiddenId}')">${escapeHTML(m.emoji)} ${escapeHTML(m.nome)}</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="${hiddenId}" value="${escapeHTML(selectedValue)}" />
+      `;
+    }
+
+    function openModalAlterarPin() {
+      const currentUser = getActiveAdultUser();
+      openSheet(`Alterar Minha Senha · ${currentUser} 🔑`, `
+        <p class="hint">Você está alterando apenas a senha individual de <strong>${escapeHTML(currentUser)}</strong> (4 dígitos).</p>
+        <label>Senha Atual de ${escapeHTML(currentUser)}</label>
+        <input type="password" id="inp-pin-atual" maxlength="4" inputmode="numeric" placeholder="••••" />
+        <label>Nova Senha (4 dígitos)</label>
+        <input type="password" id="inp-pin-nova" maxlength="4" inputmode="numeric" placeholder="••••" />
+        <label>Confirmar Nova Senha</label>
+        <input type="password" id="inp-pin-confirma" maxlength="4" inputmode="numeric" placeholder="••••" />
+      `, () => {
+        const atual = document.getElementById('inp-pin-atual').value.trim();
+        const nova = document.getElementById('inp-pin-nova').value.trim();
+        const confirma = document.getElementById('inp-pin-confirma').value.trim();
+        appState.pins = normalizePins(appState);
+        const pinSalvo = String(appState.pins[currentUser] || '1234');
+
+        if (atual !== pinSalvo) { showSheetError(`A senha atual de ${currentUser} está incorreta.`); return false; }
+        if (!/^\d{4}$/.test(nova)) { showSheetError('A nova senha deve ter exatamente 4 números.'); return false; }
+        if (nova !== confirma) { showSheetError('A confirmação da nova senha não confere.'); return false; }
+
+        appState.pins[currentUser] = nova;
+        saveState(['pins']);
+        showToast(`Senha de ${currentUser} alterada com sucesso!`);
+      });
+    }
+
+    function openModalNovoIntegrante() {
+      const cores = ['#2B6CB0', '#B83280', '#D97706', '#0D9488', '#7C3AED', '#4A7C59'];
+      openSheet('Novo Integrante da Família 👨‍👩‍👧', `
+        <p class="hint">Adicione alguém da família (ex.: Vovó Maria, Babá, Tia Ana) para filtrar e lançar compromissos individuais.</p>
+        <label>Nome</label>
+        <input type="text" id="inp-int-nome" placeholder="Ex: Vovó Maria" />
+        <label>Emoji</label>
+        <div class="chip-group">
+          ${['👵', '👴', '🧑', '👩', '🧒', '🍼', '🐾'].map((em, idx) => `
+            <button type="button" class="chip-opt ${idx === 0 ? 'selected' : ''}" data-val="${em}" onclick="selectChip(this, 'inp-int-emoji')">${em}</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-int-emoji" value="👵" />
+        <label>Cor no Calendário</label>
+        <div class="chip-group">
+          ${cores.map((c, idx) => `
+            <button type="button" class="chip-opt ${idx === 0 ? 'selected' : ''}" data-val="${c}" onclick="selectChip(this, 'inp-int-cor')" style="border-color:${c};">
+              <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${c}; vertical-align:middle;"></span>
+            </button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-int-cor" value="${cores[0]}" />
+      `, () => {
+        const nome = document.getElementById('inp-int-nome').value.trim();
+        const emoji = document.getElementById('inp-int-emoji').value || '🧑';
+        const cor = document.getElementById('inp-int-cor').value || '#4A7C59';
+        if (!nome) { showSheetError('Informe o nome do integrante.'); return false; }
+        if ((appState.integrantes || []).some(i => i.nome.toLowerCase() === nome.toLowerCase())) {
+          showSheetError('Já existe um integrante com esse nome.');
+          return false;
+        }
+        appState.integrantes.push({ id: 'int_' + Date.now(), nome, emoji, cor, fixo: false });
+        saveState(['integrantes']);
+        showToast(`${nome} adicionado aos integrantes!`);
+      });
+    }
+
+    function deleteIntegrante(id) {
+      const m = (appState.integrantes || []).find(i => i.id === id);
+      if (!m || m.fixo) return;
+      openConfirmSheet('Remover Integrante', `Remover "${m.nome}" da lista de integrantes? Os eventos antigos permanecem salvos.`, () => {
+        appState.integrantes = appState.integrantes.filter(i => i.id !== id);
+        if (currentAgendaFilter === m.nome) currentAgendaFilter = 'Todos';
+        saveState(['integrantes']);
+        showToast('Integrante removido.');
+      }, 'Remover', true);
+    }
+
+    // ============================================================================
+    // 10. NAVEGAÇÃO POR ABAS & DIAS (HOJE E REDE DE APOIO)
+    // ============================================================================
+    function switchTab(tabId, titleText, btnEl) {
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      document.getElementById('header-title').textContent = titleText;
+      if (tabId === 'familia') {
+        selectedDateISO = hojeSelectedDateISO;
+        const d = parseISOToLocalDate(selectedDateISO);
+        calCurrentYear = d.getFullYear();
+        calCurrentMonth = d.getMonth();
+        renderCalendar();
+        renderAgenda();
+      }
+    }
+
+    function shiftHojeDay(delta) {
+      hojeSelectedDateISO = addDaysISO(hojeSelectedDateISO, delta);
+      renderHoje();
+    }
+
+    function goHojeToday() {
+      hojeSelectedDateISO = getTodayISO();
+      renderHoje();
+    }
+
+    function shiftApoioDay(delta) {
+      apoioSelectedDateISO = addDaysISO(apoioSelectedDateISO, delta);
+      renderApoio();
+    }
+
+    function goApoioToday() {
+      apoioSelectedDateISO = getTodayISO();
+      renderApoio();
+    }
+
+    function openDayInHojeTab() {
+      hojeSelectedDateISO = selectedDateISO;
+      const btnHoje = document.getElementById('nav-btn-hoje');
+      switchTab('hoje', 'Família Alves · Dia', btnHoje);
+      renderHoje();
+    }
+
+    function getLogisticaForDate(isoStr) {
+      return (appState.logisticaPorDia && appState.logisticaPorDia[isoStr]) || appState.logisticaDefault;
+    }
+
+    function openModalLogistica() {
+      const log = getLogisticaForDate(hojeSelectedDateISO);
+      const isToday = hojeSelectedDateISO === getTodayISO();
+      openSheet(`Logística · ${isToday ? 'Hoje' : formatShortBR(hojeSelectedDateISO)}`, `
+        <label>Quem Leva e Horário</label>
+        <input type="text" id="inp-leva" value="${escapeHTML(log.leva)}" />
+        <label>Quem Busca e Horário</label>
+        <input type="text" id="inp-busca" value="${escapeHTML(log.busca)}" />
+        <label>Aplicar alteração para:</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt selected" data-val="day" onclick="selectChip(this, 'inp-log-scope')">Somente este dia</button>
+          <button type="button" class="chip-opt" data-val="default" onclick="selectChip(this, 'inp-log-scope')">Padrão de todos os dias</button>
+        </div>
+        <input type="hidden" id="inp-log-scope" value="day" />
+      `, () => {
+        const leva = document.getElementById('inp-leva').value.trim();
+        const busca = document.getElementById('inp-busca').value.trim();
+        const scope = document.getElementById('inp-log-scope').value;
+        if (!leva || !busca) { showSheetError('Preencha quem leva e quem busca.'); return false; }
+        if (scope === 'default') {
+          appState.logisticaDefault = { leva, busca };
+          delete appState.logisticaPorDia[hojeSelectedDateISO];
+          saveState(['logisticaDefault', 'logisticaPorDia']);
+        } else {
+          appState.logisticaPorDia[hojeSelectedDateISO] = { leva, busca };
+          saveState(['logisticaPorDia']);
+        }
+        showToast('Logística atualizada!');
+      });
+    }
+
+    // ============================================================================
+    // 11. PENDÊNCIAS DA CASA & MURAL
+    // ============================================================================
+    function openModalPendencia(editId = null) {
+      const item = editId ? appState.pendencias.find(p => p.id === editId) : null;
+      openSheet(item ? 'Editar Pendência ✏️' : 'Nova Pendência da Casa', `
+        <label>O que precisa ser feito?</label>
+        <input type="text" id="inp-pend-texto" value="${escapeHTML(item ? item.texto : '')}" placeholder="Ex: Pagar conta de luz, abastecer carro..." />
+        <label>Valor (opcional · permite enviar ao Finanças)</label>
+        <input type="text" id="inp-pend-valor" value="${escapeHTML(item ? (item.valor || '') : '')}" placeholder="Ex: R$ 150,00" />
+      `, () => {
+        const texto = document.getElementById('inp-pend-texto').value.trim();
+        const valor = document.getElementById('inp-pend-valor').value.trim();
+        if (!texto) { showSheetError('Descreva a tarefa.'); return false; }
+        if (item) {
+          item.texto = texto;
+          item.valor = valor;
+        } else {
+          appState.pendencias.push({ id: Date.now(), texto, valor, done: false, enviadoFinanceiro: false });
+        }
+        saveState(['pendencias']);
+        showToast(item ? 'Pendência atualizada!' : 'Pendência adicionada!');
+      });
+    }
+
+    function togglePendencia(id) {
+      const item = appState.pendencias.find(p => p.id === id);
+      if (item) { item.done = !item.done; saveState(['pendencias']); }
+    }
+
+    function deletePendencia(id) {
+      appState.pendencias = appState.pendencias.filter(p => p.id !== id);
+      saveState(['pendencias']);
+    }
+
+    function openModalMural(editId = null) {
+      const item = editId ? appState.mural.find(m => m.id === editId) : null;
+      const defaultAutor = item ? item.autor : getActiveAdultUser();
+      openSheet(item ? 'Editar Recado ✏️' : `Recado no Mural · ${formatShortBR(hojeSelectedDateISO)}`, `
+        <label>Quem está deixando o recado?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultAutor === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-mural-autor')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${defaultAutor === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-mural-autor')">👩 Isabela</button>
+        </div>
+        <input type="hidden" id="inp-mural-autor" value="${escapeHTML(defaultAutor)}" />
+        <label>Mensagem</label>
+        <input type="text" id="inp-mural-texto" value="${escapeHTML(item ? item.texto : '')}" placeholder="Ex: Levar guarda-chuva na mochila..." />
+      `, () => {
+        const autor = document.getElementById('inp-mural-autor').value;
+        const texto = document.getElementById('inp-mural-texto').value.trim();
+        if (!texto) { showSheetError('Escreva uma mensagem.'); return false; }
+        if (item) {
+          item.autor = autor;
+          item.texto = texto;
+        } else {
+          appState.mural.unshift({ id: Date.now(), autor, texto, date: hojeSelectedDateISO });
+        }
+        saveState(['mural']);
+        showToast(item ? 'Recado atualizado!' : 'Recado fixado no mural!');
+      });
+    }
+
+    function deleteMural(id) {
+      appState.mural = appState.mural.filter(m => m.id !== id);
+      saveState(['mural']);
+    }
+
+    // ============================================================================
+    // 12. AGENDA COM RECORRÊNCIA & LINHA DO TEMPO
+    // ============================================================================
+    function getEventsForDate(isoStr) {
+      const targetDate = parseISOToLocalDate(isoStr);
+      const targetDow = targetDate.getDay();
+      const targetDom = targetDate.getDate();
+
+      return (appState.agenda || []).filter(ev => {
+        if (!ev.date) return false;
+        if (ev.date === isoStr) return true;
+        if (isoStr < ev.date) return false;
+
+        const rec = ev.recorrencia || 'none';
+        if (rec === 'daily') return true;
+        if (rec === 'weekdays') return targetDow >= 1 && targetDow <= 5;
+        if (rec === 'weekly') return parseISOToLocalDate(ev.date).getDay() === targetDow;
+        if (rec === 'monthly') return parseISOToLocalDate(ev.date).getDate() === targetDom;
+        return false;
+      });
+    }
+
+    function getRecorrenciaLabel(rec) {
+      if (rec === 'daily') return '🔁 Diário';
+      if (rec === 'weekdays') return '🔁 Seg a Sex';
+      if (rec === 'weekly') return '🔁 Semanal';
+      if (rec === 'monthly') return '🔁 Mensal';
+      return '';
+    }
+
+    function renderAgendaFilterPills() {
+      const container = document.getElementById('familia-filter-pills');
+      if (!container) return;
+      const lista = appState.integrantes || DEFAULT_INTEGRANTES;
+      const pillsHTML = [
+        `<button type="button" class="pill ${currentAgendaFilter === 'Todos' ? 'active' : ''}" onclick="setAgendaFilter('Todos')">Todos</button>`,
+        ...lista.map(m => `
+          <button type="button" class="pill ${currentAgendaFilter === m.nome ? 'active' : ''}" onclick="setAgendaFilter('${escapeJSArg(m.nome)}')">
+            <span style="width:8px; height:8px; border-radius:50%; background:${currentAgendaFilter === m.nome ? '#fff' : escapeHTML(m.cor)}; display:inline-block;"></span>
+            ${escapeHTML(m.nome)}
+          </button>
+        `),
+        `<button type="button" class="pill add-member" onclick="openModalNovoIntegrante()">+ Integrante</button>`
+      ].join('');
+      container.innerHTML = pillsHTML;
+    }
+
+    function setAgendaFilter(cat) {
+      currentAgendaFilter = cat;
+      renderAgendaFilterPills();
+      renderCalendar();
+      renderAgenda();
+    }
+
+    function changeMonth(delta) {
+      calCurrentMonth += delta;
+      if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; }
+      else if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
+      renderCalendar();
+    }
+
+    function selectCalendarDay(isoStr) {
+      selectedDateISO = isoStr;
+      renderCalendar();
+      renderAgenda();
+    }
+
+    function openModalAgenda(editId = null, prefillDate = null) {
+      const item = editId ? appState.agenda.find(a => a.id === editId) : null;
+      const baseDate = item ? item.date : (prefillDate || selectedDateISO);
+      const defaultCat = item ? (item.categoria === 'Casal' ? 'Família' : item.categoria) : (currentAgendaFilter !== 'Todos' ? currentAgendaFilter : 'Família');
+      const defaultRec = item ? (item.recorrencia || 'none') : 'none';
+
+      openSheet(item ? 'Editar Compromisso ✏️' : `Novo Compromisso · ${formatShortBR(baseDate)}`, `
+        <label>Data Inicial</label>
+        <input type="date" id="inp-ag-date" value="${escapeHTML(baseDate)}" />
+        <label>Horário (opcional)</label>
+        <input type="time" id="inp-ag-time" value="${escapeHTML(item ? (item.time || '') : '')}" />
+        <label>De quem é este compromisso?</label>
+        ${renderIntegrantesChips(defaultCat, 'inp-ag-cat')}
+        <label>Repetição / Recorrência</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultRec === 'none' ? 'selected' : ''}" data-val="none" onclick="selectChip(this, 'inp-ag-rec')">Uma vez</button>
+          <button type="button" class="chip-opt ${defaultRec === 'daily' ? 'selected' : ''}" data-val="daily" onclick="selectChip(this, 'inp-ag-rec')">Diário</button>
+          <button type="button" class="chip-opt ${defaultRec === 'weekdays' ? 'selected' : ''}" data-val="weekdays" onclick="selectChip(this, 'inp-ag-rec')">Seg a Sex</button>
+          <button type="button" class="chip-opt ${defaultRec === 'weekly' ? 'selected' : ''}" data-val="weekly" onclick="selectChip(this, 'inp-ag-rec')">Semanal</button>
+          <button type="button" class="chip-opt ${defaultRec === 'monthly' ? 'selected' : ''}" data-val="monthly" onclick="selectChip(this, 'inp-ag-rec')">Mensal</button>
+        </div>
+        <input type="hidden" id="inp-ag-rec" value="${escapeHTML(defaultRec)}" />
+        <label>Descrição</label>
+        <input type="text" id="inp-ag-titulo" value="${escapeHTML(item ? item.titulo : '')}" placeholder="Ex: Reunião escolar, Dentista, Academia..." />
+      `, () => {
+        const date = document.getElementById('inp-ag-date').value || baseDate;
+        const time = document.getElementById('inp-ag-time').value;
+        const categoria = document.getElementById('inp-ag-cat').value;
+        const recorrencia = document.getElementById('inp-ag-rec').value || 'none';
+        const titulo = document.getElementById('inp-ag-titulo').value.trim();
+        if (!titulo) { showSheetError('Informe o nome do compromisso.'); return false; }
+
+        if (item) {
+          item.date = date;
+          item.time = time;
+          item.categoria = categoria;
+          item.recorrencia = recorrencia;
+          item.titulo = titulo;
+        } else {
+          appState.agenda.push({ id: Date.now(), date, time, categoria, recorrencia, titulo });
+        }
+        selectedDateISO = date;
+        hojeSelectedDateISO = date;
+        const d = parseISOToLocalDate(date);
+        calCurrentYear = d.getFullYear();
+        calCurrentMonth = d.getMonth();
+        saveState(['agenda']);
+        showToast(item ? 'Compromisso atualizado!' : 'Compromisso salvo!');
+      });
+    }
+
+    function deleteAgenda(id) {
+      openConfirmSheet('Excluir Compromisso', 'Deseja remover este compromisso (e suas repetições, se houver)?', () => {
+        appState.agenda = appState.agenda.filter(a => a.id !== id);
+        saveState(['agenda']);
+        showToast('Compromisso removido.');
+      }, 'Excluir', true);
+    }
+
+    // ============================================================================
+    // 13. LISTA DE MERCADO & DESPESAS COMPARTILHADAS
+    // ============================================================================
+    function openModalMercado(editId = null) {
+      const item = editId ? appState.mercado.find(m => m.id === editId) : null;
+      openSheet(item ? 'Editar Item da Lista ✏️' : 'Novo Item da Lista', `
+        <label>Item</label>
+        <input type="text" id="inp-merc-item" value="${escapeHTML(item ? item.item : '')}" placeholder="Ex: Café, Arroz, Papel toalha..." />
+        <label>Valor Estimado (opcional)</label>
+        <input type="text" id="inp-merc-valor" value="${escapeHTML(item ? (item.valor || '') : '')}" placeholder="Ex: R$ 18,90" />
+      `, () => {
+        const nome = document.getElementById('inp-merc-item').value.trim();
+        const valor = document.getElementById('inp-merc-valor').value.trim();
+        if (!nome) { showSheetError('Digite o nome do item.'); return false; }
+        if (item) {
+          item.item = nome;
+          item.valor = valor;
+        } else {
+          appState.mercado.push({ id: Date.now(), item: nome, valor, done: false });
+        }
+        saveState(['mercado']);
+        showToast(item ? 'Item atualizado!' : 'Item adicionado à lista!');
+      });
+    }
+
+    function toggleMercado(id) {
+      const item = appState.mercado.find(m => m.id === id);
+      if (item) { item.done = !item.done; saveState(['mercado']); }
+    }
+
+    function deleteMercado(id) {
+      appState.mercado = appState.mercado.filter(m => m.id !== id);
+      saveState(['mercado']);
+    }
+
+    function openModalDespesa(editId = null) {
+      const item = editId ? appState.despesas.find(d => d.id === editId) : null;
+      const defaultPagoPor = item ? item.pagoPor : getActiveAdultUser();
+      const defaultDiv = item ? (item.dividido ? 'sim' : 'nao') : 'sim';
+      const defaultStatus = item ? (item.status || 'pendente') : 'pendente';
+
+      openSheet(item ? 'Editar Despesa ✏️' : 'Nova Despesa da Casa / Família 💸', `
+        <label>Descrição da Despesa</label>
+        <input type="text" id="inp-desp-desc" value="${escapeHTML(item ? item.descricao : '')}" placeholder="Ex: Supermercado, Escola Duda, Farmácia..." />
+        <label>Valor (R$)</label>
+        <input type="number" step="0.01" inputmode="decimal" id="inp-desp-val" value="${escapeHTML(item ? item.valor : '')}" placeholder="0,00" />
+        <label>Quem pagou?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultPagoPor === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-desp-pagou')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${defaultPagoPor === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-desp-pagou')">👩 Isabela</button>
+        </div>
+        <input type="hidden" id="inp-desp-pagou" value="${escapeHTML(defaultPagoPor)}" />
+        <label>Dividir entre o casal (50% / 50%)?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultDiv === 'sim' ? 'selected' : ''}" data-val="sim" onclick="selectChip(this, 'inp-desp-div')">Sim · Dividir 50/50</button>
+          <button type="button" class="chip-opt ${defaultDiv === 'nao' ? 'selected' : ''}" data-val="nao" onclick="selectChip(this, 'inp-desp-div')">Não · Individual</button>
+        </div>
+        <input type="hidden" id="inp-desp-div" value="${defaultDiv}" />
+        <label>Status de Conferência</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultStatus === 'pendente' ? 'selected' : ''}" data-val="pendente" onclick="selectChip(this, 'inp-desp-status')">⏳ Pendente</button>
+          <button type="button" class="chip-opt ${defaultStatus === 'aprovada' ? 'selected' : ''}" data-val="aprovada" onclick="selectChip(this, 'inp-desp-status')">✅ Conferida / OK</button>
+        </div>
+        <input type="hidden" id="inp-desp-status" value="${defaultStatus}" />
+      `, () => {
+        const descricao = document.getElementById('inp-desp-desc').value.trim();
+        const valor = parseFloat(String(document.getElementById('inp-desp-val').value).replace(',', '.'));
+        const pagoPor = document.getElementById('inp-desp-pagou').value;
+        const dividido = document.getElementById('inp-desp-div').value === 'sim';
+        const status = document.getElementById('inp-desp-status').value;
+
+        if (!descricao || isNaN(valor) || valor <= 0) { showSheetError('Preencha a descrição e um valor válido.'); return false; }
+
+        if (item) {
+          item.descricao = descricao;
+          item.valor = valor;
+          item.pagoPor = pagoPor;
+          item.dividido = dividido;
+          item.status = status;
+        } else {
+          appState.despesas.unshift({ id: Date.now(), date: getTodayISO(), descricao, valor, pagoPor, dividido, status, enviadoFinanceiro: false });
+        }
+        saveState(['despesas']);
+        showToast(item ? 'Despesa atualizada!' : 'Despesa lançada!');
+      });
+    }
+
+    function toggleDespesaStatus(id) {
+      const d = appState.despesas.find(x => x.id === id);
+      if (d) {
+        d.status = d.status === 'aprovada' ? 'pendente' : 'aprovada';
+        saveState(['despesas']);
+      }
+    }
+
+    function deleteDespesa(id) {
+      openConfirmSheet('Excluir Despesa', 'Deseja remover este lançamento de despesa?', () => {
+        appState.despesas = appState.despesas.filter(d => d.id !== id);
+        saveState(['despesas']);
+        showToast('Despesa removida.');
+      }, 'Excluir', true);
+    }
+
+    // ============================================================================
+    // 14. SAÚDE: REMÉDIOS, HISTÓRICO DE DOSES, FICHA & VACINAS
+    // ============================================================================
+    function buildTimestampFromTimeInput(hhmm) {
+      if (!hhmm || !hhmm.includes(':')) return Date.now();
+      const [h, m] = hhmm.split(':').map(Number);
+      const now = new Date();
+      now.setHours(h, m, 0, 0);
+      if (now.getTime() > Date.now() + 60000) now.setDate(now.getDate() - 1);
+      return now.getTime();
+    }
+
+    function formatTimeFromTimestamp(ts) {
+      if (!ts) return 'Nenhuma dose';
+      const d = new Date(ts);
+      const hora = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const isToday = dateToISO(d) === getTodayISO();
+      return isToday ? `${hora} (hoje)` : `${hora} (${formatShortBR(dateToISO(d))})`;
+    }
+
+    function getProximaDoseInfo(remedio) {
+      if (!remedio.ultimaDoseTimestamp) return null;
+      const nextTs = remedio.ultimaDoseTimestamp + (Number(remedio.intervaloHoras) || 8) * 3600000;
+      const d = new Date(nextTs);
+      const hora = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const isToday = dateToISO(d) === getTodayISO();
+      const overdue = Date.now() >= nextTs;
+      return { nextTs, texto: isToday ? hora : `${hora} (${formatShortBR(dateToISO(d))})`, overdue };
+    }
+
+    function syncRemedioSummaryFromLogs(remedioId) {
+      const rem = appState.saude.remedios.find(r => r.id === remedioId);
+      if (!rem) return;
+      const logs = (appState.saude.historicoDoses || [])
+        .filter(l => l.remedioId === remedioId)
+        .sort((a, b) => b.timestamp - a.timestamp);
+      if (logs.length > 0) {
+        rem.ultimaDoseTimestamp = logs[0].timestamp;
+        rem.ultimaDoseTexto = formatTimeFromTimestamp(logs[0].timestamp);
+        rem.responsavelUltima = logs[0].responsavel;
+      } else {
+        rem.ultimaDoseTimestamp = null;
+        rem.ultimaDoseTexto = 'Nenhuma dose registrada';
+        rem.responsavelUltima = '-';
+      }
+    }
+
+    function openModalNovoRemedio(editId = null) {
+      const rem = editId ? appState.saude.remedios.find(r => r.id === editId) : null;
+      const defaultInt = rem ? String(rem.intervaloHoras) : '8';
+      openSheet(rem ? 'Editar Remédio ✏️' : 'Novo Remédio Ativo 💊', `
+        <label>Nome do Remédio</label>
+        <input type="text" id="inp-rem-nome" value="${escapeHTML(rem ? rem.nome : '')}" placeholder="Ex: Dipirona gotas, Predsim..." />
+        <label>Dosagem / Instrução</label>
+        <input type="text" id="inp-rem-dose" value="${escapeHTML(rem ? rem.dosagem : '')}" placeholder="Ex: 20 gotas ou 5 ml" />
+        <label>Intervalo entre doses</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultInt === '4' ? 'selected' : ''}" data-val="4" onclick="selectChip(this, 'inp-rem-int')">4h</button>
+          <button type="button" class="chip-opt ${defaultInt === '6' ? 'selected' : ''}" data-val="6" onclick="selectChip(this, 'inp-rem-int')">6h</button>
+          <button type="button" class="chip-opt ${defaultInt === '8' ? 'selected' : ''}" data-val="8" onclick="selectChip(this, 'inp-rem-int')">8h</button>
+          <button type="button" class="chip-opt ${defaultInt === '12' ? 'selected' : ''}" data-val="12" onclick="selectChip(this, 'inp-rem-int')">12h</button>
+          <button type="button" class="chip-opt ${defaultInt === '24' ? 'selected' : ''}" data-val="24" onclick="selectChip(this, 'inp-rem-int')">24h</button>
+        </div>
+        <input type="hidden" id="inp-rem-int" value="${defaultInt}" />
+      `, () => {
+        const nome = document.getElementById('inp-rem-nome').value.trim();
+        const dosagem = document.getElementById('inp-rem-dose').value.trim();
+        const intervaloHoras = Number(document.getElementById('inp-rem-int').value) || 8;
+        if (!nome) { showSheetError('Informe o nome do remédio.'); return false; }
+        if (rem) {
+          rem.nome = nome;
+          rem.dosagem = dosagem || `De ${intervaloHoras} em ${intervaloHoras}h`;
+          rem.intervaloHoras = intervaloHoras;
+        } else {
+          appState.saude.remedios.push({
+            id: Date.now(), nome, dosagem: dosagem || `De ${intervaloHoras} em ${intervaloHoras}h`,
+            intervaloHoras, ultimaDoseTimestamp: null, ultimaDoseTexto: 'Nenhuma dose registrada', responsavelUltima: '-'
+          });
+        }
+        saveState(['saude']);
+        showToast(rem ? 'Remédio atualizado!' : 'Remédio adicionado!');
+      });
+    }
+
+    function deleteRemedio(id) {
+      openConfirmSheet('Encerrar Remédio', 'Encerrar e remover este remédio dos ativos?', () => {
+        appState.saude.remedios = appState.saude.remedios.filter(r => r.id !== id);
+        saveState(['saude']);
+        showToast('Remédio encerrado.');
+      }, 'Encerrar', true);
+    }
+
+    function openModalRegistrarDose(remedioId) {
+      const rem = appState.saude.remedios.find(r => r.id === remedioId);
+      if (!rem) return;
+      const now = new Date();
+      const nowHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const defaultResp = getActiveAdultUser();
+
+      openSheet(`Registrar Dose · ${rem.nome}`, `
+        <label>Horário que o remédio foi dado</label>
+        <input type="time" id="inp-dose-hora" value="${nowHHMM}" />
+        <label>Quem administrou?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultResp === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-dose-resp')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${defaultResp === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-dose-resp')">👩 Isabela</button>
+          <button type="button" class="chip-opt" data-val="Rede de Apoio" onclick="selectChip(this, 'inp-dose-resp')">👵 Rede de Apoio</button>
+        </div>
+        <input type="hidden" id="inp-dose-resp" value="${escapeHTML(defaultResp)}" />
+      `, () => {
+        const hhmm = document.getElementById('inp-dose-hora').value || nowHHMM;
+        const resp = document.getElementById('inp-dose-resp').value;
+        const ts = buildTimestampFromTimeInput(hhmm);
+        appState.saude.historicoDoses.unshift({
+          id: Date.now(), remedioId: rem.id, remedioNome: rem.nome, dosagem: rem.dosagem, timestamp: ts, responsavel: resp
+        });
+        syncRemedioSummaryFromLogs(rem.id);
+        saveState(['saude']);
+        showToast(`Dose de ${rem.nome} registrada às ${hhmm}!`);
+      });
+    }
+
+    function openModalLancarDoseAvulsa() {
+      const now = new Date();
+      const nowHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const defaultResp = getActiveAdultUser();
+      openSheet('Lançar Dose Avulsa / Passada 💊', `
+        <label>Nome do Remédio</label>
+        <input type="text" id="inp-avulsa-nome" placeholder="Ex: Antitérmico, Xarope..." />
+        <label>Dosagem</label>
+        <input type="text" id="inp-avulsa-dose" placeholder="Ex: 5 ml" />
+        <label>Horário que foi dado</label>
+        <input type="time" id="inp-avulsa-hora" value="${nowHHMM}" />
+        <label>Quem deu?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultResp === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-avulsa-resp')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${defaultResp === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-avulsa-resp')">👩 Isabela</button>
+          <button type="button" class="chip-opt" data-val="Rede de Apoio" onclick="selectChip(this, 'inp-avulsa-resp')">👵 Rede de Apoio</button>
+        </div>
+        <input type="hidden" id="inp-avulsa-resp" value="${escapeHTML(defaultResp)}" />
+      `, () => {
+        const nome = document.getElementById('inp-avulsa-nome').value.trim();
+        const dosagem = document.getElementById('inp-avulsa-dose').value.trim();
+        const hhmm = document.getElementById('inp-avulsa-hora').value || nowHHMM;
+        const resp = document.getElementById('inp-avulsa-resp').value;
+        if (!nome) { showSheetError('Informe o nome do remédio.'); return false; }
+        const ts = buildTimestampFromTimeInput(hhmm);
+        appState.saude.historicoDoses.unshift({
+          id: Date.now(), remedioId: null, remedioNome: nome, dosagem: dosagem || 'Dose avulsa', timestamp: ts, responsavel: resp
+        });
+        saveState(['saude']);
+        showToast(`Dose avulsa de ${nome} registrada!`);
+      });
+    }
+
+    function openModalEditarDoseLog(logId) {
+      const log = appState.saude.historicoDoses.find(l => l.id === logId);
+      if (!log) return;
+      const d = new Date(log.timestamp);
+      const hhmm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      openSheet('Corrigir Registro de Dose ✏️', `
+        <label>Remédio</label>
+        <input type="text" id="inp-edit-log-nome" value="${escapeHTML(log.remedioNome)}" />
+        <label>Horário Correto</label>
+        <input type="time" id="inp-edit-log-hora" value="${hhmm}" />
+        <label>Quem administrou?</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${log.responsavel === 'Paulo' ? 'selected' : ''}" data-val="Paulo" onclick="selectChip(this, 'inp-edit-log-resp')">🧔🏾 Paulo</button>
+          <button type="button" class="chip-opt ${log.responsavel === 'Isabela' ? 'selected' : ''}" data-val="Isabela" onclick="selectChip(this, 'inp-edit-log-resp')">👩 Isabela</button>
+          <button type="button" class="chip-opt ${log.responsavel === 'Rede de Apoio' ? 'selected' : ''}" data-val="Rede de Apoio" onclick="selectChip(this, 'inp-edit-log-resp')">👵 Rede de Apoio</button>
+        </div>
+        <input type="hidden" id="inp-edit-log-resp" value="${escapeHTML(log.responsavel)}" />
+      `, () => {
+        const novoNome = document.getElementById('inp-edit-log-nome').value.trim();
+        const novaHora = document.getElementById('inp-edit-log-hora').value || hhmm;
+        const novoResp = document.getElementById('inp-edit-log-resp').value;
+        if (!novoNome) { showSheetError('Informe o nome do remédio.'); return false; }
+        const baseDate = new Date(log.timestamp);
+        const [h, m] = novaHora.split(':').map(Number);
+        baseDate.setHours(h, m, 0, 0);
+        log.remedioNome = novoNome;
+        log.timestamp = baseDate.getTime();
+        log.responsavel = novoResp;
+        if (log.remedioId) syncRemedioSummaryFromLogs(log.remedioId);
+        saveState(['saude']);
+        showToast('Registro de dose corrigido!');
+      });
+    }
+
+    function deleteDoseLog(logId) {
+      openConfirmSheet('Excluir Registro', 'Excluir este registro de dose errado?', () => {
+        const log = appState.saude.historicoDoses.find(l => l.id === logId);
+        const remId = log ? log.remedioId : null;
+        appState.saude.historicoDoses = appState.saude.historicoDoses.filter(l => l.id !== logId);
+        if (remId) syncRemedioSummaryFromLogs(remId);
+        saveState(['saude']);
+        showToast('Registro excluído.');
+      }, 'Excluir', true);
+    }
+
+    function openModalFicha() {
+      const f = appState.saude.ficha;
+      openSheet('Editar Ficha de Saúde · Duda', `
+        <label>Tipo Sanguíneo</label>
+        <input type="text" id="inp-ficha-sangue" value="${escapeHTML(f.tipoSanguineo)}" />
+        <label>Alergias Importantes</label>
+        <input type="text" id="inp-ficha-alergia" value="${escapeHTML(f.alergias)}" />
+        <label>Pediatra e Telefone</label>
+        <input type="text" id="inp-ficha-ped" value="${escapeHTML(f.pediatra)}" />
+        <label>Plano de Saúde / Carteirinha</label>
+        <input type="text" id="inp-ficha-plano" value="${escapeHTML(f.plano)}" />
+      `, () => {
+        appState.saude.ficha = {
+          tipoSanguineo: document.getElementById('inp-ficha-sangue').value.trim() || f.tipoSanguineo,
+          alergias: document.getElementById('inp-ficha-alergia').value.trim() || f.alergias,
+          pediatra: document.getElementById('inp-ficha-ped').value.trim() || f.pediatra,
+          plano: document.getElementById('inp-ficha-plano').value.trim() || f.plano
+        };
+        saveState(['saude']);
+        showToast('Ficha de saúde atualizada!');
+      });
+    }
+
+    function openModalVacina(editId = null) {
+      const vac = editId ? (appState.saude.vacinas || []).find(v => v.id === editId) : null;
+      const defaultStatus = vac ? vac.status : 'tomada';
+      openSheet(vac ? 'Editar Vacina ✏️' : 'Registrar Vacina / Reforço 💉', `
+        <label>Nome da Vacina</label>
+        <input type="text" id="inp-vac-nome" value="${escapeHTML(vac ? vac.nome : '')}" placeholder="Ex: Tríplice Viral, Gripe 2026..." />
+        <label>Data (aplicada ou prevista)</label>
+        <input type="date" id="inp-vac-data" value="${escapeHTML(vac ? vac.data : getTodayISO())}" />
+        <label>Situação</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultStatus === 'tomada' ? 'selected' : ''}" data-val="tomada" onclick="selectChip(this, 'inp-vac-status')">✅ Já Tomada</button>
+          <button type="button" class="chip-opt ${defaultStatus === 'proxima' ? 'selected' : ''}" data-val="proxima" onclick="selectChip(this, 'inp-vac-status')">📅 Próxima / Agendada</button>
+        </div>
+        <input type="hidden" id="inp-vac-status" value="${defaultStatus}" />
+      `, () => {
+        const nome = document.getElementById('inp-vac-nome').value.trim();
+        const data = document.getElementById('inp-vac-data').value || getTodayISO();
+        const status = document.getElementById('inp-vac-status').value;
+        if (!nome) { showSheetError('Informe o nome da vacina.'); return false; }
+        if (!Array.isArray(appState.saude.vacinas)) appState.saude.vacinas = [];
+        if (vac) {
+          vac.nome = nome;
+          vac.data = data;
+          vac.status = status;
+        } else {
+          appState.saude.vacinas.unshift({ id: Date.now(), nome, data, status });
+        }
+        saveState(['saude']);
+        showToast(vac ? 'Vacina atualizada!' : 'Vacina registrada!');
+      });
+    }
+
+    function deleteVacina(id) {
+      appState.saude.vacinas = (appState.saude.vacinas || []).filter(v => v.id !== id);
+      saveState(['saude']);
+    }
+
+    // ============================================================================
+    // 15. MISSÕES, DETALHAMENTO, DIA CLICÁVEL NA SEMANA, METAS & DESEJOS
+    // ============================================================================
+    function getCompletedIdsForDate(isoStr) {
+      if (appState.missoesHistorico && Array.isArray(appState.missoesHistorico[isoStr])) {
+        return appState.missoesHistorico[isoStr];
+      }
+      if (isoStr === getTodayISO()) {
+        return (appState.missoes || []).filter(m => m.done).map(m => m.id);
+      }
+      return [];
+    }
+
+    function computeDudaStatsAndMedals() {
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const totalMissions = (appState.missoes || []).length || 1;
+
+      let totalHistoricoEstrelas = 0;
+      Object.values(appState.missoesHistorico || {}).forEach(arr => {
+        if (Array.isArray(arr)) totalHistoricoEstrelas += arr.length;
+      });
+      const acumuladoReal = Math.max(totalHistoricoEstrelas, appState.estrelasTotais || 0);
+
+      let hasPerfectWeek = false;
+      let streakAbove80 = 0;
+      let recent4WeeksStars = 0;
+
+      for (let w = 1; w <= 8; w++) {
+        const mon = addDaysISO(thisMon, -7 * w);
+        let sum = 0;
+        getWeekDatesArray(mon).forEach(d => { sum += getCompletedIdsForDate(d).length; });
+        const maxWeek = totalMissions * 7;
+        if (sum >= maxWeek && maxWeek > 0) hasPerfectWeek = true;
+        if (w <= 4) recent4WeeksStars += sum;
+        if (sum >= Math.ceil(maxWeek * 0.8)) {
+          if (streakAbove80 === w - 1) streakAbove80++;
+        }
+      }
+
+      const avgStarsPerWeek = recent4WeeksStars > 0 ? Math.max(1, Math.round(recent4WeeksStars / 4)) : Math.max(1, totalMissions * 5);
+
+      const medals = [
+        { id: 'perfect', icon: '🔥', label: 'Semana Perfeita (100%)', unlocked: hasPerfectWeek },
+        { id: 'streak3', icon: '🛡️', label: '3 Semanas >80%', unlocked: streakAbove80 >= 3 },
+        { id: 'club100', icon: '💯', label: 'Clube 100+ Estrelas', unlocked: acumuladoReal >= 100 }
+      ];
+
+      return { acumuladoReal, avgStarsPerWeek, medals };
+    }
+
+    function getActiveLongGoalWish() {
+      const wishes = appState.desejos || [];
+      if (appState.metaDestaqueId) {
+        const pinned = wishes.find(w => w.id === appState.metaDestaqueId && w.status === 'pendente');
+        if (pinned) return pinned;
+      }
+      const pending = wishes.filter(w => w.status === 'pendente');
+      if (!pending.length) return null;
+      return [...pending].sort((a, b) => (Number(b.custo) || 0) - (Number(a.custo) || 0))[0];
+    }
+
+    function pinWishAsMainGoal(wishId) {
+      appState.metaDestaqueId = wishId;
+      saveState(['metaDestaqueId']);
+      showToast('Meta principal fixada no topo! 🎯');
+    }
+
+    function renderLongGoalCardHTML(isAdmin = false) {
+      const goal = getActiveLongGoalWish();
+      if (!goal) return '';
+      const saldo = appState.estrelasTotais || 0;
+      const custo = Math.max(1, Number(goal.custo) || 10);
+      const pct = Math.min(100, Math.round((saldo / custo) * 100));
+      const faltam = Math.max(0, custo - saldo);
+      const { avgStarsPerWeek } = computeDudaStatsAndMedals();
+      const estWeeks = faltam === 0 ? 0 : Math.max(1, Math.ceil(faltam / avgStarsPerWeek));
+
+      return `
+        <div class="long-goal-card">
+          <div class="long-goal-head">
+            <strong>🎯 Meta Principal: ${escapeHTML(goal.titulo)}</strong>
+            <span class="long-goal-tag">${saldo} / ${custo} ⭐ (${pct}%)</span>
+          </div>
+          <div class="long-goal-bar">
+            <div class="long-goal-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="long-goal-meta">
+            <span>${faltam === 0 ? '🎉 Meta atingida! Já pode resgatar!' : `Faltam ${faltam} ${faltam === 1 ? 'estrela' : 'estrelas'}`}</span>
+            <span>${faltam === 0 ? 'Pronto para aprovar' : `~${estWeeks} ${estWeeks === 1 ? 'semana' : 'semanas'} no ritmo atual`}</span>
+          </div>
+          ${isAdmin && faltam === 0 ? `
+            <div style="margin-top:8px;">
+              <button type="button" class="btn-approve" style="width:100%;" onclick="approveWish(${goal.id})">✅ Aprovar Meta Agora (-${custo}⭐)</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function openModalDetalheMissao(missaoId) {
+      const m = (appState.missoes || []).find(item => item.id === missaoId);
+      if (!m) return;
+      const turnoIcon = m.turno === 'Manhã' ? '☀️' : (m.turno === 'Tarde' ? '🌤️' : '🌙');
+      const desc = (m.descricao || '').trim();
+
+      openSheet(`${m.emoji} ${m.titulo}`, `
+        <div class="mission-detail-sheet-box">
+          <span class="hoje-status-pill" style="margin-bottom:4px;">${turnoIcon} Turno da ${escapeHTML(m.turno)} · +1 ⭐</span>
+          <p>${desc ? escapeHTML(desc) : 'Nenhum detalhamento extra cadastrado para esta missão.'}</p>
+        </div>
+      `, null, 'Fechar');
+    }
+
+    function toggleMissao(id) {
+      const today = getTodayISO();
+      if (dudaSelectedDateISO !== today) {
+        showToast('Missões de dias anteriores ficam apenas para consulta.');
+        return;
+      }
+      const m = appState.missoes.find(item => item.id === id);
+      if (!m) return;
+
+      const list = [...getCompletedIdsForDate(today)];
+      const idx = list.indexOf(id);
+      if (idx === -1) {
+        list.push(id);
+        m.done = true;
+        appState.estrelasTotais = (appState.estrelasTotais || 0) + 1;
+      } else {
+        list.splice(idx, 1);
+        m.done = false;
+        appState.estrelasTotais = Math.max(0, (appState.estrelasTotais || 0) - 1);
+      }
+      appState.missoesHistorico[today] = list;
+      saveState(['missoes', 'missoesHistorico', 'estrelasTotais']);
+    }
+
+    function selectDudaWeekDay(isoStr) {
+      if (isoStr > getTodayISO()) return;
+      dudaSelectedDateISO = isoStr;
+      renderDuda();
+    }
+
+    function selectAdminWeekDay(isoStr) {
+      if (isoStr > getTodayISO()) return;
+      adminWeekSelectedDateISO = isoStr;
+      renderAdminDuda();
+    }
+
+    function toggleMissionOnSpecificAdminDate(isoStr, missaoId) {
+      const today = getTodayISO();
+      if (isoStr > today) return;
+      const m = (appState.missoes || []).find(item => item.id === missaoId);
+      if (!m) return;
+
+      const list = [...getCompletedIdsForDate(isoStr)];
+      const idx = list.indexOf(missaoId);
+      if (idx === -1) {
+        list.push(missaoId);
+        if (isoStr === today) m.done = true;
+        appState.estrelasTotais = (appState.estrelasTotais || 0) + 1;
+        showToast(`+1 ⭐ creditada em ${formatShortBR(isoStr)}!`);
+      } else {
+        list.splice(idx, 1);
+        if (isoStr === today) m.done = false;
+        appState.estrelasTotais = Math.max(0, (appState.estrelasTotais || 0) - 1);
+        showToast(`Missão desmarcada em ${formatShortBR(isoStr)}.`);
+      }
+      appState.missoesHistorico[isoStr] = list;
+      saveState(['missoes', 'missoesHistorico', 'estrelasTotais']);
+    }
+
+    function openModalEstrelasManual(mode = 'bonus', prefillReason = '') {
+      const isPenalty = mode === 'penalty';
+      openSheet(isPenalty ? 'Aplicar Penalidade de Estrelas ⚠️' : 'Atribuir Bônus de Estrelas ⭐', `
+        <p class="hint">${isPenalty
+          ? 'Toda penalidade exige um motivo claro para que a Duda entenda o porquê na tela dela.'
+          : 'Recompense uma atitude legal da Duda com estrelas extras e uma mensagem carinhosa.'}</p>
+        <label>Quantidade de Estrelas</label>
+        <div class="chip-group">
+          ${[1, 2, 3, 5].map((qtd, idx) => `
+            <button type="button" class="chip-opt ${isPenalty ? 'penalty' : ''} ${idx === 0 ? 'selected' : ''}" data-val="${qtd}" onclick="selectChip(this, 'inp-star-qtd')">
+              ${isPenalty ? `-${qtd} ⭐` : `+${qtd} ⭐`}
+            </button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-star-qtd" value="1" />
+        <label>Motivo (obrigatório · aparece para a Duda)</label>
+        <input type="text" id="inp-star-motivo" value="${escapeHTML(prefillReason)}" placeholder="${isPenalty ? 'Ex: Não guardou o material escolar após o aviso' : 'Ex: Foi super paciente e carinhosa hoje'}" />
+      `, () => {
+        const qtd = Number(document.getElementById('inp-star-qtd').value) || 1;
+        const motivo = document.getElementById('inp-star-motivo').value.trim();
+        if (!motivo) { showSheetError('Escreva o motivo para manter a transparência com a Duda.'); return false; }
+
+        const delta = isPenalty ? -qtd : qtd;
+        appState.estrelasTotais = Math.max(0, (appState.estrelasTotais || 0) + delta);
+        appState.historicoEstrelas.unshift({
+          id: Date.now(), date: getTodayISO(), tipo: isPenalty ? 'penalty' : 'bonus',
+          delta, motivo, autor: getActiveAdultUser(), vistaPelaDuda: false
+        });
+        saveState(['estrelasTotais', 'historicoEstrelas']);
+        showToast(isPenalty ? 'Penalidade registrada com motivo.' : 'Bônus de estrelas atribuído!');
+      });
+      if (isPenalty) {
+        document.getElementById('sheet-save-btn').className = 'btn-primary penalty';
+      }
+    }
+
+    function acknowledgePenaltyDuda(logId) {
+      const item = (appState.historicoEstrelas || []).find(h => h.id === logId);
+      if (item) {
+        item.vistaPelaDuda = true;
+        saveState(['historicoEstrelas']);
+        showToast('Combinado! Vamos continuar brilhando 🌟');
+      }
+    }
+
+    function openModalDudaExtrato() {
+      const logs = (appState.historicoEstrelas || []).slice(0, 12);
+      const html = logs.length
+        ? logs.map(h => {
+            const isPen = h.tipo === 'penalty' || h.delta < 0;
+            const sign = h.delta > 0 ? `+${h.delta}` : `${h.delta}`;
+            return `
+              <div class="star-log-row ${isPen ? 'penalty' : ''}" style="margin-bottom:8px;">
+                <div>
+                  <strong>${isPen ? '⚠️ Ajuste / Penalidade' : (h.tipo === 'redeem' ? '🎁 Desejo Realizado' : '🌟 Estrelas Extras')}</strong>
+                  <p style="font-size:13px; margin-top:2px;">${escapeHTML(h.motivo)}</p>
+                  <small style="font-size:11px; color:var(--text-muted);">${formatShortBR(h.date)} · por ${escapeHTML(h.autor || 'Pais')}</small>
+                </div>
+                <span class="star-log-delta">${sign} ⭐</span>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint">Ainda não há registros extras ou penalidades no seu extrato.</p>';
+
+      openSheet('Meu Extrato de Estrelas 🏆', `
+        <p class="hint">Saldo atual: <strong>⭐ ${appState.estrelasTotais || 0} estrelas</strong></p>
+        ${html}
+      `, null, 'Fechar');
+    }
+
+    function resetEstrelas() {
+      openConfirmSheet('Zerar Saldo de Estrelas', 'Zerar o saldo acumulado de estrelas da Duda?', () => {
+        appState.estrelasTotais = 0;
+        saveState(['estrelasTotais']);
+        showToast('Saldo zerado.');
+      }, 'Zerar', true);
+    }
+
+    function selectWishPresetChip(el, val) {
+      const group = el.parentElement;
+      group.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      const numInput = document.getElementById('inp-wish-custo-num');
+      if (numInput) numInput.value = val;
+    }
+
+    function clearWishPresetChips() {
+      const group = document.getElementById('wish-preset-chips');
+      if (group) group.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
+    }
+
+    function openModalNovoDesejoDuda() {
+      openSheet('Pedir um Desejo ou Meta 🎁', `
+        <p class="hint">Você tem <strong>⭐ ${appState.estrelasTotais || 0} estrelas</strong> guardadas!</p>
+        <label>O que você gostaria de ganhar ou fazer?</label>
+        <input type="text" id="inp-wish-titulo" placeholder="Ex: Tomar sorvete, passear no parque, bicicleta..." />
+        <label>Atalhos rápidos de estrelas</label>
+        <div class="chip-group" id="wish-preset-chips">
+          <button type="button" class="chip-opt" onclick="selectWishPresetChip(this, 5)">⭐ 5</button>
+          <button type="button" class="chip-opt selected" onclick="selectWishPresetChip(this, 10)">⭐ 10</button>
+          <button type="button" class="chip-opt" onclick="selectWishPresetChip(this, 25)">⭐ 25</button>
+          <button type="button" class="chip-opt" onclick="selectWishPresetChip(this, 50)">⭐ 50</button>
+          <button type="button" class="chip-opt" onclick="selectWishPresetChip(this, 100)">⭐ 100</button>
+        </div>
+        <label>Ou digite qualquer quantidade de estrelas</label>
+        <input type="number" min="1" max="9999" inputmode="numeric" id="inp-wish-custo-num" value="10" oninput="clearWishPresetChips()" placeholder="Ex: 35" />
+      `, () => {
+        const titulo = document.getElementById('inp-wish-titulo').value.trim();
+        const custo = parseInt(document.getElementById('inp-wish-custo-num').value, 10);
+        if (!titulo) { showSheetError('Escreva qual é o seu desejo!'); return false; }
+        if (isNaN(custo) || custo < 1) { showSheetError('Digite um número de estrelas maior que zero.'); return false; }
+        const newId = Date.now();
+        appState.desejos.unshift({ id: newId, titulo, custo, status: 'pendente', motivoRecusa: '' });
+        if (!appState.metaDestaqueId && custo >= 15) {
+          appState.metaDestaqueId = newId;
+        }
+        saveState(['desejos', 'metaDestaqueId']);
+        showToast('Pedido enviado para o papai e a Isabela! 🌟');
+      });
+    }
+
+    function approveWish(id) {
+      const w = appState.desejos.find(item => item.id === id);
+      if (!w) return;
+      const saldo = appState.estrelasTotais || 0;
+      if (saldo < w.custo) {
+        showToast(`Saldo insuficiente (${saldo}⭐ de ${w.custo}⭐ necessárias).`, true);
+        return;
+      }
+      openConfirmSheet('Aprovar Desejo', `Aprovar "${w.titulo}" e descontar ${w.custo} estrelas da Duda?`, () => {
+        appState.estrelasTotais = saldo - w.custo;
+        w.status = 'aprovado';
+        w.motivoRecusa = '';
+        if (appState.metaDestaqueId === w.id) appState.metaDestaqueId = null;
+        appState.historicoEstrelas.unshift({
+          id: Date.now(), date: getTodayISO(), tipo: 'redeem', delta: -w.custo,
+          motivo: `Resgate do desejo: ${w.titulo}`, autor: getActiveAdultUser()
+        });
+        saveState(['estrelasTotais', 'desejos', 'metaDestaqueId', 'historicoEstrelas']);
+        showToast('Desejo aprovado e estrelas descontadas!');
+      }, 'Aprovar', false);
+    }
+
+    function openModalRecusarDesejo(id) {
+      const w = appState.desejos.find(item => item.id === id);
+      if (!w) return;
+      openSheet('Recusar / Adiar Desejo 💬', `
+        <p class="hint">Desejo pedido: <strong>${escapeHTML(w.titulo)} (${w.custo} ⭐)</strong></p>
+        <label>Motivo para a Duda entender (aparece na tela dela)</label>
+        <input type="text" id="inp-wish-recusa" placeholder="Ex: Vamos deixar para o fim de semana / Precisa juntar mais estrelas" />
+      `, () => {
+        const motivo = document.getElementById('inp-wish-recusa').value.trim();
+        if (!motivo) { showSheetError('Escreva um motivo claro para a Duda.'); return false; }
+        w.status = 'recusado';
+        w.motivoRecusa = motivo;
+        if (appState.metaDestaqueId === w.id) appState.metaDestaqueId = null;
+        saveState(['desejos', 'metaDestaqueId']);
+        showToast('Motivo enviado para a tela da Duda.');
+      });
+      document.getElementById('sheet-save-btn').className = 'btn-primary penalty';
+    }
+
+    function deleteWish(id) {
+      appState.desejos = appState.desejos.filter(item => item.id !== id);
+      if (appState.metaDestaqueId === id) appState.metaDestaqueId = null;
+      saveState(['desejos', 'metaDestaqueId']);
+    }
+
+    function openModalMissao(editId = null) {
+      const item = editId ? appState.missoes.find(m => m.id === editId) : null;
+      const defaultTurno = item ? item.turno : 'Manhã';
+      const defaultEmoji = item ? item.emoji : '⭐';
+      openSheet(item ? 'Editar Missão ✏️' : 'Nova Missão Recorrente', `
+        <label>Turno</label>
+        <div class="chip-group">
+          <button type="button" class="chip-opt ${defaultTurno === 'Manhã' ? 'selected' : ''}" data-val="Manhã" onclick="selectChip(this, 'inp-mis-turno')">☀️ Manhã</button>
+          <button type="button" class="chip-opt ${defaultTurno === 'Tarde' ? 'selected' : ''}" data-val="Tarde" onclick="selectChip(this, 'inp-mis-turno')">🌤️ Tarde</button>
+          <button type="button" class="chip-opt ${defaultTurno === 'Noite' ? 'selected' : ''}" data-val="Noite" onclick="selectChip(this, 'inp-mis-turno')">🌙 Noite</button>
+        </div>
+        <input type="hidden" id="inp-mis-turno" value="${defaultTurno}" />
+        <label>Emoji</label>
+        <div class="chip-group">
+          ${['⭐', '🪥', '🛏️', '📚', '🧸', '🥗', '🚿', '🎒'].map(em => `
+            <button type="button" class="chip-opt ${defaultEmoji === em ? 'selected' : ''}" data-val="${em}" onclick="selectChip(this, 'inp-mis-emoji')">${em}</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-mis-emoji" value="${defaultEmoji}" />
+        <label>Nome da Missão</label>
+        <input type="text" id="inp-mis-titulo" value="${escapeHTML(item ? item.titulo : '')}" placeholder="Ex: Guardar os sapatos" />
+        <label>Detalhamento / Como fazer (opcional)</label>
+        <textarea id="inp-mis-descricao" rows="3" placeholder="Ex: Colocar o tênis na sapateira do quarto e as meias no cesto de roupa suja.">${escapeHTML(item ? (item.descricao || '') : '')}</textarea>
+      `, () => {
+        const turno = document.getElementById('inp-mis-turno').value;
+        const emoji = document.getElementById('inp-mis-emoji').value;
+        const titulo = document.getElementById('inp-mis-titulo').value.trim();
+        const descricao = document.getElementById('inp-mis-descricao').value.trim();
+        if (!titulo) { showSheetError('Escreva o nome da missão.'); return false; }
+        if (item) {
+          item.turno = turno;
+          item.emoji = emoji;
+          item.titulo = titulo;
+          item.descricao = descricao;
+        } else {
+          appState.missoes.push({ id: Date.now(), turno, titulo, emoji, descricao, done: false });
+        }
+        saveState(['missoes']);
+        showToast(item ? 'Missão atualizada!' : 'Missão criada!');
+      });
+    }
+
+    function deleteMissao(id) {
+      openConfirmSheet('Excluir Missão', 'Excluir esta missão recorrente?', () => {
+        appState.missoes = appState.missoes.filter(m => m.id !== id);
+        saveState(['missoes']);
+        showToast('Missão excluída.');
+      }, 'Excluir', true);
+    }
+
+    function openModalDudaPastWeeks() {
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const totalMissions = appState.missoes.length || 1;
+      let html = '';
+
+      for (let w = 1; w <= 6; w++) {
+        const mon = addDaysISO(thisMon, -7 * w);
+        const sun = addDaysISO(mon, 6);
+        const days = getWeekDatesArray(mon);
+        let starsSum = 0;
+        days.forEach(d => { starsSum += getCompletedIdsForDate(d).length; });
+        html += `
+          <div class="week-history-row">
+            <div>
+              <strong>Semana ${formatShortBR(mon)} a ${formatShortBR(sun)}</strong>
+              <div class="hint" style="margin:2px 0 0;">Meta semanal: ${totalMissions * 7} estrelas</div>
+            </div>
+            <span class="week-badge-stars">⭐ ${starsSum} estrelas</span>
+          </div>
+        `;
+      }
+      openSheet('Minhas Semanas Anteriores 📅', html, null, 'Fechar');
+    }
+
+    // ============================================================================
+    // 16. RENDERIZAÇÃO DAS TELAS
+    // ============================================================================
+    function renderAll() {
+      renderHoje();
+      renderAgendaFilterPills();
+      renderCalendar();
+      renderAgenda();
+      renderMercado();
+      renderDespesas();
+      renderSaude();
+      renderAdminDuda();
+      renderApoio();
+      renderDuda();
+    }
+
+    function renderHoje() {
+      const today = getTodayISO();
+      const isToday = hojeSelectedDateISO === today;
+      const dObj = parseISOToLocalDate(hojeSelectedDateISO);
+      const dowName = DIAS_SEMANA_PT[dObj.getDay()];
+
+      document.getElementById('hoje-day-label').textContent = isToday
+        ? `Hoje · ${formatShortBR(hojeSelectedDateISO)}`
+        : `${dowName.split('-')[0]} · ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('hoje-day-sublabel').textContent = isToday ? dowName : formatFullDateBR(hojeSelectedDateISO);
+      document.getElementById('btn-back-today').classList.toggle('hidden', isToday);
+
+      const alertBox = document.getElementById('hoje-med-alert-box');
+      if (alertBox) {
+        const overdueMeds = (appState.saude.remedios || []).filter(r => {
+          const info = getProximaDoseInfo(r);
+          return info && info.overdue;
+        });
+        alertBox.innerHTML = overdueMeds.map(rem => {
+          const info = getProximaDoseInfo(rem);
+          return `
+            <div class="med-alert-banner">
+              <div>
+                <strong>⏰ Remédio no horário: ${escapeHTML(rem.nome)}</strong>
+                <small>${escapeHTML(rem.dosagem)} · Previsto às ${escapeHTML(info.texto)}</small>
+              </div>
+              <button type="button" class="btn-med-quick" onclick="openModalRegistrarDose(${rem.id})">✔️ Dar Dose</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const log = getLogisticaForDate(hojeSelectedDateISO);
+      document.getElementById('logistica-card-title').textContent = isToday
+        ? 'Duda · Logística & Missões'
+        : `Duda · ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('hoje-leva').textContent = log.leva;
+      document.getElementById('hoje-busca').textContent = log.busca;
+
+      const doneIds = getCompletedIdsForDate(hojeSelectedDateISO);
+      const total = appState.missoes.length;
+      const feitos = doneIds.length;
+      const pct = total ? Math.round((feitos / total) * 100) : 0;
+
+      document.getElementById('adult-duda-progress-label').textContent = isToday ? 'Missões de hoje' : `Missões de ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('adult-duda-progress-text').textContent = `${feitos} de ${total} (${pct}%)`;
+      document.getElementById('adult-duda-progress-fill').style.width = `${pct}%`;
+
+      const pendentesCount = (appState.pendencias || []).filter(p => !p.done).length;
+      document.getElementById('hoje-status-badge').textContent = isToday ? '✨ Relance de Hoje' : `📅 Dia ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('hoje-glance-summary').textContent = `${feitos}/${total} missões da Duda · ${pendentesCount} pendência(s) da casa`;
+
+      document.getElementById('pendencias-list').innerHTML = appState.pendencias.length
+        ? appState.pendencias.map(p => `
+            <div class="check-item ${p.done ? 'done' : ''}">
+              <span class="item-text-main" style="flex:1;" onclick="togglePendencia(${p.id})">
+                ${p.done ? '✅' : '⬜'} ${escapeHTML(p.texto)}
+                ${p.valor ? `<span class="valor-pill">${escapeHTML(p.valor)}</span>` : ''}
+              </span>
+              <span class="item-actions-inline">
+                ${(p.valor || p.enviadoFinanceiro) ? `
+                  <button type="button" class="btn-bridge ${p.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromPendencia(${p.id})" title="Enviar ao App de Finanças">
+                    ${p.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
+                  </button>
+                ` : ''}
+                <span class="act-icon" title="Editar" onclick="openModalPendencia(${p.id})">✏️</span>
+                <span class="act-icon" title="Excluir" onclick="deletePendencia(${p.id})">🗑️</span>
+              </span>
+            </div>
+          `).join('')
+        : '<p class="hint" style="margin:4px 0;">Nenhuma pendência cadastrada.</p>';
+
+      const muralItems = appState.mural.filter(m => !m.date || m.date === hojeSelectedDateISO);
+      document.getElementById('mural-card-title').textContent = isToday ? '📌 Mural Rápido' : `📌 Mural · ${formatShortBR(hojeSelectedDateISO)}`;
+      document.getElementById('mural-list').innerHTML = muralItems.length
+        ? muralItems.map(m => `
+            <div class="check-item">
+              <span style="flex:1;"><strong>${escapeHTML(m.autor)}:</strong> ${escapeHTML(m.texto)}</span>
+              <span class="item-actions-inline">
+                <span class="act-icon" title="Editar" onclick="openModalMural(${m.id})">✏️</span>
+                <span class="act-icon" title="Excluir" onclick="deleteMural(${m.id})">🗑️</span>
+              </span>
+            </div>
+          `).join('')
+        : '<p class="hint" style="margin:0;">Nenhum recado para este dia.</p>';
+
+      const memberCache = buildMemberMetaCache();
+      const eventsDay = getEventsForDate(hojeSelectedDateISO).sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+      const timelineItems = [];
+
+      eventsDay.forEach(ev => {
+        const catName = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
+        const meta = memberCache[catName] || { nome: catName, emoji: '📌', cor: '#4A7C59' };
+        const recTag = getRecorrenciaLabel(ev.recorrencia);
+        timelineItems.push(`
+          <div class="timeline-row">
+            <div class="timeline-time-col" style="background:${escapeHTML(meta.cor)}18; color:${escapeHTML(meta.cor)};">${escapeHTML(ev.time || 'Dia todo')}</div>
+            <div class="timeline-main-col">
+              <div class="timeline-title-line">
+                <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(catName)}</span>
+                <span>${escapeHTML(ev.titulo)}</span>
+              </div>
+              ${recTag ? `<div class="timeline-meta">${recTag}</div>` : ''}
+            </div>
+            <span class="item-actions-inline">
+              <span class="act-icon" title="Editar" onclick="openModalAgenda(${ev.id})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteAgenda(${ev.id})">🗑️</span>
+            </span>
+          </div>
+        `);
+      });
+
+      const turnoHorario = { 'Manhã': '☀️ Manhã', 'Tarde': '🌤️ Tarde', 'Noite': '🌙 Noite' };
+      (appState.missoes || []).forEach(m => {
+        const isDone = doneIds.includes(m.id);
+        const hasDesc = Boolean((m.descricao || '').trim());
+        timelineItems.push(`
+          <div class="timeline-row">
+            <div class="timeline-time-col">${turnoHorario[m.turno] || escapeHTML(m.turno)}</div>
+            <div class="timeline-main-col" style="${isToday ? 'cursor:pointer;' : ''}" ${isToday ? `onclick="toggleMissao(${m.id})"` : ''}>
+              <div class="timeline-title-line ${isDone ? 'done' : ''}">
+                <span>${isDone ? '✅' : '⬜'}</span>
+                <span>${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</span>
+              </div>
+              ${hasDesc ? `<span class="mission-desc-preview">${escapeHTML(m.descricao)}</span>` : ''}
+              <div class="timeline-meta">🌟 Missão da Duda · ${isDone ? '+1 estrela conquistada' : 'Pendente'}</div>
+            </div>
+            ${hasDesc ? `
+              <span class="item-actions-inline">
+                <button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})" title="Ver detalhamento da missão">ℹ️ Detalhes</button>
+              </span>
+            ` : ''}
+          </div>
+        `);
+      });
+
+      const tlContainer = document.getElementById('hoje-timeline-list');
+      if (tlContainer) {
+        tlContainer.innerHTML = timelineItems.length
+          ? timelineItems.join('')
+          : '<p class="hint" style="margin:4px 0;">Dia livre! Nenhum compromisso ou missão cadastrada.</p>';
+      }
+    }
+
+    function renderCalendar() {
+      document.getElementById('cal-month-label').textContent = `${MESES_PT[calCurrentMonth]} ${calCurrentYear}`;
+      const grid = document.getElementById('cal-days-grid');
+      const firstDayWeek = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
+      const daysInMonth = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+      const today = getTodayISO();
+      const memberCache = buildMemberMetaCache();
+
+      let html = '';
+      for (let i = 0; i < firstDayWeek; i++) html += `<div class="cal-day empty"></div>`;
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const iso = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = getEventsForDate(iso).filter(a => {
+          const cat = a.categoria === 'Casal' ? 'Família' : a.categoria;
+          return currentAgendaFilter === 'Todos' || cat === currentAgendaFilter;
+        });
+
+        const dots = dayEvents.slice(0, 3).map(ev => {
+          const cat = ev.categoria === 'Casal' ? 'Família' : ev.categoria;
+          const meta = memberCache[cat] || { cor: '#4A7C59' };
+          return `<span class="cal-dot" style="background:${escapeHTML(meta.cor)};"></span>`;
+        }).join('');
+
+        html += `
+          <div class="cal-day ${iso === today ? 'today' : ''} ${iso === selectedDateISO ? 'selected' : ''}" onclick="selectCalendarDay('${iso}')">
+            <span>${day}</span>
+            <div class="cal-dots">${dots}</div>
+          </div>
+        `;
+      }
+      grid.innerHTML = html;
+    }
+
+    function renderAgenda() {
+      document.getElementById('selected-day-title').textContent = `📅 ${formatFullDateBR(selectedDateISO)}`;
+      const memberCache = buildMemberMetaCache();
+      const filtered = getEventsForDate(selectedDateISO)
+        .filter(a => {
+          const cat = a.categoria === 'Casal' ? 'Família' : a.categoria;
+          return currentAgendaFilter === 'Todos' || cat === currentAgendaFilter;
+        })
+        .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+
+      document.getElementById('agenda-list').innerHTML = filtered.length
+        ? filtered.map(a => {
+            const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
+            const meta = memberCache[cat] || { nome: cat, emoji: '📌', cor: '#4A7C59' };
+            const recTag = getRecorrenciaLabel(a.recorrencia);
+            return `
+              <div class="agenda-item">
+                <div>
+                  <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(cat)}</span>
+                  <strong>${escapeHTML(a.time || '')}</strong> ${escapeHTML(a.titulo)}
+                  ${recTag ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${recTag}</div>` : ''}
+                </div>
+                <span class="item-actions-inline">
+                  <span class="act-icon" title="Editar" onclick="openModalAgenda(${a.id})">✏️</span>
+                  <span class="act-icon" title="Excluir" onclick="deleteAgenda(${a.id})">🗑️</span>
+                </span>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum compromisso neste dia.</p>';
+    }
+
+    function renderMercado() {
+      document.getElementById('mercado-list').innerHTML = appState.mercado.length
+        ? appState.mercado.map(m => `
+            <div class="check-item ${m.done ? 'done' : ''}">
+              <span class="item-text-main" style="flex:1;" onclick="toggleMercado(${m.id})">
+                ${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}
+                ${m.valor ? `<span class="valor-pill">${escapeHTML(m.valor)}</span>` : ''}
+              </span>
+              <span class="item-actions-inline">
+                <span class="act-icon" title="Editar" onclick="openModalMercado(${m.id})">✏️</span>
+                <span class="act-icon" title="Excluir" onclick="deleteMercado(${m.id})">🗑️</span>
+              </span>
+            </div>
+          `).join('')
+        : '<p class="hint" style="margin:0;">Lista vazia.</p>';
+    }
+
+    function renderDespesas() {
+      const lista = appState.despesas || [];
+      let totalGeral = 0;
+      let pauloPagouDiv = 0;
+      let isabelaPagouDiv = 0;
+
+      lista.forEach(d => {
+        const val = Number(d.valor) || 0;
+        totalGeral += val;
+        if (d.dividido) {
+          if (d.pagoPor === 'Paulo') pauloPagouDiv += val;
+          else if (d.pagoPor === 'Isabela') isabelaPagouDiv += val;
+        }
+      });
+
+      const diff = (pauloPagouDiv - isabelaPagouDiv) / 2;
+      let acertoTexto = 'Contas compartilhadas empatadas (R$ 0,00)';
+      if (diff > 0.01) acertoTexto = `Isabela acerta ${formatCurrencyBR(diff)} com Paulo`;
+      else if (diff < -0.01) acertoTexto = `Paulo acerta ${formatCurrencyBR(Math.abs(diff))} com Isabela`;
+
+      document.getElementById('familia-despesas-summary').innerHTML = `
+        <div class="finance-summary-grid">
+          <div class="finance-stat-box"><span>Total Lançado</span><strong>${formatCurrencyBR(totalGeral)}</strong></div>
+          <div class="finance-stat-box"><span>Paulo (Divid.)</span><strong>${formatCurrencyBR(pauloPagouDiv)}</strong></div>
+          <div class="finance-stat-box"><span>Isabela (Divid.)</span><strong>${formatCurrencyBR(isabelaPagouDiv)}</strong></div>
+        </div>
+        <div class="finance-balance-banner">
+          <span>⚖️ ${acertoTexto}</span>
+        </div>
+      `;
+
+      document.getElementById('familia-despesas-list').innerHTML = lista.length
+        ? lista.map(d => {
+            const isOk = d.status === 'aprovada';
+            const isSent = !!d.enviadoFinanceiro;
+            return `
+              <div class="despesa-row">
+                <div style="flex:1; min-width:0;">
+                  <strong>${escapeHTML(d.descricao)}</strong>
+                  <span class="despesa-status-badge ${isOk ? 'aprovada' : ''}" style="cursor:pointer;" onclick="toggleDespesaStatus(${d.id})">
+                    ${isOk ? '✅ Conferida' : '⏳ Pendente'}
+                  </span>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                    ${formatShortBR(d.date)} · Pago por <strong>${escapeHTML(d.pagoPor)}</strong> · ${d.dividido ? 'Dividido 50/50' : 'Individual'}
+                  </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <strong style="display:block; font-size:14px;">${formatCurrencyBR(d.valor)}</strong>
+                  <div class="item-actions-inline" style="justify-content:flex-end; margin-top:4px;">
+                    <button type="button" class="btn-bridge ${isSent ? 'sent' : ''}" onclick="openBridgeFromDespesa(${d.id})" title="${isSent ? 'Já enviado ao App de Finanças' : 'Lançar no App de Finanças'}">
+                      ${isSent ? '✅ No Finanças' : '💸 Lançar'}
+                    </button>
+                    <span class="act-icon" title="Editar" onclick="openModalDespesa(${d.id})">✏️</span>
+                    <span class="act-icon" title="Excluir" onclick="deleteDespesa(${d.id})">🗑️</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhuma despesa registrada ainda.</p>';
+    }
+
+    function renderSaude() {
+      const remedios = appState.saude.remedios || [];
+      document.getElementById('remedio-box').innerHTML = remedios.length
+        ? remedios.map(rem => {
+            const prox = getProximaDoseInfo(rem);
+            return `
+              <div class="remedio-card ${prox && prox.overdue ? 'overdue' : ''}">
+                <div class="remedio-top">
+                  <div>
+                    <strong>${escapeHTML(rem.nome)}</strong> · <span style="font-size:13px;">${escapeHTML(rem.dosagem)}</span>
+                  </div>
+                  <div class="remedio-actions-top">
+                    <button type="button" class="icon-btn-tiny" title="Editar" onclick="openModalNovoRemedio(${rem.id})">✏️</button>
+                    <button type="button" class="icon-btn-tiny" title="Encerrar" onclick="deleteRemedio(${rem.id})">🗑️</button>
+                  </div>
+                </div>
+                <p class="hint" style="margin:6px 0 0;">
+                  Última dose: <strong>${escapeHTML(rem.ultimaDoseTexto)}</strong> (${escapeHTML(rem.responsavelUltima)})<br/>
+                  ${prox ? `Próxima dose: <strong>${escapeHTML(prox.texto)}</strong> ${prox.overdue ? '⚠️ Horário atingido!' : ''}` : 'Aguardando 1ª dose'}
+                </p>
+                <button type="button" class="btn-dose" onclick="openModalRegistrarDose(${rem.id})">✔️ Registrar Dose Agora</button>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum remédio ativo no momento. Toque em <strong>+ Remédio</strong> para iniciar.</p>';
+
+      const logs = appState.saude.historicoDoses || [];
+      document.getElementById('dose-history-box').innerHTML = logs.length
+        ? logs.slice(0, 15).map(log => `
+            <div class="dose-log-row">
+              <div class="dose-log-main">
+                <strong>${escapeHTML(log.remedioNome)}</strong> · ${escapeHTML(formatTimeFromTimestamp(log.timestamp))}
+                <div class="dose-log-meta">${escapeHTML(log.dosagem)} · por <strong>${escapeHTML(log.responsavel)}</strong></div>
+              </div>
+              <div class="dose-log-btns">
+                <button type="button" class="icon-btn-tiny" title="Corrigir" onclick="openModalEditarDoseLog(${log.id})">✏️</button>
+                <button type="button" class="icon-btn-tiny" title="Excluir" onclick="deleteDoseLog(${log.id})">🗑️</button>
+              </div>
+            </div>
+          `).join('')
+        : '<p class="hint" style="margin:0;">Nenhuma dose registrada ainda.</p>';
+
+      const f = appState.saude.ficha;
+      document.getElementById('ficha-saude-box').innerHTML = `
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(f.tipoSanguineo)}</p>
+        <p><strong>Alergias:</strong> ${escapeHTML(f.alergias)}</p>
+        <p><strong>Pediatra:</strong> ${escapeHTML(f.pediatra)}</p>
+        <p><strong>Plano / Carteirinha:</strong> ${escapeHTML(f.plano)}</p>
+      `;
+
+      const vacinas = appState.saude.vacinas || [];
+      document.getElementById('vacinas-list-box').innerHTML = vacinas.length
+        ? vacinas.map(v => {
+            const isProx = v.status === 'proxima';
+            return `
+              <div class="vaccine-row">
+                <div>
+                  <strong>${escapeHTML(v.nome)}</strong>
+                  <div style="font-size:11px; color:var(--text-muted);">${isProx ? 'Previsão:' : 'Aplicada em:'} ${formatFullDateBR(v.data)}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span class="vaccine-pill ${isProx ? 'upcoming' : ''}">${isProx ? '📅 Próxima' : '✅ Tomada'}</span>
+                  <span class="act-icon" title="Editar" onclick="openModalVacina(${v.id})">✏️</span>
+                  <span class="act-icon" title="Excluir" onclick="deleteVacina(${v.id})">🗑️</span>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhuma vacina cadastrada.</p>';
+    }
+
+    function renderAdminDuda() {
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const thisSun = addDaysISO(thisMon, 6);
+      const weekDates = getWeekDatesArray(thisMon);
+      const totalMissions = appState.missoes.length;
+
+      if (!weekDates.includes(adminWeekSelectedDateISO) || adminWeekSelectedDateISO > today) {
+        adminWeekSelectedDateISO = today;
+      }
+
+      document.getElementById('admin-week-range-label').textContent = `Semana atual: ${formatShortBR(thisMon)} a ${formatShortBR(thisSun)} · Toque no dia para detalhar`;
+      document.getElementById('admin-week-strip').innerHTML = weekDates.map((iso, idx) => {
+        const doneCount = getCompletedIdsForDate(iso).length;
+        const isToday = iso === today;
+        const isSel = iso === adminWeekSelectedDateISO;
+        const isFuture = iso > today;
+        return `
+          <div class="week-day-pill ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''} ${isFuture ? 'future' : ''}"
+            ${!isFuture ? `onclick="selectAdminWeekDay('${iso}')"` : ''}>
+            <small>${DIAS_CURTOS_SEG_DOM[idx]}</small>
+            <strong>${iso.split('-')[2]}</strong>
+            <span>${isFuture ? '-' : `⭐${doneCount}/${totalMissions}`}</span>
+          </div>
+        `;
+      }).join('');
+
+      const dayDetailBox = document.getElementById('admin-week-day-detail');
+      if (dayDetailBox) {
+        const selDoneIds = getCompletedIdsForDate(adminWeekSelectedDateISO);
+        const isSelToday = adminWeekSelectedDateISO === today;
+        const selDow = DIAS_SEMANA_PT[parseISOToLocalDate(adminWeekSelectedDateISO).getDay()];
+        const missoesList = appState.missoes || [];
+
+        dayDetailBox.innerHTML = `
+          <div class="admin-day-detail-box">
+            <div class="admin-day-detail-head">
+              <strong>📅 ${isSelToday ? 'Hoje' : selDow.split('-')[0]} (${formatShortBR(adminWeekSelectedDateISO)}) · ${selDoneIds.length}/${missoesList.length} concluídas</strong>
+              <button type="button" class="btn-mini" onclick="openModalEstrelasManual('bonus', 'Missão extra em ${formatShortBR(adminWeekSelectedDateISO)}')">+ Estrela Extra</button>
+            </div>
+            ${missoesList.length ? missoesList.map(m => {
+              const isDone = selDoneIds.includes(m.id);
+              const hasDesc = Boolean((m.descricao || '').trim());
+              return `
+                <div class="admin-day-mission-row">
+                  <div style="flex:1; min-width:0; cursor:pointer;" onclick="toggleMissionOnSpecificAdminDate('${adminWeekSelectedDateISO}', ${m.id})" title="Toque para marcar ou desmarcar nesta data">
+                    <span>${isDone ? '✅' : '⬜'}</span>
+                    <strong style="${isDone ? '' : 'color:var(--text-muted); font-weight:700;'}">${escapeHTML(m.emoji)} ${escapeHTML(m.titulo)}</strong>
+                    <span class="valor-pill">${escapeHTML(m.turno)}</span>
+                  </div>
+                  ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})">ℹ️ Detalhes</button>` : ''}
+                </div>
+              `;
+            }).join('') : '<p class="hint" style="margin:0;">Nenhuma missão cadastrada.</p>'}
+          </div>
+        `;
+      }
+
+      const { medals } = computeDudaStatsAndMedals();
+      const adminMedalsBox = document.getElementById('admin-duda-medals-box');
+      if (adminMedalsBox) {
+        adminMedalsBox.innerHTML = medals.map(m => `
+          <span class="medal-pill ${m.unlocked ? '' : 'locked'}" title="${m.unlocked ? 'Conquistada!' : 'Ainda não desbloqueada'}">
+            ${m.icon} ${escapeHTML(m.label)}
+          </span>
+        `).join('');
+      }
+
+      const adminLongGoalBox = document.getElementById('admin-duda-long-goal-box');
+      if (adminLongGoalBox) {
+        adminLongGoalBox.innerHTML = renderLongGoalCardHTML(true);
+      }
+
+      let pastHtml = '';
+      for (let w = 1; w <= 4; w++) {
+        const mon = addDaysISO(thisMon, -7 * w);
+        const sun = addDaysISO(mon, 6);
+        let sum = 0;
+        getWeekDatesArray(mon).forEach(d => { sum += getCompletedIdsForDate(d).length; });
+        pastHtml += `
+          <div class="week-history-row">
+            <span><strong>${formatShortBR(mon)} a ${formatShortBR(sun)}</strong></span>
+            <span class="week-badge-stars">⭐ ${sum} / ${totalMissions * 7} estrelas</span>
+          </div>
+        `;
+      }
+      document.getElementById('admin-past-weeks-list').innerHTML = pastHtml;
+
+      document.getElementById('admin-estrelas-count').textContent = `⭐ ${appState.estrelasTotais || 0} estrelas`;
+
+      const starLogs = (appState.historicoEstrelas || []).slice(0, 12);
+      document.getElementById('admin-star-history-list').innerHTML = starLogs.length
+        ? starLogs.map(h => {
+            const isPen = h.tipo === 'penalty' || h.delta < 0;
+            const sign = h.delta > 0 ? `+${h.delta}` : `${h.delta}`;
+            return `
+              <div class="star-log-row ${isPen ? 'penalty' : ''}">
+                <div>
+                  <strong>${isPen ? '⚠️ Penalidade' : (h.tipo === 'redeem' ? '🎁 Resgate de Desejo' : '⭐ Bônus')}</strong>
+                  <div style="margin-top:2px;">${escapeHTML(h.motivo)}</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${formatShortBR(h.date)} · por ${escapeHTML(h.autor || 'Pais')}</div>
+                </div>
+                <span class="star-log-delta">${sign} ⭐</span>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhuma penalidade ou bônus extra registrado.</p>';
+
+      const wishes = appState.desejos || [];
+      const activeGoal = getActiveLongGoalWish();
+      document.getElementById('admin-wishes-list').innerHTML = wishes.length
+        ? wishes.map(w => {
+            const isApproved = w.status === 'aprovado';
+            const isRejected = w.status === 'recusado';
+            const isPinnedGoal = activeGoal && activeGoal.id === w.id;
+            return `
+              <div class="wish-admin-card">
+                <div class="wish-admin-top">
+                  <div>
+                    <strong>${escapeHTML(w.titulo)}</strong> ${isPinnedGoal ? '<span class="valor-pill">🎯 Meta Principal</span>' : ''}
+                    <div class="hint" style="margin:2px 0 0;">Custo: <strong>${w.custo} ⭐</strong></div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    ${(!isApproved && !isRejected && !isPinnedGoal) ? `<span class="act-icon" title="Fixar como meta principal" onclick="pinWishAsMainGoal(${w.id})">🎯</span>` : ''}
+                    <span class="wish-status-pill ${isApproved ? 'approved' : (isRejected ? 'rejected' : '')}">
+                      ${isApproved ? '✅ Aprovado' : (isRejected ? '❌ Recusado' : '⏳ Aguardando')}
+                    </span>
+                    <span class="act-icon" title="Excluir" onclick="deleteWish(${w.id})">🗑️</span>
+                  </div>
+                </div>
+                ${isRejected && w.motivoRecusa ? `<div class="wish-reason-box">💬 Motivo informado à Duda: "${escapeHTML(w.motivoRecusa)}"</div>` : ''}
+                ${(!isApproved && !isRejected) ? `
+                  <div class="wish-actions">
+                    <button type="button" class="btn-approve" onclick="approveWish(${w.id})">✅ Aprovar (-${w.custo}⭐)</button>
+                    <button type="button" class="btn-reject" onclick="openModalRecusarDesejo(${w.id})">💬 Recusar c/ Motivo</button>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum desejo pedido pela Duda no momento.</p>';
+
+      document.getElementById('admin-missoes-list').innerHTML = appState.missoes.map(m => {
+        const hasDesc = Boolean((m.descricao || '').trim());
+        return `
+          <div class="check-item" style="align-items:flex-start;">
+            <div style="flex:1; min-width:0;">
+              <div><span class="agenda-tag">${escapeHTML(m.turno)}</span> ${escapeHTML(m.emoji)} <strong>${escapeHTML(m.titulo)}</strong></div>
+              ${hasDesc ? `<span class="mission-desc-preview">${escapeHTML(m.descricao)}</span>` : ''}
+            </div>
+            <span class="item-actions-inline">
+              ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="openModalDetalheMissao(${m.id})">ℹ️ Detalhes</button>` : ''}
+              <span class="act-icon" title="Editar" onclick="openModalMissao(${m.id})">✏️</span>
+              <span class="act-icon" title="Excluir" onclick="deleteMissao(${m.id})">🗑️</span>
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderApoio() {
+      const today = getTodayISO();
+      const isToday = apoioSelectedDateISO === today;
+      const dObj = parseISOToLocalDate(apoioSelectedDateISO);
+      const dowName = DIAS_SEMANA_PT[dObj.getDay()];
+
+      document.getElementById('apoio-day-label').textContent = isToday
+        ? `Hoje · ${formatShortBR(apoioSelectedDateISO)}`
+        : `${dowName.split('-')[0]} · ${formatShortBR(apoioSelectedDateISO)}`;
+      document.getElementById('apoio-day-sublabel').textContent = isToday ? dowName : formatFullDateBR(apoioSelectedDateISO);
+      document.getElementById('btn-apoio-back-today').classList.toggle('hidden', isToday);
+
+      const log = getLogisticaForDate(apoioSelectedDateISO);
+      document.getElementById('apoio-logistica-title').textContent = isToday
+        ? '🎒 Logística da Duda · Hoje'
+        : `🎒 Logística da Duda · ${formatShortBR(apoioSelectedDateISO)}`;
+      document.getElementById('apoio-leva').textContent = log.leva;
+      document.getElementById('apoio-busca').textContent = log.busca;
+
+      document.getElementById('apoio-agenda-title').textContent = isToday
+        ? '📅 Agenda da Duda · Hoje'
+        : `📅 Agenda da Duda · ${formatShortBR(apoioSelectedDateISO)}`;
+      const memberCache = buildMemberMetaCache();
+      const dudaAgenda = getEventsForDate(apoioSelectedDateISO)
+        .filter(ev => {
+          const cat = ev.categoria === 'Casal' ? 'Família' : (ev.categoria || 'Família');
+          return cat === 'Duda' || cat === 'Família';
+        })
+        .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+
+      document.getElementById('apoio-agenda-list').innerHTML = dudaAgenda.length
+        ? dudaAgenda.map(a => {
+            const cat = a.categoria === 'Casal' ? 'Família' : (a.categoria || 'Família');
+            const meta = memberCache[cat] || { nome: cat, emoji: '📌', cor: '#4A7C59' };
+            const recTag = getRecorrenciaLabel(a.recorrencia);
+            return `
+              <div class="agenda-item">
+                <div>
+                  <span class="agenda-tag" style="background:${escapeHTML(meta.cor)}20; color:${escapeHTML(meta.cor)};">${escapeHTML(meta.emoji)} ${escapeHTML(cat)}</span>
+                  <strong>${escapeHTML(a.time || '')}</strong> ${escapeHTML(a.titulo)}
+                  ${recTag ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${recTag}</div>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum compromisso da Duda neste dia.</p>';
+
+      const remedios = appState.saude.remedios || [];
+      document.getElementById('apoio-remedio-box').innerHTML = remedios.length
+        ? remedios.map(rem => {
+            const prox = getProximaDoseInfo(rem);
+            return `
+              <div class="remedio-card ${prox && prox.overdue ? 'overdue' : ''}">
+                <strong>${escapeHTML(rem.nome)}</strong> · <span style="font-size:13px;">${escapeHTML(rem.dosagem)}</span>
+                <p class="hint" style="margin:6px 0 0;">
+                  Última dose: <strong>${escapeHTML(rem.ultimaDoseTexto)}</strong> (${escapeHTML(rem.responsavelUltima)})<br/>
+                  ${prox ? `Próxima dose: <strong>${escapeHTML(prox.texto)}</strong>` : 'Aguardando 1ª dose'}
+                </p>
+                <button type="button" class="btn-dose" onclick="openModalRegistrarDose(${rem.id})">✔️ Registrar Dose Agora</button>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum remédio ativo no momento.</p>';
+
+      const f = appState.saude.ficha;
+      document.getElementById('apoio-ficha-box').innerHTML = `
+        <p><strong>Alergias:</strong> ${escapeHTML(f.alergias)}</p>
+        <p><strong>Tipo Sanguíneo:</strong> ${escapeHTML(f.tipoSanguineo)}</p>
+        <p><strong>Pediatra:</strong> ${escapeHTML(f.pediatra)}</p>
+        <p><strong>Plano / Carteirinha:</strong> ${escapeHTML(f.plano)}</p>
+      `;
+    }
+
+    function renderDuda() {
+      const today = getTodayISO();
+      const thisMon = getMondayOfWeekISO(today);
+      const weekDates = getWeekDatesArray(thisMon);
+      if (!weekDates.includes(dudaSelectedDateISO)) dudaSelectedDateISO = today;
+
+      const isViewingToday = dudaSelectedDateISO === today;
+      const doneIds = getCompletedIdsForDate(dudaSelectedDateISO);
+      const total = appState.missoes.length;
+      const feitos = doneIds.length;
+      const pct = total ? Math.round((feitos / total) * 100) : 0;
+
+      document.getElementById('duda-today-stars').textContent = `⭐ ${feitos} ${feitos === 1 ? 'estrela' : 'estrelas'} nesse dia`;
+      document.getElementById('duda-total-stars').textContent = `🏆 Saldo: ${appState.estrelasTotais || 0} estrelas`;
+      document.getElementById('duda-counter-text').textContent = `${feitos} de ${total} Missões Feitas!`;
+      document.getElementById('duda-progress-fill').style.width = `${pct}%`;
+
+      const celebBanner = document.getElementById('duda-celebration-banner');
+      if (total > 0 && feitos === total) {
+        celebBanner.textContent = isViewingToday
+          ? '🎉 Parabéns Duda! Você completou TODAS as missões de hoje!'
+          : `🎉 Você completou todas as missões no dia ${formatShortBR(dudaSelectedDateISO)}!`;
+        celebBanner.classList.remove('hidden');
+      } else {
+        celebBanner.classList.add('hidden');
+      }
+
+      const recentPenalties = (appState.historicoEstrelas || []).filter(h => (h.tipo === 'penalty' || h.delta < 0) && !h.vistaPelaDuda);
+      const transpContainer = document.getElementById('duda-transparency-container');
+      if (recentPenalties.length > 0) {
+        transpContainer.innerHTML = `
+          <div class="duda-transparency-card">
+            <div class="duda-transparency-head">
+              <div>
+                <h3>💬 Combinados & Ajustes</h3>
+                <span class="duda-transparency-sub">Veja por que algumas estrelas foram descontadas:</span>
+              </div>
+            </div>
+            ${recentPenalties.map(p => `
+              <div class="duda-penalty-item">
+                <div>
+                  <strong>${p.delta} ${Math.abs(p.delta) === 1 ? 'estrela descontada' : 'estrelas descontadas'}</strong>
+                  <p>"${escapeHTML(p.motivo)}"</p>
+                  <small>${formatShortBR(p.date)} · por ${escapeHTML(p.autor || 'Papai / Isabela')}</small>
+                </div>
+                <button type="button" class="btn-duda-ack" onclick="acknowledgePenaltyDuda(${p.id})">Entendi 👍</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        transpContainer.innerHTML = '';
+      }
+
+      document.getElementById('duda-week-strip').innerHTML = weekDates.map((iso, idx) => {
+        const c = getCompletedIdsForDate(iso).length;
+        const isToday = iso === today;
+        const isSel = iso === dudaSelectedDateISO;
+        const isFuture = iso > today;
+        return `
+          <div class="week-day-pill ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''} ${isFuture ? 'future' : ''}"
+            ${!isFuture ? `onclick="selectDudaWeekDay('${iso}')"` : ''}>
+            <small>${DIAS_CURTOS_SEG_DOM[idx]}</small>
+            <strong>${iso.split('-')[2]}</strong>
+            <span>${isFuture ? '-' : `⭐${c}`}</span>
+          </div>
+        `;
+      }).join('');
+
+      const { medals } = computeDudaStatsAndMedals();
+      const dudaMedalsEl = document.getElementById('duda-medals-container');
+      if (dudaMedalsEl) {
+        dudaMedalsEl.innerHTML = medals.map(m => `
+          <span class="medal-pill ${m.unlocked ? '' : 'locked'}">
+            ${m.icon} ${escapeHTML(m.label)}
+          </span>
+        `).join('');
+      }
+
+      const readonlyBanner = document.getElementById('duda-readonly-notice');
+      if (!isViewingToday) {
+        readonlyBanner.innerHTML = `👀 Consultando ${formatShortBR(dudaSelectedDateISO)} (somente leitura) · <u style="cursor:pointer;" onclick="selectDudaWeekDay('${today}')">Voltar para Hoje</u>`;
+        readonlyBanner.classList.remove('hidden');
+      } else {
+        readonlyBanner.classList.add('hidden');
+      }
+
+      const longGoalContainer = document.getElementById('duda-long-goal-container');
+      if (longGoalContainer) {
+        longGoalContainer.innerHTML = renderLongGoalCardHTML(false);
+      }
+
+      const wishes = appState.desejos || [];
+      document.getElementById('duda-wishes-container').innerHTML = wishes.length
+        ? wishes.map(w => {
+            const isApproved = w.status === 'aprovado';
+            const isRejected = w.status === 'recusado';
+            return `
+              <div class="duda-wish-item ${isApproved ? 'approved' : (isRejected ? 'rejected' : '')}">
+                <div style="flex:1;">
+                  <div><strong>${escapeHTML(w.titulo)}</strong> (${w.custo} ⭐)</div>
+                  ${isRejected && w.motivoRecusa ? `<div class="duda-wish-reason">💬 Recado: "${escapeHTML(w.motivoRecusa)}"</div>` : ''}
+                </div>
+                <span class="wish-tag-mini">
+                  ${isApproved ? '✅ Aprovado!' : (isRejected ? '❌ Recusado' : '⏳ Esperando aprovar')}
+                </span>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Toque no botão acima para pedir um desejo ou ver seu extrato tocando no saldo!</p>';
+
+      const container = document.getElementById('duda-missoes-container');
+      const turnos = [
+        { nome: 'Manhã', icon: '☀️' },
+        { nome: 'Tarde', icon: '🌤️' },
+        { nome: 'Noite', icon: '🌙' }
+      ];
+
+      container.innerHTML = turnos.map(t => {
+        const lista = appState.missoes.filter(m => m.turno === t.nome);
+        if (!lista.length) return '';
+        return `
+          <h3 class="duda-turno-title">${t.icon} ${t.nome}</h3>
+          ${lista.map(m => {
+            const isDone = doneIds.includes(m.id);
+            const hasDesc = Boolean((m.descricao || '').trim());
+            return `
+              <div class="duda-mission-card ${isDone ? 'completed' : ''} ${!isViewingToday ? 'locked-past' : ''}" onclick="toggleMissao(${m.id})">
+                <div class="mission-left">
+                  <span class="mission-emoji">${escapeHTML(m.emoji)}</span>
+                  <div class="mission-text-col">
+                    <span>${escapeHTML(m.titulo)}</span>
+                    ${hasDesc ? `<span class="mission-sub-hint">${escapeHTML(m.descricao)}</span>` : ''}
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                  ${hasDesc ? `<button type="button" class="btn-mission-detail" onclick="event.stopPropagation(); openModalDetalheMissao(${m.id})" title="Ver como fazer">ℹ️</button>` : ''}
+                  <span class="mission-star-tag">${isDone ? '+1 ⭐' : '1 ⭐'}</span>
+                  <div class="mission-circle">${isDone ? '✓' : ''}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+      }).join('');
+    }
+
+    initTheme();
+    initProfile();
+  </script>
+</body>
+</html>
