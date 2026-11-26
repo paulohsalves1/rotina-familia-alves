@@ -884,7 +884,7 @@
         <h1 id="header-title">Família Alves · Dia</h1>
       </div>
       <div class="header-actions">
-        <button type="button" class="btn-icon-lock" title="Configurações, Abastecimento & Segurança" onclick="openSettingsMenu()">⚙️</button>
+        <button type="button" class="btn-icon-lock" title="Configurações, Integrantes & Segurança" onclick="openSettingsMenu()">⚙️</button>
         <button type="button" class="btn-icon-lock" title="Bloquear / Trocar Perfil" onclick="lockApp()">🔒</button>
         <button type="button" class="btn-duda-switch" onclick="enterDudaMode()">🌟 Duda</button>
       </div>
@@ -1008,6 +1008,18 @@
           </div>
           <div id="familia-despesas-summary"></div>
           <div id="familia-despesas-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>⛽ Abastecimento & Consumo</h2>
+            <div class="btn-group-mini">
+              <button type="button" class="btn-mini export" onclick="openAbastecimentoModal()" title="Abrir painel completo, filtros e troca de óleo">📊 Painel</button>
+              <button type="button" class="btn-mini" onclick="openModalNovoAbastecimento(null, { fromFamiliaTab: true })">+ Abastecer</button>
+            </div>
+          </div>
+          <div id="familia-abastecimento-summary"></div>
+          <div id="familia-abastecimento-list"></div>
         </div>
       </section>
 
@@ -2228,7 +2240,10 @@
       `, null, 'Fechar');
     }
 
-    function openModalNovoAbastecimento(editId = null) {
+    let fuelModalContext = { fromFamiliaTab: false };
+
+    function openModalNovoAbastecimento(editId = null, opts = {}) {
+      fuelModalContext = { fromFamiliaTab: !!opts.fromFamiliaTab };
       const ab = normalizeAbastecimentoState(appState.abastecimento);
       const item = editId ? ab.registros.find(r => r.id === editId) : null;
       const defaultVeiculo = item ? item.veiculo : (selectedFuelVehicleFilter !== 'Todos' ? selectedFuelVehicleFilter : ab.veiculos[0]);
@@ -2325,6 +2340,7 @@
         const posto = document.getElementById('inp-fuel-posto').value.trim();
         const sendBridgeEl = document.getElementById('inp-fuel-bridge');
         const shouldBridge = sendBridgeEl ? sendBridgeEl.value === 'sim' : false;
+        const stayOnFamilia = fuelModalContext.fromFamiliaTab;
 
         if (isNaN(odometro) || odometro <= 0) {
           showSheetError('Informe o odômetro (km) atual do veículo.');
@@ -2351,7 +2367,7 @@
           item.posto = posto;
           saveState(['abastecimento']);
           showToast('Abastecimento atualizado!');
-          setTimeout(() => openAbastecimentoModal(), 120);
+          if (!stayOnFamilia) setTimeout(() => openAbastecimentoModal(), 120);
         } else {
           const newRecord = {
             id: Date.now(),
@@ -2372,9 +2388,9 @@
 
           if (shouldBridge) {
             setTimeout(() => {
-              openBridgeFromAbastecimento(newRecord.id);
+              openBridgeFromAbastecimento(newRecord.id, { stayOnFamilia });
             }, 150);
-          } else {
+          } else if (!stayOnFamilia) {
             setTimeout(() => openAbastecimentoModal(), 120);
           }
         }
@@ -2393,7 +2409,8 @@
       }
     }
 
-    function openBridgeFromAbastecimento(regId) {
+    function openBridgeFromAbastecimento(regId, opts = {}) {
+      const stayOnFamilia = !!opts.stayOnFamilia;
       const ab = normalizeAbastecimentoState(appState.abastecimento);
       const r = ab.registros.find(x => x.id === regId);
       if (!r) return;
@@ -2413,7 +2430,7 @@
             r.financeiroTxId = tx.id;
             r.financeiroMeta = `${tx.category} · ${tx.account}`;
             saveState(['abastecimento']);
-            setTimeout(() => openAbastecimentoModal(), 150);
+            if (!stayOnFamilia) setTimeout(() => openAbastecimentoModal(), 150);
           }
         });
       };
@@ -3092,10 +3109,6 @@
     function openSettingsMenu() {
       const currentUser = getActiveAdultUser();
       const isDark = document.body.classList.contains('dark-mode');
-      const fuelStats = computeFuelAnalytics('Todos');
-      const fuelSubLabel = fuelStats.mediaGeralKmL
-        ? `Média: ${fuelStats.mediaGeralKmL.toFixed(1).replace('.', ',')} km/L · Mês: ${formatCurrencyBR(fuelStats.gastoMes)}`
-        : `${fuelStats.registros.length} registro(s) · Mês: ${formatCurrencyBR(fuelStats.gastoMes)}`;
 
       const integrantesRows = (appState.integrantes || []).map(m => `
         <div class="week-history-row" style="margin-bottom:6px;">
@@ -3110,20 +3123,6 @@
       `).join('');
 
       openSheet('Configurações & Família ⚙️', `
-        <span class="sub-title">⛽ Veículos & Abastecimento</span>
-        <div class="bridge-summary-card" style="margin-bottom:10px; cursor:pointer;" onclick="openAbastecimentoModal()">
-          <div>
-            <strong>⛽ Abastecimento & Consumo</strong>
-            <small>${escapeHTML(fuelSubLabel)}</small>
-          </div>
-          <span style="font-size:18px;">›</span>
-        </div>
-        <div class="row-buttons" style="margin-bottom:14px;">
-          <button type="button" class="btn-primary" style="flex:1;" onclick="openAbastecimentoModal()">⛽ Abrir Painel</button>
-          <button type="button" class="btn-secondary" style="flex:1;" onclick="openModalNovoAbastecimento()">+ Abastecer</button>
-        </div>
-
-        <hr class="divider" />
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <span class="sub-title" style="margin:0;">👨‍👩‍👧 Integrantes & Lançamentos</span>
           <button type="button" class="btn-mini" onclick="openModalNovoIntegrante()">+ Integrante</button>
@@ -4391,6 +4390,7 @@
       renderAgenda();
       renderMercado();
       renderDespesas();
+      renderFamiliaAbastecimento();
       renderSaude();
       renderApoio();
       renderAdminDuda();
@@ -4692,6 +4692,64 @@
             `;
           }).join('')
         : '<p class="hint" style="margin:0;">Nenhuma despesa compartilhada lançada.</p>';
+    }
+
+    function renderFamiliaAbastecimento() {
+      const sumEl = document.getElementById('familia-abastecimento-summary');
+      const listEl = document.getElementById('familia-abastecimento-list');
+      if (!sumEl || !listEl) return;
+
+      const stats = computeFuelAnalytics('Todos');
+
+      sumEl.innerHTML = `
+        <div class="finance-summary-grid">
+          <div class="finance-stat-box">
+            <span>Média Consumo</span>
+            <strong>${stats.mediaGeralKmL ? `${stats.mediaGeralKmL.toFixed(1).replace('.', ',')} km/L` : '-- km/L'}</strong>
+          </div>
+          <div class="finance-stat-box">
+            <span>Gasto no Mês</span>
+            <strong>${formatCurrencyBR(stats.gastoMes)}</strong>
+          </div>
+          <div class="finance-stat-box">
+            <span>Último Odôm.</span>
+            <strong>${stats.maiorOdometro > 0 ? `${stats.maiorOdometro.toLocaleString('pt-BR')} km` : '--'}</strong>
+          </div>
+        </div>
+      `;
+
+      listEl.innerHTML = stats.registros.length
+        ? stats.registros.slice(0, 5).map(r => {
+            const mediaBadge = r.kmPorLitro
+              ? `<span class="fuel-badge">⚡ ${r.kmPorLitro.toFixed(1).replace('.', ',')} km/L</span>`
+              : (r.tanqueCheio
+                  ? `<span class="fuel-badge">⛽ Cheio</span>`
+                  : `<span class="fuel-badge partial">Parcial</span>`);
+
+            return `
+              <div class="despesa-row">
+                <div style="flex:1; min-width:0;">
+                  <div>
+                    <strong>${escapeHTML(r.veiculo)} · ${escapeHTML(r.combustivel || 'Gasolina')}</strong>
+                    ${mediaBadge}
+                  </div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                    ${formatShortBR(r.date)} · ${Number(r.litros).toFixed(1).replace('.', ',')}L · ${Number(r.odometro).toLocaleString('pt-BR')} km · por <strong>${escapeHTML(r.pagoPor || 'Paulo')}</strong>
+                  </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <strong style="display:block; font-size:14px; color:var(--text-main);">${formatCurrencyBR(r.valor)}</strong>
+                  <div class="item-actions-inline" style="justify-content:flex-end; margin-top:4px;">
+                    <button type="button" class="btn-bridge ${r.enviadoFinanceiro ? 'sent' : ''}" onclick="openBridgeFromAbastecimento(${r.id}, { stayOnFamilia: true })" title="Lançar no App de Finanças">
+                      ${r.enviadoFinanceiro ? '✅ Finanças' : '💸 Finanças'}
+                    </button>
+                    <span class="act-icon" title="Editar" onclick="openModalNovoAbastecimento(${r.id}, { fromFamiliaTab: true })">✏️</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p class="hint" style="margin:0;">Nenhum abastecimento registrado ainda. Toque em "+ Abastecer" para lançar.</p>';
     }
 
     function renderSaude() {
