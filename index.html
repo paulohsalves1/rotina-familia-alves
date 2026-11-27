@@ -4107,6 +4107,39 @@
       );
     }
 
+    function clearMarkedMercado() {
+      if (!Array.isArray(appState.mercado) || appState.mercado.length === 0) {
+        showToast('Nenhum item na lista de compras.');
+        return;
+      }
+
+      const isFiltered = selectedMercadoLojaFilter && selectedMercadoLojaFilter !== 'Todas';
+      const markedItems = appState.mercado.filter(m => {
+        const matchesLoja = !isFiltered || ((m.loja || 'Supermercado') === selectedMercadoLojaFilter);
+        return matchesLoja && Boolean(m.done);
+      });
+
+      if (markedItems.length === 0) {
+        showToast('Nenhum item marcado para limpar.');
+        return;
+      }
+
+      const qtd = markedItems.length;
+      const escopoTexto = isFiltered ? ` da loja "${selectedMercadoLojaFilter}"` : '';
+      openConfirmSheet(
+        'Limpar Itens Marcados 🧹',
+        `Remover os ${qtd} ${qtd === 1 ? 'item marcado (✅)' : 'itens marcados (✅)'}${escopoTexto} da lista de compras? Os itens ainda não marcados serão mantidos.`,
+        () => {
+          const idsRemover = new Set(markedItems.map(m => m.id));
+          appState.mercado = appState.mercado.filter(m => !idsRemover.has(m.id));
+          saveState(['mercado']);
+          showToast(`${qtd} ${qtd === 1 ? 'item removido' : 'itens removidos'} da lista!`);
+        },
+        `Remover (${qtd})`,
+        true
+      );
+    }
+
     function deleteMercado(id) {
       appState.mercado = appState.mercado.filter(m => m.id !== id);
       saveState(['mercado']);
@@ -5337,10 +5370,12 @@
         const histCount = (appState.mercadoHistorico || []).length;
         const showLojaChips = lojasSet.size > 2;
         const hasBulkBtn = filtrada.length > 0;
+        const markedCount = filtrada.filter(m => Boolean(m.done)).length;
         if (showLojaChips || histCount > 0 || hasBulkBtn) {
           toolbarEl.innerHTML = `
             <div class="mercado-toolbar">
               ${hasBulkBtn ? `<button type="button" class="mercado-loja-pill" onclick="toggleAllMercado(${allFilteredDone ? 'false' : 'true'})" title="Marcar ou desmarcar todos os itens da lista">${bulkToggleLabel}</button>` : ''}
+              ${markedCount > 0 ? `<button type="button" class="mercado-loja-pill" onclick="clearMarkedMercado()" title="Excluir apenas os itens já marcados (✅)">🧹 Limpar marcados (${markedCount})</button>` : ''}
               ${showLojaChips ? Array.from(lojasSet).map(lj => `
                 <button type="button" class="mercado-loja-pill ${selectedMercadoLojaFilter === lj ? 'active' : ''}" onclick="setMercadoLojaFilter('${escapeJSArg(lj)}')">${escapeHTML(lj)}</button>
               `).join('') : ''}
