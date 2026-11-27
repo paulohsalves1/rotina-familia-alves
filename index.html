@@ -332,6 +332,54 @@
     }
     .mercado-summary-bar span { color: var(--primary-dark); font-weight: 700; }
     .mercado-summary-bar strong { color: var(--primary-dark); font-weight: 800; font-size: 14px; }
+    .mercado-toolbar {
+      display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 10px;
+    }
+    .mercado-loja-pill {
+      padding: 5px 10px; border-radius: 99px; font-size: 11px; font-weight: 800;
+      border: 1px solid var(--border); background: var(--bg-adult); color: var(--text-muted);
+      cursor: pointer; white-space: nowrap;
+    }
+    .mercado-loja-pill.active {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+    }
+    .mercado-aisle-group { margin-bottom: 12px; }
+    .mercado-aisle-group:last-child { margin-bottom: 0; }
+    .mercado-aisle-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--text-muted); padding: 4px 2px 6px; border-bottom: 1px dashed var(--border);
+      margin-bottom: 6px;
+    }
+    .mercado-qty-badge {
+      display: inline-block; font-size: 11px; font-weight: 800;
+      background: var(--bg-adult); border: 1px solid var(--border);
+      color: var(--text-main); padding: 1px 7px; border-radius: 99px; margin-right: 4px;
+    }
+    .mercado-loja-tag {
+      display: inline-block; font-size: 10px; font-weight: 800;
+      background: var(--note-bg); border: 1px solid var(--note-border);
+      color: #854D0E; padding: 1px 6px; border-radius: 99px; margin-left: 4px;
+    }
+    .valor-pill.add-price {
+      background: var(--bg-adult); color: var(--text-muted); border: 1px dashed var(--border);
+      cursor: pointer;
+    }
+    .freq-item-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 9px 10px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--card-bg); margin-bottom: 7px;
+    }
+    .freq-item-row.in-list {
+      background: var(--primary-soft); border-color: var(--primary-border);
+    }
+    .mercado-calc-preview {
+      margin-top: 8px; padding: 9px 12px; border-radius: 12px;
+      background: var(--primary-soft); border: 1px solid var(--primary-border);
+      color: var(--primary-dark); font-size: 13px; font-weight: 800;
+      display: flex; justify-content: space-between; align-items: center;
+    }
     .currency-input-wrap {
       display: flex; align-items: center;
       border: 1.5px solid var(--border); border-radius: 14px;
@@ -1010,13 +1058,16 @@
 
         <div class="card">
           <div class="card-header">
-            <h2>🛒 Lista Compartilhada</h2>
+            <h2>🛒 Lista de Compras</h2>
             <div class="btn-group-mini">
-              <button type="button" class="btn-mini" onclick="openBridgeFromMercado()" title="Enviar fechamento das compras ao Finanças">💸 Fechar Compra</button>
+              <button type="button" class="btn-mini export" onclick="openModalMercadoFrequentes()" title="Adicionar itens frequentes com 1 toque">⚡ Frequentes</button>
+              <button type="button" class="btn-mini export" onclick="copyMercadoWhatsApp()" title="Copiar lista organizada por seção para WhatsApp">📋 Copiar</button>
+              <button type="button" class="btn-mini" onclick="openBridgeFromMercado()" title="Enviar fechamento das compras ao Finanças">💸 Fechar</button>
               <button type="button" class="btn-mini" onclick="openModalMercado()">+ Item</button>
             </div>
           </div>
           <div id="mercado-summary"></div>
+          <div id="mercado-toolbar"></div>
           <div id="mercado-list" class="check-list"></div>
         </div>
 
@@ -1484,10 +1535,21 @@
         { id: 1, date: todayISO, time: "08:00", categoria: "Duda", titulo: "Aula de Natação", recorrencia: "none" },
         { id: 2, date: todayISO, time: "19:30", categoria: "Família", titulo: "Jantar em família", recorrencia: "none" }
       ],
+      initialized: true,
       mercado: [
-        { id: 1, item: "Leite integral (2 cx)", valor: "R$ 11,80", done: false },
-        { id: 2, item: "Banana prata", valor: "R$ 7,50", done: false }
+        { id: 1, item: "Leite integral", qtd: 2, unidade: "cx", precoUnit: 5.90, valor: "R$ 11,80", categoria: "Laticínios & Padaria", loja: "Supermercado", done: false },
+        { id: 2, item: "Banana prata", qtd: 1, unidade: "kg", precoUnit: 7.50, valor: "R$ 7,50", categoria: "Hortifrúti", loja: "Supermercado", done: false }
       ],
+      mercadoCatalogo: [
+        { nome: "Leite integral", categoria: "Laticínios & Padaria", unidade: "cx", ultimoPreco: 5.90, vezes: 5 },
+        { nome: "Banana prata", categoria: "Hortifrúti", unidade: "kg", ultimoPreco: 7.50, vezes: 4 },
+        { nome: "Arroz 5kg", categoria: "Mercearia", unidade: "pct", ultimoPreco: 26.90, vezes: 3 },
+        { nome: "Feijão carioca 1kg", categoria: "Mercearia", unidade: "pct", ultimoPreco: 8.50, vezes: 3 },
+        { nome: "Peito de frango", categoria: "Açougue & Frios", unidade: "kg", ultimoPreco: 21.90, vezes: 3 },
+        { nome: "Detergente líquido", categoria: "Limpeza", unidade: "un", ultimoPreco: 2.69, vezes: 2 },
+        { nome: "Papel higiênico", categoria: "Higiene & Bebê", unidade: "pct", ultimoPreco: 18.90, vezes: 2 }
+      ],
+      mercadoHistorico: [],
       despesas: [
         { id: 101, date: todayISO, descricao: "Feira e frutas da semana", valor: 86.50, pagoPor: "Isabela", dividido: true, status: "aprovada", enviadoFinanceiro: false },
         { id: 102, date: todayISO, descricao: "Farmácia · Xarope e soro", valor: 54.00, pagoPor: "Paulo", dividido: true, status: "pendente", enviadoFinanceiro: false }
@@ -1644,7 +1706,19 @@
         const remoteData = snapshot.val();
         if (remoteData) {
           const now = Date.now();
-          const merged = { ...defaultState, ...remoteData };
+          const isAlreadyInit = !!remoteData.initialized || !!appState.initialized;
+          const emptyAwareBase = isAlreadyInit
+            ? {
+                ...defaultState,
+                pendencias: [],
+                mural: [],
+                agenda: [],
+                mercado: [],
+                despesas: [],
+                desejos: []
+              }
+            : defaultState;
+          const merged = { ...emptyAwareBase, ...remoteData, initialized: true };
           Object.keys(localBranchWriteTimestamps).forEach(branch => {
             if (now - localBranchWriteTimestamps[branch] < BRANCH_LOCK_MS && appState[branch] !== undefined) {
               merged[branch] = appState[branch];
@@ -2008,21 +2082,68 @@
 
     function openBridgeFromMercado() {
       const lista = appState.mercado || [];
-      const marcados = lista.filter(i => i.done);
-      const baseItens = marcados.length > 0 ? marcados : lista;
+      const filtrada = selectedMercadoLojaFilter === 'Todas'
+        ? lista
+        : lista.filter(i => (i.loja || 'Supermercado') === selectedMercadoLojaFilter);
+      const marcados = filtrada.filter(i => i.done);
+      const baseItens = marcados.length > 0 ? marcados : filtrada;
       let somaEstimada = 0;
       baseItens.forEach(i => {
-        somaEstimada += parseCurrencyTextToNumber(i.valor);
+        somaEstimada += getMercadoItemTotal(i);
       });
       const qtdTexto = baseItens.length > 0 ? ` (${baseItens.length} ${baseItens.length === 1 ? 'item' : 'itens'})` : '';
+      const lojaTag = selectedMercadoLojaFilter !== 'Todas' ? ` · ${selectedMercadoLojaFilter}` : '';
 
       openFinancasBridgeModal({
-        descricao: `Compras Mercado${qtdTexto}`,
+        descricao: `Compras Mercado${lojaTag}${qtdTexto}`,
         valor: somaEstimada,
         date: getTodayISO(),
         user: getActiveAdultUser(),
-        categoryHint: 'Mercado',
-        statusDefault: 'paid'
+        categoryHint: selectedMercadoLojaFilter === 'Farmácia' ? 'Farmácia' : 'Mercado',
+        statusDefault: 'paid',
+        onSuccessCallback: (tx) => {
+          if (!Array.isArray(appState.mercadoHistorico)) appState.mercadoHistorico = [];
+          appState.mercadoHistorico.unshift({
+            id: Date.now(),
+            date: tx.date || getTodayISO(),
+            total: Number(tx.amount) || somaEstimada,
+            qtdItens: baseItens.length,
+            loja: selectedMercadoLojaFilter !== 'Todas' ? selectedMercadoLojaFilter : 'Supermercado',
+            itens: baseItens.map(i => ({
+              item: i.item,
+              qtd: Number(i.qtd) || 1,
+              unidade: i.unidade || 'un',
+              precoUnit: getMercadoItemUnitPrice(i),
+              total: getMercadoItemTotal(i),
+              categoria: i.categoria || inferMercadoCategoria(i.item)
+            }))
+          });
+          if (appState.mercadoHistorico.length > 50) {
+            appState.mercadoHistorico = appState.mercadoHistorico.slice(0, 50);
+          }
+
+          baseItens.forEach(i => {
+            upsertMercadoCatalogoItem(i.item, i.categoria || inferMercadoCategoria(i.item), i.unidade || 'un', getMercadoItemUnitPrice(i), false);
+          });
+
+          if (marcados.length > 0) {
+            const idsRemover = new Set(marcados.map(m => m.id));
+            setTimeout(() => {
+              openConfirmSheet(
+                'Compra Lançada no Finanças! 🎉',
+                `Deseja remover os ${marcados.length} ${marcados.length === 1 ? 'item marcado (✅)' : 'itens marcados (✅)'} da lista e manter apenas o que faltou comprar?`,
+                () => {
+                  appState.mercado = (appState.mercado || []).filter(m => !idsRemover.has(m.id));
+                  saveState(['mercado', 'mercadoHistorico', 'mercadoCatalogo']);
+                  showToast('Carrinho limpo! Itens pendentes mantidos.');
+                },
+                'Limpar Carrinho (✅)',
+                false
+              );
+            }, 220);
+          }
+          saveState(['mercadoHistorico', 'mercadoCatalogo']);
+        }
       });
     }
 
@@ -3617,49 +3738,404 @@
     // ============================================================================
     // 13. LISTA DE MERCADO & DESPESAS COMPARTILHADAS
     // ============================================================================
+    const MERCADO_SECOES = [
+      { nome: 'Hortifrúti', emoji: '🥬' },
+      { nome: 'Açougue & Frios', emoji: '🥩' },
+      { nome: 'Laticínios & Padaria', emoji: '🥛' },
+      { nome: 'Mercearia', emoji: '🥫' },
+      { nome: 'Bebidas', emoji: '🥤' },
+      { nome: 'Limpeza', emoji: '🧹' },
+      { nome: 'Higiene & Bebê', emoji: '🧴' },
+      { nome: 'Outros', emoji: '📦' }
+    ];
+
+    const MERCADO_UNIDADES = ['un', 'kg', 'g', 'L', 'ml', 'pct', 'cx', 'dz'];
+    const MERCADO_LOJAS_PADRAO = ['Supermercado', 'Açougue', 'Feira', 'Farmácia', 'Pet Shop'];
+    let selectedMercadoLojaFilter = 'Todas';
+
+    function getMercadoSecaoEmoji(secaoNome) {
+      const found = MERCADO_SECOES.find(s => s.nome === secaoNome);
+      return found ? found.emoji : '📦';
+    }
+
+    function inferMercadoCategoria(nomeItem) {
+      const t = String(nomeItem || '').toLowerCase();
+      if (!t) return 'Mercearia';
+      if (/(banana|maçã|maca|uva|laranja|limão|limao|mamão|mamao|melancia|abacaxi|morango|tomate|cebola|alho|batata|cenoura|alface|rúcula|rucula|verdura|legume|fruta|cheiro verde|coentro|abobrinha|brócolis|brocolis)/.test(t)) return 'Hortifrúti';
+      if (/(carne|frango|peixe|tilápia|tilapia|bife|alcatra|patinho|acém|acem|moída|moida|linguiça|linguica|bacon|presunto|mussarela|queijo|peito de peru|salsicha|hambúrguer|hamburguer)/.test(t)) return 'Açougue & Frios';
+      if (/(leite|iogurte|manteiga|margarina|requeijão|requeijao|creme de leite|leite condensado|pão|pao|bisnaguinha|bolo|torrada|ovo|ovos)/.test(t)) return 'Laticínios & Padaria';
+      if (/(água|agua|suco|refrigerante|coca|guaraná|guarana|cerveja|vinho|energético|energetico|chá|cha|café|cafe|achocolatado|toddy|nescau)/.test(t)) return 'Bebidas';
+      if (/(detergente|sabão|sabao|amaciante|água sanitária|agua sanitaria|desinfetante|esponja|papel toalha|saco de lixo|multiuso|veja|álcool|alcool|pano)/.test(t)) return 'Limpeza';
+      if (/(shampoo|condicionador|sabonete|pasta de dente|creme dental|escova|papel higiênico|papel higienico|desodorante|fralda|lenço|lenco|absorvente|algodão|algodao|protetor)/.test(t)) return 'Higiene & Bebê';
+      if (/(arroz|feijão|feijao|macarrão|macarrao|óleo|oleo|azeite|sal|açúcar|acucar|farinha|molho|extrato|milho|ervilha|atum|sardinha|bolacha|biscoito|cereal|aveia|tempero)/.test(t)) return 'Mercearia';
+      return 'Outros';
+    }
+
+    function getMercadoItemUnitPrice(item) {
+      if (!item) return 0;
+      if (typeof item.precoUnit === 'number' && !isNaN(item.precoUnit) && item.precoUnit > 0) {
+        return item.precoUnit;
+      }
+      const totalLegacy = parseCurrencyTextToNumber(item.valor);
+      const q = Number(item.qtd) || 1;
+      return totalLegacy > 0 ? (totalLegacy / q) : 0;
+    }
+
+    function getMercadoItemTotal(item) {
+      if (!item) return 0;
+      const q = Number(item.qtd) || 1;
+      const unit = getMercadoItemUnitPrice(item);
+      if (unit > 0) return q * unit;
+      return parseCurrencyTextToNumber(item.valor);
+    }
+
     function formatMercadoValorLabel(rawVal) {
       const num = parseCurrencyTextToNumber(rawVal);
       if (num > 0) return formatCurrencyBR(num);
       return '';
     }
 
+    function upsertMercadoCatalogoItem(nome, categoria, unidade, precoUnit, incrementCount = true) {
+      const cleanName = String(nome || '').trim();
+      if (!cleanName) return;
+      if (!Array.isArray(appState.mercadoCatalogo)) appState.mercadoCatalogo = [];
+      const idx = appState.mercadoCatalogo.findIndex(c => c.nome.toLowerCase() === cleanName.toLowerCase());
+      if (idx !== -1) {
+        const cur = appState.mercadoCatalogo[idx];
+        cur.nome = cleanName;
+        if (categoria) cur.categoria = categoria;
+        if (unidade) cur.unidade = unidade;
+        if (Number(precoUnit) > 0) cur.ultimoPreco = Number(precoUnit);
+        if (incrementCount) cur.vezes = (Number(cur.vezes) || 1) + 1;
+      } else {
+        appState.mercadoCatalogo.unshift({
+          nome: cleanName,
+          categoria: categoria || inferMercadoCategoria(cleanName),
+          unidade: unidade || 'un',
+          ultimoPreco: Number(precoUnit) > 0 ? Number(precoUnit) : 0,
+          vezes: 1
+        });
+      }
+      appState.mercadoCatalogo.sort((a, b) => (b.vezes || 1) - (a.vezes || 1));
+      if (appState.mercadoCatalogo.length > 100) {
+        appState.mercadoCatalogo = appState.mercadoCatalogo.slice(0, 100);
+      }
+    }
+
+    function updateMercadoModalPreview() {
+      const qtdEl = document.getElementById('inp-merc-qtd');
+      const unitEl = document.getElementById('inp-merc-preco-unit');
+      const prevEl = document.getElementById('merc-total-preview');
+      if (!qtdEl || !unitEl || !prevEl) return;
+      const q = parseFloat(String(qtdEl.value || '1').replace(',', '.')) || 1;
+      const u = parseCurrencyTextToNumber(unitEl.value);
+      const tot = q * u;
+      prevEl.textContent = tot > 0 ? formatCurrencyBR(tot) : 'R$ 0,00 (opcional)';
+    }
+
+    function onMercadoItemInput(val) {
+      const catEl = document.getElementById('inp-merc-cat');
+      const unitEl = document.getElementById('inp-merc-unidade');
+      const precoEl = document.getElementById('inp-merc-preco-unit');
+      const catalog = appState.mercadoCatalogo || [];
+      const match = catalog.find(c => c.nome.toLowerCase() === String(val || '').trim().toLowerCase());
+      if (match) {
+        if (catEl && match.categoria) catEl.value = match.categoria;
+        if (unitEl && match.unidade) unitEl.value = match.unidade;
+        if (precoEl && !precoEl.value && Number(match.ultimoPreco) > 0) {
+          precoEl.value = Number(match.ultimoPreco).toFixed(2).replace('.', ',');
+          updateMercadoModalPreview();
+        }
+      } else if (catEl && !catEl.dataset.manual) {
+        catEl.value = inferMercadoCategoria(val);
+      }
+    }
+
     function openModalMercado(editId = null) {
       const item = editId ? appState.mercado.find(m => m.id === editId) : null;
-      const numericInitial = item ? parseCurrencyTextToNumber(item.valor) : 0;
-      const initialFieldVal = numericInitial > 0 ? numericInitial.toFixed(2).replace('.', ',') : '';
-      openSheet(item ? 'Editar Item da Lista ✏️' : 'Novo Item da Lista', `
-        <label>Item</label>
-        <input type="text" id="inp-merc-item" value="${escapeHTML(item ? item.item : '')}" placeholder="Ex: Café, Arroz, Papel toalha..." />
-        <label>Valor (opcional · vazio = R$ 0,00)</label>
+      const qtdInitial = item ? (Number(item.qtd) || 1) : 1;
+      const unidadeInitial = item ? (item.unidade || 'un') : 'un';
+      const unitPriceInitial = item ? getMercadoItemUnitPrice(item) : 0;
+      const initialFieldVal = unitPriceInitial > 0 ? unitPriceInitial.toFixed(2).replace('.', ',') : '';
+      const catInitial = item ? (item.categoria || inferMercadoCategoria(item.item)) : 'Mercearia';
+      const lojaInitial = item ? (item.loja || (selectedMercadoLojaFilter !== 'Todas' ? selectedMercadoLojaFilter : 'Supermercado')) : (selectedMercadoLojaFilter !== 'Todas' ? selectedMercadoLojaFilter : 'Supermercado');
+      const catalog = appState.mercadoCatalogo || [];
+
+      openSheet(item ? 'Editar Item da Lista ✏️' : 'Novo Item da Lista 🛒', `
+        <label>Produto / Item</label>
+        <input type="text" id="inp-merc-item" list="mercado-catalogo-datalist" value="${escapeHTML(item ? item.item : '')}" placeholder="Ex: Café, Arroz, Banana, Detergente..." oninput="onMercadoItemInput(this.value)" />
+        <datalist id="mercado-catalogo-datalist">
+          ${catalog.map(c => `<option value="${escapeHTML(c.nome)}"></option>`).join('')}
+        </datalist>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          <div>
+            <label>Quantidade</label>
+            <input type="number" step="0.1" min="0.1" inputmode="decimal" id="inp-merc-qtd" value="${qtdInitial}" oninput="updateMercadoModalPreview()" />
+          </div>
+          <div>
+            <label>Unidade</label>
+            <select id="inp-merc-unidade">
+              ${MERCADO_UNIDADES.map(u => `<option value="${u}" ${u === unidadeInitial ? 'selected' : ''}>${u}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <label>Preço Unitário (opcional · vazio = R$ 0,00)</label>
         <div class="currency-input-wrap">
           <span class="currency-prefix">R$</span>
-          <input type="text" inputmode="decimal" id="inp-merc-valor" value="${escapeHTML(initialFieldVal)}" placeholder="0,00" />
+          <input type="text" inputmode="decimal" id="inp-merc-preco-unit" value="${escapeHTML(initialFieldVal)}" placeholder="0,00" oninput="updateMercadoModalPreview()" />
         </div>
+
+        <div class="mercado-calc-preview">
+          <span>Total estimado do item:</span>
+          <span id="merc-total-preview">${qtdInitial * unitPriceInitial > 0 ? formatCurrencyBR(qtdInitial * unitPriceInitial) : 'R$ 0,00 (opcional)'}</span>
+        </div>
+
+        <label>Seção / Corredor do Mercado</label>
+        <select id="inp-merc-cat" onchange="this.dataset.manual='1'">
+          ${MERCADO_SECOES.map(s => `<option value="${escapeHTML(s.nome)}" ${s.nome === catInitial ? 'selected' : ''}>${s.emoji} ${escapeHTML(s.nome)}</option>`).join('')}
+        </select>
+
+        <label>Estabelecimento / Lista</label>
+        <div class="chip-group">
+          ${MERCADO_LOJAS_PADRAO.map(lj => `
+            <button type="button" class="chip-opt ${lojaInitial === lj ? 'selected' : ''}" data-val="${escapeHTML(lj)}" onclick="selectChip(this, 'inp-merc-loja')">${escapeHTML(lj)}</button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="inp-merc-loja" value="${escapeHTML(lojaInitial)}" />
       `, () => {
         const nome = document.getElementById('inp-merc-item').value.trim();
-        const rawValor = document.getElementById('inp-merc-valor').value.trim();
-        const numValor = parseCurrencyTextToNumber(rawValor);
-        const valorFormatado = numValor > 0 ? formatCurrencyBR(numValor) : '';
+        const qtd = parseFloat(String(document.getElementById('inp-merc-qtd').value || '1').replace(',', '.')) || 1;
+        const unidade = document.getElementById('inp-merc-unidade').value || 'un';
+        const precoUnit = parseCurrencyTextToNumber(document.getElementById('inp-merc-preco-unit').value);
+        const totalItem = precoUnit > 0 ? (qtd * precoUnit) : 0;
+        const valorFormatado = totalItem > 0 ? formatCurrencyBR(totalItem) : '';
+        const categoria = document.getElementById('inp-merc-cat').value || inferMercadoCategoria(nome);
+        const loja = document.getElementById('inp-merc-loja').value || 'Supermercado';
+
         if (!nome) { showSheetError('Digite o nome do item.'); return false; }
+
         if (item) {
           item.item = nome;
+          item.qtd = qtd;
+          item.unidade = unidade;
+          item.precoUnit = precoUnit;
           item.valor = valorFormatado;
+          item.categoria = categoria;
+          item.loja = loja;
         } else {
-          appState.mercado.push({ id: Date.now(), item: nome, valor: valorFormatado, done: false });
+          appState.mercado.push({
+            id: Date.now(),
+            item: nome,
+            qtd,
+            unidade,
+            precoUnit,
+            valor: valorFormatado,
+            categoria,
+            loja,
+            done: false
+          });
         }
-        saveState(['mercado']);
+        upsertMercadoCatalogoItem(nome, categoria, unidade, precoUnit, !item);
+        saveState(['mercado', 'mercadoCatalogo']);
         showToast(item ? 'Item atualizado!' : 'Item adicionado à lista!');
+      });
+    }
+
+    function openQuickPriceMercado(id, ev) {
+      if (ev) ev.stopPropagation();
+      const item = (appState.mercado || []).find(m => m.id === id);
+      if (!item) return;
+      const qtdInitial = Number(item.qtd) || 1;
+      const unitInitial = getMercadoItemUnitPrice(item);
+      const initialFieldVal = unitInitial > 0 ? unitInitial.toFixed(2).replace('.', ',') : '';
+
+      openSheet(`💲 Preço no Carrinho · ${item.item}`, `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          <div>
+            <label>Quantidade (${escapeHTML(item.unidade || 'un')})</label>
+            <input type="number" step="0.1" min="0.1" inputmode="decimal" id="inp-merc-qtd" value="${qtdInitial}" oninput="updateMercadoModalPreview()" />
+          </div>
+          <div>
+            <label>Preço Unitário (R$)</label>
+            <div class="currency-input-wrap">
+              <span class="currency-prefix">R$</span>
+              <input type="text" inputmode="decimal" id="inp-merc-preco-unit" value="${escapeHTML(initialFieldVal)}" placeholder="0,00" oninput="updateMercadoModalPreview()" />
+            </div>
+          </div>
+        </div>
+        <div class="mercado-calc-preview">
+          <span>Subtotal deste item:</span>
+          <span id="merc-total-preview">${qtdInitial * unitInitial > 0 ? formatCurrencyBR(qtdInitial * unitInitial) : 'R$ 0,00'}</span>
+        </div>
+      `, () => {
+        const qtd = parseFloat(String(document.getElementById('inp-merc-qtd').value || '1').replace(',', '.')) || 1;
+        const precoUnit = parseCurrencyTextToNumber(document.getElementById('inp-merc-preco-unit').value);
+        const totalItem = precoUnit > 0 ? (qtd * precoUnit) : 0;
+        item.qtd = qtd;
+        item.precoUnit = precoUnit;
+        item.valor = totalItem > 0 ? formatCurrencyBR(totalItem) : '';
+        item.done = true;
+        upsertMercadoCatalogoItem(item.item, item.categoria || inferMercadoCategoria(item.item), item.unidade || 'un', precoUnit, false);
+        saveState(['mercado', 'mercadoCatalogo']);
+        showToast('Preço atualizado e marcado no carrinho!');
       });
     }
 
     function toggleMercado(id) {
       const item = appState.mercado.find(m => m.id === id);
-      if (item) { item.done = !item.done; saveState(['mercado']); }
+      if (item) {
+        item.done = !item.done;
+        saveState(['mercado']);
+      }
     }
 
     function deleteMercado(id) {
       appState.mercado = appState.mercado.filter(m => m.id !== id);
       saveState(['mercado']);
+    }
+
+    function setMercadoLojaFilter(loja) {
+      selectedMercadoLojaFilter = loja;
+      renderMercado();
+    }
+
+    function toggleFrequentItemToMercado(nome) {
+      const catalog = appState.mercadoCatalogo || [];
+      const catItem = catalog.find(c => c.nome.toLowerCase() === String(nome).toLowerCase());
+      if (!catItem) return;
+      const existingIdx = (appState.mercado || []).findIndex(m => m.item.toLowerCase() === catItem.nome.toLowerCase());
+      if (existingIdx !== -1) {
+        appState.mercado.splice(existingIdx, 1);
+        showToast(`"${catItem.nome}" removido da lista.`);
+      } else {
+        const unit = Number(catItem.ultimoPreco) || 0;
+        appState.mercado.push({
+          id: Date.now() + Math.floor(Math.random() * 100),
+          item: catItem.nome,
+          qtd: 1,
+          unidade: catItem.unidade || 'un',
+          precoUnit: unit,
+          valor: unit > 0 ? formatCurrencyBR(unit) : '',
+          categoria: catItem.categoria || inferMercadoCategoria(catItem.nome),
+          loja: selectedMercadoLojaFilter !== 'Todas' ? selectedMercadoLojaFilter : 'Supermercado',
+          done: false
+        });
+        catItem.vezes = (Number(catItem.vezes) || 1) + 1;
+        showToast(`"${catItem.nome}" adicionado!`);
+      }
+      saveState(['mercado', 'mercadoCatalogo']);
+      renderFrequentesModalList();
+    }
+
+    function removeFrequentCatalogItem(nome) {
+      appState.mercadoCatalogo = (appState.mercadoCatalogo || []).filter(c => c.nome.toLowerCase() !== String(nome).toLowerCase());
+      saveState(['mercadoCatalogo']);
+      renderFrequentesModalList();
+    }
+
+    function renderFrequentesModalList() {
+      const container = document.getElementById('freq-catalog-list');
+      if (!container) return;
+      const catalog = appState.mercadoCatalogo || [];
+      const activeNames = new Set((appState.mercado || []).map(m => m.item.toLowerCase()));
+      if (!catalog.length) {
+        container.innerHTML = '<p class="hint">Nenhum item frequente salvo ainda. Conforme você adiciona itens na lista, eles aparecem aqui automaticamente.</p>';
+        return;
+      }
+      container.innerHTML = catalog.map(c => {
+        const inList = activeNames.has(c.nome.toLowerCase());
+        const emoji = getMercadoSecaoEmoji(c.categoria);
+        const priceInfo = Number(c.ultimoPreco) > 0 ? ` · Último: ${formatCurrencyBR(c.ultimoPreco)}/${c.unidade || 'un'}` : '';
+        return `
+          <div class="freq-item-row ${inList ? 'in-list' : ''}">
+            <div style="flex:1; cursor:pointer;" onclick="toggleFrequentItemToMercado('${escapeJSArg(c.nome)}')">
+              <strong style="font-size:13px;">${inList ? '✅' : '➕'} ${escapeHTML(c.nome)}</strong>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${emoji} ${escapeHTML(c.categoria || 'Mercearia')}${escapeHTML(priceInfo)}</div>
+            </div>
+            <span class="act-icon" title="Remover dos frequentes" onclick="removeFrequentCatalogItem('${escapeJSArg(c.nome)}')">🗑️</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openModalMercadoFrequentes() {
+      openSheet('⚡ Itens Frequentes (1 Toque)', `
+        <p class="hint" style="margin-bottom:10px;">Toque nos itens abaixo para incluir ou remover rapidamente da sua lista de compras:</p>
+        <div id="freq-catalog-list" style="max-height:52vh; overflow-y:auto;"></div>
+      `, null, 'Concluir');
+      renderFrequentesModalList();
+    }
+
+    function openModalMercadoHistorico() {
+      const hist = appState.mercadoHistorico || [];
+      const body = hist.length
+        ? hist.map(h => `
+            <div class="freq-item-row" style="flex-direction:column; align-items:stretch;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>🛒 ${escapeHTML(h.loja || 'Supermercado')} · ${formatShortBR(h.date)}</strong>
+                <strong style="color:var(--primary-dark);">${formatCurrencyBR(h.total)}</strong>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+                ${h.qtdItens} ${h.qtdItens === 1 ? 'item' : 'itens'}: ${(h.itens || []).slice(0, 6).map(i => escapeHTML(i.item)).join(', ')}${(h.itens || []).length > 6 ? '...' : ''}
+              </div>
+            </div>
+          `).join('')
+        : '<p class="hint">Nenhuma compra fechada registrada ainda. Ao usar "💸 Fechar", o resumo da compra fica salvo aqui.</p>';
+
+      openSheet('📜 Histórico de Compras', `<div style="max-height:55vh; overflow-y:auto;">${body}</div>`, null, 'Fechar');
+    }
+
+    function copyMercadoWhatsApp() {
+      const lista = appState.mercado || [];
+      const filtrada = selectedMercadoLojaFilter === 'Todas'
+        ? lista
+        : lista.filter(i => (i.loja || 'Supermercado') === selectedMercadoLojaFilter);
+      const pendentes = filtrada.filter(i => !i.done);
+      const base = pendentes.length > 0 ? pendentes : filtrada;
+
+      if (!base.length) {
+        showToast('A lista está vazia para copiar.', true);
+        return;
+      }
+
+      const tituloLoja = selectedMercadoLojaFilter !== 'Todas' ? ` (${selectedMercadoLojaFilter})` : '';
+      const lines = [`🛒 *Lista de Compras · Família Alves${tituloLoja}*`, ''];
+
+      let totalEst = 0;
+      MERCADO_SECOES.forEach(sec => {
+        const itensSec = base.filter(i => (i.categoria || inferMercadoCategoria(i.item)) === sec.nome);
+        if (itensSec.length > 0) {
+          lines.push(`${sec.emoji} *${sec.nome}*`);
+          itensSec.forEach(i => {
+            const q = Number(i.qtd) || 1;
+            const un = i.unidade || 'un';
+            const tot = getMercadoItemTotal(i);
+            totalEst += tot;
+            const qtdStr = (q !== 1 || un !== 'un') ? `${q} ${un} · ` : '';
+            const valStr = tot > 0 ? ` (${formatCurrencyBR(tot)})` : '';
+            lines.push(`• ${qtdStr}${i.item}${valStr}`);
+          });
+          lines.push('');
+        }
+      });
+
+      if (totalEst > 0) {
+        lines.push(`💰 *Total estimado:* ${formatCurrencyBR(totalEst)}`);
+      }
+
+      const finalTxt = lines.join('
+').trim();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(finalTxt).then(() => {
+          showToast('Lista copiada para o WhatsApp! 📋');
+        }).catch(() => {
+          openSheet('📋 Copiar Lista', `<textarea rows="10" style="width:100%; font-size:13px;">${escapeHTML(finalTxt)}</textarea>`, null, 'Fechar');
+        });
+      } else {
+        openSheet('📋 Copiar Lista', `<textarea rows="10" style="width:100%; font-size:13px;">${escapeHTML(finalTxt)}</textarea>`, null, 'Fechar');
+      }
     }
 
     function openModalDespesa(editId = null) {
@@ -4652,44 +5128,113 @@
     function renderMercado() {
       const lista = appState.mercado || [];
       const sumEl = document.getElementById('mercado-summary');
+      const toolbarEl = document.getElementById('mercado-toolbar');
+      const listEl = document.getElementById('mercado-list');
+
+      // Coleta lojas presentes para exibir filtro discreto quando houver mais de 1 loja
+      const lojasSet = new Set(['Todas']);
+      lista.forEach(m => { if (m.loja) lojasSet.add(m.loja); });
+      if (selectedMercadoLojaFilter !== 'Todas' && !lojasSet.has(selectedMercadoLojaFilter)) {
+        selectedMercadoLojaFilter = 'Todas';
+      }
+
+      if (toolbarEl) {
+        const histCount = (appState.mercadoHistorico || []).length;
+        const showLojaChips = lojasSet.size > 2;
+        if (showLojaChips || histCount > 0) {
+          toolbarEl.innerHTML = `
+            <div class="mercado-toolbar">
+              ${showLojaChips ? Array.from(lojasSet).map(lj => `
+                <button type="button" class="mercado-loja-pill ${selectedMercadoLojaFilter === lj ? 'active' : ''}" onclick="setMercadoLojaFilter('${escapeJSArg(lj)}')">${escapeHTML(lj)}</button>
+              `).join('') : ''}
+              ${histCount > 0 ? `<button type="button" class="mercado-loja-pill" style="margin-left:auto;" onclick="openModalMercadoHistorico()">📜 Histórico (${histCount})</button>` : ''}
+            </div>
+          `;
+        } else {
+          toolbarEl.innerHTML = '';
+        }
+      }
+
+      const filtrada = selectedMercadoLojaFilter === 'Todas'
+        ? lista
+        : lista.filter(m => (m.loja || 'Supermercado') === selectedMercadoLojaFilter);
 
       let subtotalMarcados = 0;
+      let totalGeral = 0;
       let qtdMarcados = 0;
-      lista.forEach(m => {
+      filtrada.forEach(m => {
+        const itemTot = getMercadoItemTotal(m);
+        totalGeral += itemTot;
         if (m.done) {
           qtdMarcados++;
-          subtotalMarcados += parseCurrencyTextToNumber(m.valor);
+          subtotalMarcados += itemTot;
         }
       });
 
       if (sumEl) {
-        sumEl.innerHTML = lista.length
+        sumEl.innerHTML = filtrada.length
           ? `
             <div class="mercado-summary-bar">
-              <span>🛒 Subtotal (${qtdMarcados} de ${lista.length} ${qtdMarcados === 1 ? 'marcado' : 'marcados'})</span>
+              <div>
+                <span>🛒 Carrinho (${qtdMarcados}/${filtrada.length})</span>
+                ${totalGeral > subtotalMarcados ? `<div style="font-size:11px; color:var(--text-muted); font-weight:700;">Total previsto da lista: ${formatCurrencyBR(totalGeral)}</div>` : ''}
+              </div>
               <strong>${formatCurrencyBR(subtotalMarcados)}</strong>
             </div>
           `
           : '';
       }
 
-      document.getElementById('mercado-list').innerHTML = lista.length
-        ? lista.map(m => {
-            const valorExibicao = formatMercadoValorLabel(m.valor);
-            return `
-              <div class="check-item ${m.done ? 'done' : ''}">
-                <span onclick="toggleMercado(${m.id})" style="flex:1;">
-                  <span class="item-text-main">${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}</span>
-                  ${valorExibicao ? `<span class="valor-pill">${escapeHTML(valorExibicao)}</span>` : ''}
-                </span>
-                <span class="item-actions-inline">
-                  <span class="act-icon" title="Editar" onclick="openModalMercado(${m.id})">✏️</span>
-                  <span class="act-icon" title="Excluir" onclick="deleteMercado(${m.id})">🗑️</span>
-                </span>
-              </div>
-            `;
-          }).join('')
-        : '<p class="hint" style="margin:0;">Lista vazia.</p>';
+      if (!filtrada.length) {
+        listEl.innerHTML = '<p class="hint" style="margin:0;">Lista vazia. Toque em <strong>+ Item</strong> ou <strong>⚡ Frequentes</strong> para montar suas compras.</p>';
+        return;
+      }
+
+      // Agrupa por seção / corredor do mercado
+      const groupedHTML = [];
+      MERCADO_SECOES.forEach(sec => {
+        const itensSec = filtrada.filter(m => (m.categoria || inferMercadoCategoria(m.item)) === sec.nome);
+        if (!itensSec.length) return;
+        // Pendentes primeiro, marcados no carrinho depois
+        itensSec.sort((a, b) => (a.done === b.done ? 0 : (a.done ? 1 : -1)));
+        const secTotal = itensSec.reduce((acc, it) => acc + getMercadoItemTotal(it), 0);
+
+        groupedHTML.push(`
+          <div class="mercado-aisle-group">
+            <div class="mercado-aisle-header">
+              <span>${sec.emoji} ${escapeHTML(sec.nome)} (${itensSec.length})</span>
+              <span>${secTotal > 0 ? formatCurrencyBR(secTotal) : ''}</span>
+            </div>
+            ${itensSec.map(m => {
+              const q = Number(m.qtd) || 1;
+              const un = m.unidade || 'un';
+              const tot = getMercadoItemTotal(m);
+              const unit = getMercadoItemUnitPrice(m);
+              const qtdLabel = (q !== 1 || un !== 'un') ? `<span class="mercado-qty-badge">${q} ${escapeHTML(un)}</span>` : '';
+              const unitDetail = (q !== 1 && unit > 0) ? ` <small style="opacity:0.75;">(${formatCurrencyBR(unit)}/${escapeHTML(un)})</small>` : '';
+              const lojaBadge = (selectedMercadoLojaFilter === 'Todas' && m.loja && m.loja !== 'Supermercado')
+                ? `<span class="mercado-loja-tag">${escapeHTML(m.loja)}</span>` : '';
+
+              return `
+                <div class="check-item ${m.done ? 'done' : ''}">
+                  <span onclick="toggleMercado(${m.id})" style="flex:1;">
+                    <span class="item-text-main">${m.done ? '✅' : '⬜'} ${qtdLabel}${escapeHTML(m.item)}${lojaBadge}</span>
+                    ${tot > 0
+                      ? `<span class="valor-pill" title="Toque para ajustar preço/qtd" onclick="openQuickPriceMercado(${m.id}, event)">${formatCurrencyBR(tot)}${unitDetail}</span>`
+                      : `<span class="valor-pill add-price" title="Informar preço no carrinho" onclick="openQuickPriceMercado(${m.id}, event)">+ R$</span>`}
+                  </span>
+                  <span class="item-actions-inline">
+                    <span class="act-icon" title="Editar" onclick="openModalMercado(${m.id})">✏️</span>
+                    <span class="act-icon" title="Excluir" onclick="deleteMercado(${m.id})">🗑️</span>
+                  </span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `);
+      });
+
+      listEl.innerHTML = groupedHTML.join('');
     }
 
     function renderDespesas() {
