@@ -325,6 +325,27 @@
     .act-icon:hover { background: var(--bg-adult); opacity: 1; }
 
     /* CHECKLISTS & LOGÍSTICA */
+    .mercado-summary-bar {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: var(--primary-soft); border: 1px solid var(--primary-border);
+      border-radius: 14px; padding: 9px 12px; margin-bottom: 10px; font-size: 13px;
+    }
+    .mercado-summary-bar span { color: var(--primary-dark); font-weight: 700; }
+    .mercado-summary-bar strong { color: var(--primary-dark); font-weight: 800; font-size: 14px; }
+    .currency-input-wrap {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: 14px;
+      background: var(--card-bg); overflow: hidden;
+    }
+    .currency-input-wrap:focus-within { border-color: var(--primary); }
+    .currency-prefix {
+      padding: 12px 10px 12px 14px; font-weight: 800; font-size: 15px;
+      color: var(--text-muted); user-select: none;
+    }
+    .currency-input-wrap input {
+      border: none !important; border-radius: 0 !important; padding-left: 2px !important;
+      background: transparent !important; flex: 1;
+    }
     .check-item {
       display: flex; align-items: center; justify-content: space-between; padding: 9px 0;
       border-bottom: 1px solid var(--border-subtle); font-size: 14px; cursor: pointer; gap: 8px;
@@ -995,6 +1016,7 @@
               <button type="button" class="btn-mini" onclick="openModalMercado()">+ Item</button>
             </div>
           </div>
+          <div id="mercado-summary"></div>
           <div id="mercado-list" class="check-list"></div>
         </div>
 
@@ -3595,22 +3617,35 @@
     // ============================================================================
     // 13. LISTA DE MERCADO & DESPESAS COMPARTILHADAS
     // ============================================================================
+    function formatMercadoValorLabel(rawVal) {
+      const num = parseCurrencyTextToNumber(rawVal);
+      if (num > 0) return formatCurrencyBR(num);
+      return '';
+    }
+
     function openModalMercado(editId = null) {
       const item = editId ? appState.mercado.find(m => m.id === editId) : null;
+      const numericInitial = item ? parseCurrencyTextToNumber(item.valor) : 0;
+      const initialFieldVal = numericInitial > 0 ? numericInitial.toFixed(2).replace('.', ',') : '';
       openSheet(item ? 'Editar Item da Lista ✏️' : 'Novo Item da Lista', `
         <label>Item</label>
         <input type="text" id="inp-merc-item" value="${escapeHTML(item ? item.item : '')}" placeholder="Ex: Café, Arroz, Papel toalha..." />
-        <label>Valor Estimado (opcional)</label>
-        <input type="text" id="inp-merc-valor" value="${escapeHTML(item ? (item.valor || '') : '')}" placeholder="Ex: R$ 18,90" />
+        <label>Valor (opcional · vazio = R$ 0,00)</label>
+        <div class="currency-input-wrap">
+          <span class="currency-prefix">R$</span>
+          <input type="text" inputmode="decimal" id="inp-merc-valor" value="${escapeHTML(initialFieldVal)}" placeholder="0,00" />
+        </div>
       `, () => {
         const nome = document.getElementById('inp-merc-item').value.trim();
-        const valor = document.getElementById('inp-merc-valor').value.trim();
+        const rawValor = document.getElementById('inp-merc-valor').value.trim();
+        const numValor = parseCurrencyTextToNumber(rawValor);
+        const valorFormatado = numValor > 0 ? formatCurrencyBR(numValor) : '';
         if (!nome) { showSheetError('Digite o nome do item.'); return false; }
         if (item) {
           item.item = nome;
-          item.valor = valor;
+          item.valor = valorFormatado;
         } else {
-          appState.mercado.push({ id: Date.now(), item: nome, valor, done: false });
+          appState.mercado.push({ id: Date.now(), item: nome, valor: valorFormatado, done: false });
         }
         saveState(['mercado']);
         showToast(item ? 'Item atualizado!' : 'Item adicionado à lista!');
@@ -4615,19 +4650,45 @@
     }
 
     function renderMercado() {
-      document.getElementById('mercado-list').innerHTML = appState.mercado.length
-        ? appState.mercado.map(m => `
-            <div class="check-item ${m.done ? 'done' : ''}">
-              <span onclick="toggleMercado(${m.id})" style="flex:1;">
-                <span class="item-text-main">${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}</span>
-                ${m.valor ? `<span class="valor-pill">${escapeHTML(m.valor)}</span>` : ''}
-              </span>
-              <span class="item-actions-inline">
-                <span class="act-icon" title="Editar" onclick="openModalMercado(${m.id})">✏️</span>
-                <span class="act-icon" title="Excluir" onclick="deleteMercado(${m.id})">🗑️</span>
-              </span>
+      const lista = appState.mercado || [];
+      const sumEl = document.getElementById('mercado-summary');
+
+      let subtotalMarcados = 0;
+      let qtdMarcados = 0;
+      lista.forEach(m => {
+        if (m.done) {
+          qtdMarcados++;
+          subtotalMarcados += parseCurrencyTextToNumber(m.valor);
+        }
+      });
+
+      if (sumEl) {
+        sumEl.innerHTML = lista.length
+          ? `
+            <div class="mercado-summary-bar">
+              <span>🛒 Subtotal (${qtdMarcados} de ${lista.length} ${qtdMarcados === 1 ? 'marcado' : 'marcados'})</span>
+              <strong>${formatCurrencyBR(subtotalMarcados)}</strong>
             </div>
-          `).join('')
+          `
+          : '';
+      }
+
+      document.getElementById('mercado-list').innerHTML = lista.length
+        ? lista.map(m => {
+            const valorExibicao = formatMercadoValorLabel(m.valor);
+            return `
+              <div class="check-item ${m.done ? 'done' : ''}">
+                <span onclick="toggleMercado(${m.id})" style="flex:1;">
+                  <span class="item-text-main">${m.done ? '✅' : '⬜'} ${escapeHTML(m.item)}</span>
+                  ${valorExibicao ? `<span class="valor-pill">${escapeHTML(valorExibicao)}</span>` : ''}
+                </span>
+                <span class="item-actions-inline">
+                  <span class="act-icon" title="Editar" onclick="openModalMercado(${m.id})">✏️</span>
+                  <span class="act-icon" title="Excluir" onclick="deleteMercado(${m.id})">🗑️</span>
+                </span>
+              </div>
+            `;
+          }).join('')
         : '<p class="hint" style="margin:0;">Lista vazia.</p>';
     }
 
