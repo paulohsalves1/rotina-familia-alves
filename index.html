@@ -4125,8 +4125,7 @@
         lines.push(`💰 *Total estimado:* ${formatCurrencyBR(totalEst)}`);
       }
 
-      const finalTxt = lines.join('
-').trim();
+      const finalTxt = lines.join('\n').trim();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(finalTxt).then(() => {
           showToast('Lista copiada para o WhatsApp! 📋');
